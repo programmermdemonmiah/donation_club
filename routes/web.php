@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Auth;
+use App\Http\Controllers\KycController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\User;
 use Illuminate\Support\Facades\Route;
 
@@ -100,6 +102,16 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::put('/profile', [Auth\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/password', [Auth\ProfileController::class, 'updatePassword'])->name('password.change');
 
+    // KYC Verification
+    Route::get('/kyc', [KycController::class, 'index'])->name('kyc.index');
+    Route::post('/kyc', [KycController::class, 'store'])->middleware('throttle:6,1')->name('kyc.store');
+
+    // Two-Factor Authentication
+    Route::get('/security/2fa', [TwoFactorController::class, 'index'])->name('security.2fa.index');
+    Route::get('/security/2fa/setup', [TwoFactorController::class, 'setup'])->name('security.2fa.setup');
+    Route::post('/security/2fa/enable', [TwoFactorController::class, 'enable'])->name('security.2fa.enable');
+    Route::post('/security/2fa/disable', [TwoFactorController::class, 'disable'])->name('security.2fa.disable');
+
     // Notifications
     Route::get('/notifications', [User\NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{id}/read', [User\NotificationController::class, 'markRead'])->name('notifications.read');
@@ -158,6 +170,13 @@ Route::prefix('admin')
         Route::post('/withdrawals/{withdrawal}/complete', [Admin\WithdrawalController::class, 'complete'])->name('withdrawals.complete');
         Route::post('/withdrawals/{withdrawal}/reject', [Admin\WithdrawalController::class, 'reject'])->name('withdrawals.reject');
         Route::post('/withdrawals/{withdrawal}/fail', [Admin\WithdrawalController::class, 'fail'])->name('withdrawals.fail');
+
+        // KYC Review
+        Route::get('/kyc', [Admin\KycController::class, 'index'])->name('kyc.index');
+        Route::get('/kyc/{kycDocument}', [Admin\KycController::class, 'show'])->name('kyc.show');
+        Route::post('/kyc/{kycDocument}/approve', [Admin\KycController::class, 'approve'])->name('kyc.approve');
+        Route::post('/kyc/{kycDocument}/reject', [Admin\KycController::class, 'reject'])->name('kyc.reject');
+        Route::get('/kyc/{kycDocument}/download', [Admin\KycController::class, 'download'])->name('kyc.download');
 
         Route::get('/settings', [Admin\SettingsController::class, 'edit'])->name('settings.edit');
         Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');

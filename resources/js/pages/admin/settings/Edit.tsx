@@ -17,6 +17,11 @@ interface CommissionRule {
 }
 
 interface Settings {
+    company_name: string;
+    company_registration: string;
+    company_address: string;
+    company_phone: string;
+    company_email: string;
     deposit_min_amount: string;
     deposit_max_amount: string;
     deposit_required_sequence_gap: number;
@@ -34,6 +39,7 @@ interface Settings {
     withdrawal_min_amount: string;
     withdrawal_max_amount: string;
     withdrawal_fee_percent: string;
+    chat_widget_code: string;
 }
 
 export default function AdminSettings() {
@@ -49,11 +55,11 @@ export default function AdminSettings() {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
         fd.append('_method', 'PUT');
-        rules.forEach((rule) => {
-            fd.append('commission_rules[][id]', String(rule.id));
-            fd.append('commission_rules[][percentage]', rule.percentage);
-            fd.append('commission_rules[][enabled]', rule.enabled ? '1' : '0');
-            fd.append('commission_rules[][trigger_event]', rule.trigger_event);
+        rules.forEach((rule, index) => {
+            fd.append(`commission_rules[${index}][id]`, String(rule.id));
+            fd.append(`commission_rules[${index}][percentage]`, rule.percentage);
+            fd.append(`commission_rules[${index}][enabled]`, rule.enabled ? '1' : '0');
+            fd.append(`commission_rules[${index}][trigger_event]`, rule.trigger_event);
         });
         router.post(route('admin.settings.update'), fd, { preserveScroll: true });
     };
@@ -67,6 +73,17 @@ export default function AdminSettings() {
             </p>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
+                <Card>
+                    <CardHeader title="Company Branding" subtitle="This information is displayed on About, Contact, Terms pages and footer" />
+                    <CardBody className="grid gap-4 sm:grid-cols-2">
+                        <Input label="Company Name" name="company_name" defaultValue={s.company_name} required />
+                        <Input label="Registration Number" name="company_registration" defaultValue={s.company_registration} />
+                        <Input label="Address" name="company_address" defaultValue={s.company_address} className="sm:col-span-2" />
+                        <Input label="Phone" name="company_phone" defaultValue={s.company_phone} />
+                        <Input label="Support Email" name="company_email" type="email" defaultValue={s.company_email} />
+                    </CardBody>
+                </Card>
+
                 <Card>
                     <CardHeader title="Deposit rules" subtitle="Per-deposit limits and sequence-based eligibility" />
                     <CardBody className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -177,6 +194,13 @@ export default function AdminSettings() {
                             <Input label="Maximum withdrawal ($)" name="withdrawal_max_amount" type="number" step="0.01" min="0.01" defaultValue={s.withdrawal_max_amount} required />
                             <Input label="Fee (%)" name="withdrawal_fee_percent" type="number" step="0.01" min="0" max="50" defaultValue={s.withdrawal_fee_percent} required />
                         </div>
+                    </CardBody>
+                </Card>
+
+                <Card>
+                    <CardHeader title="Live Chat Widget" subtitle="Paste your live chat embed code (e.g. Tawk.to, Crisp). Leave empty to disable." />
+                    <CardBody>
+                        <Textarea label="Chat Widget Code (HTML/JS)" name="chat_widget_code" rows={4} defaultValue={s.chat_widget_code} />
                     </CardBody>
                 </Card>
 

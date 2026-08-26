@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\UserRankStatus;
 use App\Enums\UserStatus;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +14,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = [
@@ -23,11 +25,15 @@ class User extends Authenticatable
         'referred_by',
         'is_admin',
         'status',
+        'kyc_status',
+        'google2fa_secret',
+        'google2fa_enabled',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'google2fa_secret',
     ];
 
     protected function casts(): array
@@ -99,13 +105,23 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Rank::class, 'user_ranks')
             ->withPivot(['status', 'achieved_at', 'metrics_snapshot'])
-            ->wherePivot('status', \App\Enums\UserRankStatus::Active->value)
+            ->wherePivot('status', UserRankStatus::Active->value)
             ->withTimestamps();
     }
 
     public function rankHistories(): HasMany
     {
         return $this->hasMany(RankHistory::class);
+    }
+
+    public function kycDocuments(): HasMany
+    {
+        return $this->hasMany(KycDocument::class);
+    }
+
+    public function latestKyc(): HasOne
+    {
+        return $this->hasOne(KycDocument::class)->latestOfMany();
     }
 
     public function isAdmin(): bool
@@ -121,5 +137,15 @@ class User extends Authenticatable
     public function hasVerifiedEmail(): bool
     {
         return $this->email_verified_at !== null;
+    }
+
+    public function isKycVerified(): bool
+    {
+        return $this->kyc_status === 'verified';
+    }
+
+    public function is2faEnabled(): bool
+    {
+        return (bool) $this->google2fa_enabled;
     }
 }

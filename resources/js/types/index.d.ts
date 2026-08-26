@@ -14,6 +14,16 @@ export interface FlashMessages {
 
 export interface PageProps {
     auth: { user: AuthUser | null };
+    company: {
+        name: string;
+        registration: string;
+        address: string;
+        phone: string;
+        email: string;
+    };
+    chat: {
+        widget_code: string;
+    };
     flash?: FlashMessages;
     [key: string]: unknown;
 }

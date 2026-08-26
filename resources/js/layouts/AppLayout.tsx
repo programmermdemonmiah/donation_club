@@ -21,6 +21,8 @@ export default function AppLayout({ children }: PropsWithChildren) {
     const page = usePage<PageProps>();
     const user = page.props.auth.user!;
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
     const logout = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -29,20 +31,33 @@ export default function AppLayout({ children }: PropsWithChildren) {
 
     return (
         <div className="flex min-h-screen bg-gray-50">
-            {/* Sidebar */}
             <aside
                 className={cn(
-                    'fixed inset-y-0 left-0 z-40 w-64 transform border-r border-gray-200 bg-white transition-transform lg:static lg:translate-x-0',
+                    'fixed inset-y-0 left-0 z-40 flex flex-col bg-gray-900 transition-all duration-300 lg:translate-x-0',
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+                    isCollapsed ? 'w-20' : 'w-60'
                 )}
             >
-                <div className="flex h-16 items-center gap-2 border-b border-gray-100 px-5">
-                    <Link href={route('home')} className="flex items-center gap-2 text-base font-bold text-indigo-600">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-sm text-white">D</span>
-                        Donation Club
+                <div className={cn("flex h-16 shrink-0 items-center justify-between border-b border-gray-800", isCollapsed ? "px-0 justify-center" : "px-5")}>
+                    <Link href={route('home')} className={cn("flex items-center gap-2 text-base font-bold text-white", isCollapsed && "hidden")}>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-sm">D</span>
+                        <span>Donation Club</span>
                     </Link>
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="rounded-md p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white"
+                        title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+                    >
+                        <svg className="h-5 w-5 shrink-0 fill-current" viewBox="0 0 24 24">
+                            {isCollapsed ? (
+                                <path d="M4 15h16v-2H4v2zm0 4h16v-2H4v2zm0-8h16V9H4v2zm0-6v2h16V5H4z" />
+                            ) : (
+                                <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                            )}
+                        </svg>
+                    </button>
                 </div>
-                <nav className="space-y-1 px-3 py-4">
+                <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
                     {navigation.map((item) => {
                         const active = route().current(item.href);
                         return (
@@ -50,25 +65,47 @@ export default function AppLayout({ children }: PropsWithChildren) {
                                 key={item.href}
                                 href={route(item.href)}
                                 onClick={() => setSidebarOpen(false)}
+                                title={isCollapsed ? item.label : undefined}
                                 className={cn(
-                                    'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium',
-                                    active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                                    'group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                                    active ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white',
+                                    isCollapsed ? 'justify-center' : 'gap-3'
                                 )}
                             >
-                                <svg className={cn('h-5 w-5 shrink-0', active ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500')} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+                                <svg className="h-5 w-5 shrink-0 fill-current" viewBox="0 0 24 24">
+                                    <path d={item.icon} />
                                 </svg>
-                                {item.label}
+                                {!isCollapsed && <span>{item.label}</span>}
                             </Link>
                         );
                     })}
+                    <div className="my-3 border-t border-gray-800" />
+                    {!isCollapsed && <p className="px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Security</p>}
+                    <Link
+                        href={route('profile.edit')}
+                        onClick={() => setSidebarOpen(false)}
+                        title={isCollapsed ? "Profile" : undefined}
+                        className={cn('group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors', route().current('profile.edit') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white', isCollapsed ? 'justify-center' : 'gap-3')}
+                    >
+                        <svg className="h-5 w-5 shrink-0 fill-current" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
+                        {!isCollapsed && <span>Profile</span>}
+                    </Link>
+                    <Link
+                        href={route('kyc.index')}
+                        onClick={() => setSidebarOpen(false)}
+                        title={isCollapsed ? "KYC Verification" : undefined}
+                        className={cn('group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors', route().current('kyc.index') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white', isCollapsed ? 'justify-center' : 'gap-3')}
+                    >
+                        <svg className="h-5 w-5 shrink-0 fill-current" viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-3V2h-2v2H8V2H6v2H3v18h18V4zm-2 16H5V9h14v11z" /></svg>
+                        {!isCollapsed && <span>KYC Verification</span>}
+                    </Link>
                 </nav>
             </aside>
 
-            {sidebarOpen && <div className="fixed inset-0 z-30 bg-gray-900/30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+            {sidebarOpen && <div className="fixed inset-0 z-30 bg-gray-900/40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
             {/* Main */}
-            <div className="flex min-w-0 flex-1 flex-col">
+            <div className={cn("flex min-w-0 flex-1 flex-col transition-all duration-300", isCollapsed ? "lg:ml-20" : "lg:ml-60")}>
                 <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-gray-200 bg-white/90 px-4 backdrop-blur sm:px-6">
                     <button className="rounded-md p-2 text-gray-500 hover:bg-gray-100 lg:hidden" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -77,22 +114,44 @@ export default function AppLayout({ children }: PropsWithChildren) {
                     </button>
 
                     <div className="ml-auto flex items-center gap-4">
-                        <Link href={route('notifications.index')} className="relative rounded-full p-2 text-gray-500 hover:bg-gray-100" aria-label="Notifications">
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                            </svg>
-                        </Link>
-
-                        <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
-                            <Link href={route('profile.edit')} className="flex items-center gap-2 text-sm">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
+                        <div className="relative border-l border-gray-200 pl-4">
+                            <button
+                                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                                className="flex items-center gap-2 rounded-full text-sm hover:ring-2 hover:ring-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            >
+                                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700 ring-2 ring-white">
                                     {user.name.charAt(0).toUpperCase()}
                                 </span>
                                 <span className="hidden font-medium text-gray-700 sm:block">{user.name}</span>
-                            </Link>
-                            <button onClick={logout} className="text-sm font-medium text-gray-500 hover:text-rose-600">
-                                Log out
+                                <svg className="hidden h-4 w-4 text-gray-400 sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
                             </button>
+
+                            {profileDropdownOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-10" onClick={() => setProfileDropdownOpen(false)}></div>
+                                    <div className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                        <div className="border-b border-gray-100 px-4 py-3 text-sm text-gray-900">
+                                            <p>Signed in as</p>
+                                            <p className="truncate font-medium">{user.email}</p>
+                                        </div>
+                                        <Link href={route('profile.edit')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Your Profile
+                                        </Link>
+                                        <Link href={route('dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Dashboard
+                                        </Link>
+                                        <div className="border-t border-gray-100"></div>
+                                        <button
+                                            onClick={logout}
+                                            className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Sign out
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </header>
