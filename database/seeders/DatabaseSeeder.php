@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
             ['email' => env('ADMIN_EMAIL', 'admin@donationclub.test')],
             [
                 'name' => 'Administrator',
-                'password' => env('ADMIN_PASSWORD', 'ChangeMe!2026'),
+                'password' => env('ADMIN_PASSWORD', '12345678'),
                 'is_admin' => true,
                 'status' => \App\Enums\UserStatus::Active->value,
                 'referral_code' => \App\Services\Referral\ReferralService::generateReferralCode(),
