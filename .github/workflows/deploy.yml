@@ -1,0 +1,71 @@
+name: Deploy Laravel via FTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ftp-deploy:
+    name: FTP Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, bcmath, intl, zip
+          tools: composer
+
+      # ✅ Install only what is needed (and faster)
+      - name: Install Composer Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+      
+      - name: Setup Node.js 
+        uses: actions/setup-node@v4 
+        with: 
+          node-version: 22 
+          cache: npm 
+
+      - name: Install Node Dependencies 
+        run: npm ci 
+
+      - name: Build Frontend Assets 
+        run: npm run build
+
+      # ✅ FTP Deploy (optimized)
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          server-dir: /
+          exclude: |
+            **/.husky/**
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/tests/**
+            .huskey
+            .env
+            .env.example
+            .htaccess
+            .gitignore
+            vendor/**
+            **/vendor/**
+            storage/**
+            **/storage/**
+            **/bootstrap/cache/**
+            resources/views/sitemap.blade.php
+            resources/views/sitemap.blade.php
+            resources/views/js/**
+            resources/views/css/**
+            resources/views/welcome.blade.php
