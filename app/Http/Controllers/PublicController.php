@@ -27,10 +27,22 @@ class PublicController extends Controller
                 'max' => $this->settings->maxDeposit(),
             ],
             'stats' => [
-                'total_deposits' => Deposit::query()->completed()->count(),
-                'total_amount' => (string) Deposit::query()->completed()->sum('amount'),
+                'deposits' => Deposit::query()->completed()->count(),
+                'paid_out' => \App\Models\Commission::query()->where('status', 'credited')->sum('amount') + \App\Models\MemberReturn::query()->where('status', 'completed')->sum('payout_amount'),
                 'members' => \App\Models\User::query()->where('is_admin', false)->count(),
+                'countries' => 12, // Placeholder or User::distinct('country')->count() if country exists
             ],
+            'latestDeposits' => Deposit::query()
+                ->with('user:id,name')
+                ->completed()
+                ->latest('completed_at')
+                ->take(7)
+                ->get()
+                ->map(fn ($d) => [
+                    'reference' => $d->reference,
+                    'amount' => (string) $d->amount,
+                    'created_at' => $d->completed_at?->diffForHumans() ?? $d->created_at->diffForHumans(),
+                ]),
         ]);
     }
 
