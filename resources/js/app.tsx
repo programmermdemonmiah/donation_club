@@ -6,7 +6,8 @@ createInertiaApp({
     title: (title) => `${title ? `${title} — ` : ''}Donation Club`,
     resolve: (name) => {
         const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
-        const page = pages[`./pages/${name}.tsx`];
+        const key = `./pages/${name.replace(/^\.\/Pages?\//i, '').replace(/\.tsx$/, '')}.tsx`;
+        const page = pages[key];
 
         if (!page) {
             throw new Error(`Page not found: ${name}`);
