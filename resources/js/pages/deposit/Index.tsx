@@ -1,6 +1,4 @@
 import AppLayout from '@/layouts/AppLayout';
-import Button from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
 import Badge from '@/components/ui/Badge';
 import Pagination from '@/components/ui/Pagination';
@@ -9,85 +7,99 @@ import type { PageProps } from '@/types';
 import { formatDate, formatMoney, formatSequence } from '@/utils/format';
 
 interface DepositRow {
-    id: number;
-    reference: string;
-    amount: string;
-    status: string;
-    sequence_number: number | null;
-    created_at: string;
+    id: number; reference: string; amount: string;
+    status: string; sequence_number: number | null; created_at: string;
 }
 
 export default function Deposits() {
-    const page = usePage<
-        PageProps & {
-            deposits: { data: DepositRow[]; current_page: number; last_page: number };
-            eligibility: boolean;
-            eligibilityReason?: string;
-            rules: { min: string; max: string };
-        }
-    >();
+    const page = usePage<PageProps & {
+        deposits: { data: DepositRow[]; current_page: number; last_page: number };
+        eligibility: boolean; eligibilityReason?: string;
+        rules: { min: string; max: string };
+    }>();
     const { deposits, eligibility, eligibilityReason, rules } = page.props;
-
     const form = useForm({ amount: rules.min });
-
-    const submit = (e: React.FormEvent) => {
-        e.preventDefault();
-        form.post(route('deposits.store'));
-    };
+    const submit = (e: React.FormEvent) => { e.preventDefault(); form.post(route('deposits.store')); };
 
     return (
         <AppLayout>
-            <h1 className="text-xl font-bold text-gray-900">Deposits</h1>
-            <p className="mt-1 text-sm text-gray-500">
-                Voluntary contributions between <strong>${rules.min}</strong> and <strong>${rules.max}</strong>.
-            </p>
+            <div className="mb-8">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Your Contributions</p>
+                <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Deposits</h1>
+                <p className="mt-1 text-sm font-medium text-gray-500">
+                    Voluntary contributions between <strong className="text-gray-700">${rules.min}</strong> and <strong className="text-gray-700">${rules.max}</strong>.
+                </p>
+            </div>
 
-            <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                {/* New deposit */}
-                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <h2 className="text-sm font-semibold text-gray-900">New Deposit</h2>
-                    {eligibility ? (
-                        <form onSubmit={submit} className="mt-4 space-y-4">
-                            <Input
-                                label={`Amount (USD, ${rules.min}–${rules.max})`}
-                                type="number"
-                                step="0.01"
-                                min={rules.min}
-                                max={rules.max}
-                                value={form.data.amount}
-                                onChange={(e) => form.setData('amount', e.target.value)}
-                                error={form.errors.amount}
-                                required
-                            />
-                            <Button type="submit" loading={form.processing} className="w-full">
-                                Continue to payment
-                            </Button>
-                        </form>
-                    ) : (
-                        <div className="mt-4 rounded-lg bg-amber-50 p-4 text-sm text-amber-800 ring-1 ring-inset ring-amber-600/20">
-                            {eligibilityReason ?? 'Deposits are currently unavailable for your account.'}
-                        </div>
-                    )}
+            <div className="grid gap-6 lg:grid-cols-3">
+                {/* New deposit card */}
+                <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm shadow-gray-200/50">
+                    <div className="border-b border-gray-50 bg-gray-50/60 px-6 py-4">
+                        <h2 className="text-sm font-black text-gray-900">Make a Contribution</h2>
+                        <p className="mt-0.5 text-xs font-medium text-gray-400">Amount in USD</p>
+                    </div>
+                    <div className="p-6">
+                        {eligibility ? (
+                            <form onSubmit={submit} className="space-y-5">
+                                <div className="space-y-1.5">
+                                    <label className="block text-sm font-bold text-gray-700">
+                                        Amount (${rules.min} – ${rules.max})
+                                    </label>
+                                    <div className="relative">
+                                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-sm font-black text-gray-400">$</span>
+                                        <input
+                                            type="number" step="0.01" min={rules.min} max={rules.max}
+                                            value={form.data.amount}
+                                            onChange={(e) => form.setData('amount', e.target.value)}
+                                            required
+                                            className="block w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-8 pr-4 text-sm font-bold text-gray-900 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+                                        />
+                                    </div>
+                                    {form.errors.amount && <p className="text-xs font-semibold text-red-600">{form.errors.amount}</p>}
+                                </div>
+                                <button
+                                    type="submit" disabled={form.processing}
+                                    className="group relative w-full overflow-hidden rounded-xl bg-amber-500 py-3 text-sm font-black text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.25)] transition-all hover:bg-amber-400 hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] disabled:opacity-60"
+                                >
+                                    <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
+                                    {form.processing ? 'Processing…' : 'Continue to Payment →'}
+                                </button>
+                            </form>
+                        ) : (
+                            <div className="rounded-xl border border-amber-200/50 bg-amber-50 p-4">
+                                <div className="flex items-start gap-3">
+                                    <svg className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <p className="text-sm font-semibold text-amber-800">
+                                        {eligibilityReason ?? 'Deposits are currently unavailable for your account.'}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* History */}
-                <div className="lg:col-span-2 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                    <div className="border-b border-gray-100 px-5 py-4">
-                        <h2 className="text-sm font-semibold text-gray-900">Deposit History</h2>
+                <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm shadow-gray-200/50 lg:col-span-2">
+                    <div className="border-b border-gray-50 px-6 py-4">
+                        <h2 className="text-sm font-black text-gray-900">Deposit History</h2>
                     </div>
                     <Table<DepositRow>
                         columns={[
-                            { header: 'Sequence', render: (d) => <span className="font-mono font-semibold text-indigo-600">{formatSequence(d.sequence_number)}</span> },
-                            { header: 'Reference', render: (d) => <Link href={route('deposits.show', d.id)} className="font-mono text-xs text-gray-700 hover:text-indigo-600">{d.reference}</Link> },
-                            { header: 'Amount', render: (d) => formatMoney(d.amount) },
+                            { header: 'Sequence', render: (d) => <span className="font-mono text-xs font-black text-amber-600">{formatSequence(d.sequence_number)}</span> },
+                            { header: 'Reference', render: (d) => <Link href={route('deposits.show', d.id)} className="font-mono text-xs font-bold text-gray-700 hover:text-amber-600 transition-colors">{d.reference}</Link> },
+                            { header: 'Amount', render: (d) => <span className="font-black text-gray-900">{formatMoney(d.amount)}</span> },
                             { header: 'Status', render: (d) => <Badge value={d.status} /> },
-                            { header: 'Created', render: (d) => formatDate(d.created_at) },
+                            { header: 'Date', render: (d) => <span className="text-xs text-gray-400">{formatDate(d.created_at)}</span> },
                         ]}
                         rows={deposits.data}
                         rowKey={(d) => d.id}
-                        emptyMessage="No deposits yet."
+                        emptyMessage="No deposits yet. Make your first contribution above."
                     />
-                    <Pagination currentPage={deposits.current_page} lastPage={deposits.last_page} />
+                    <div className="border-t border-gray-50 bg-gray-50/50 px-5 py-3">
+                        <Pagination currentPage={deposits.current_page} lastPage={deposits.last_page} />
+                    </div>
                 </div>
             </div>
         </AppLayout>

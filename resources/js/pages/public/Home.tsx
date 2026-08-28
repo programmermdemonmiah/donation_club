@@ -1,317 +1,611 @@
 import PublicLayout from '@/layouts/PublicLayout';
 import { Link, usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
+import { useEffect, useRef, useState } from 'react';
 
+/* ═══════════════════════════════════════════════════════
+   ANIMATED CANVAS — network particle mesh
+═══════════════════════════════════════════════════════ */
+function NetworkCanvas({ className = '' }: { className?: string }) {
+    const ref = useRef<HTMLCanvasElement>(null);
+    useEffect(() => {
+        const c = ref.current; if (!c) return;
+        const ctx = c.getContext('2d'); if (!ctx) return;
+        let raf: number;
+        const resize = () => { c.width = c.offsetWidth; c.height = c.offsetHeight; };
+        resize();
+        window.addEventListener('resize', resize);
+        const N = 70;
+        const pts = Array.from({ length: N }, () => ({
+            x: Math.random() * c.width, y: Math.random() * c.height,
+            vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4,
+        }));
+        const loop = () => {
+            ctx.clearRect(0, 0, c.width, c.height);
+            pts.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > c.width) p.vx *= -1;
+                if (p.y < 0 || p.y > c.height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(245,158,11,.5)'; ctx.fill();
+            });
+            for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+                const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+                const d = Math.hypot(dx, dy);
+                if (d < 130) {
+                    ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+                    ctx.strokeStyle = `rgba(245,158,11,${.15 * (1 - d / 130)})`; ctx.lineWidth = .7; ctx.stroke();
+                }
+            }
+            raf = requestAnimationFrame(loop);
+        };
+        loop();
+        return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
+    }, []);
+    return <canvas ref={ref} className={`absolute inset-0 h-full w-full ${className}`} />;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLL-IN FADE
+═══════════════════════════════════════════════════════ */
+function FadeUp({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
+    const [vis, setVis] = useState(false);
+    const r = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); o.disconnect(); } }, { threshold: 0.12 });
+        if (r.current) o.observe(r.current);
+        return () => o.disconnect();
+    }, []);
+    return (
+        <div ref={r} style={{ transitionDelay: `${delay}ms` }}
+            className={`transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} ${className}`}>
+            {children}
+        </div>
+    );
+}
+
+/* ═══════════════════════════════════════════════════════
+   ANIMATED COUNTER
+═══════════════════════════════════════════════════════ */
+function Counter({ end, prefix = '', suffix = '', label, sub }: { end: number; prefix?: string; suffix?: string; label: string; sub?: string }) {
+    const [n, setN] = useState(0);
+    const [active, setActive] = useState(false);
+    const r = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setActive(true); o.disconnect(); } }, { threshold: 0.3 });
+        if (r.current) o.observe(r.current);
+        return () => o.disconnect();
+    }, []);
+    useEffect(() => {
+        if (!active || !end) return;
+        const step = Math.max(1, Math.ceil(end / 80));
+        let cur = 0;
+        const t = setInterval(() => { cur = Math.min(cur + step, end); setN(cur); if (cur >= end) clearInterval(t); }, 16);
+        return () => clearInterval(t);
+    }, [active, end]);
+    return (
+        <div ref={r} className="flex flex-col items-center gap-1 text-center">
+            <p className="text-5xl font-black tracking-tight text-white lg:text-6xl tabular-nums">
+                {prefix}{n.toLocaleString()}{suffix}
+            </p>
+            <p className="mt-1 text-xs font-black uppercase tracking-[.22em] text-amber-500">{label}</p>
+            {sub && <p className="text-[11px] text-gray-500">{sub}</p>}
+        </div>
+    );
+}
+
+/* ═══════════════════════════════════════════════════════
+   MARQUEE TICKER
+═══════════════════════════════════════════════════════ */
+function Ticker({ items }: { items: string[] }) {
+    const list = [...items, ...items];
+    return (
+        <div className="relative overflow-hidden border-y border-amber-500/20 bg-gray-900/80 py-3 backdrop-blur-sm">
+            <div className="flex animate-[marquee_30s_linear_infinite] whitespace-nowrap">
+                {list.map((item, i) => (
+                    <span key={i} className="mx-8 text-xs font-bold uppercase tracking-[.18em] text-amber-500/70">
+                        ◆ {item}
+                    </span>
+                ))}
+            </div>
+            <style>{`@keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
+        </div>
+    );
+}
+
+/* ═══════════════════════════════════════════════════════
+   TYPES
+═══════════════════════════════════════════════════════ */
+interface HomeProps {
+    stats?: { members: number; deposits: number; paid_out: number; countries: number };
+    settings?: { min_deposit: string; max_deposit: string; commission_levels: number };
+    latestDeposits?: Array<{ reference: string; amount: string; created_at: string }>;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════ */
+const FEATURES = [
+    {
+        icon: 'M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.87c1.355 0 2.697.055 4.024.165C17.155 8.51 18 9.473 18 10.608v2.513m-3-4.87v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.379a48.474 48.474 0 00-6-.371c-2.032 0-4.034.126-6 .371',
+        title: 'Voluntary Contributions',
+        desc: 'Contribute freely between $1–$10 per deposit. No lock-in, no hidden fees. Every deposit is timestamped on the public ledger permanently.',
+        color: 'from-amber-500 to-orange-500',
+    },
+    {
+        icon: 'M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z',
+        title: 'Immutable Public Ledger',
+        desc: 'Every transaction is publicly verifiable. 100% transparency — anyone can audit any deposit, any time, from anywhere in the world.',
+        color: 'from-blue-500 to-cyan-500',
+    },
+    {
+        icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+        title: '10-Generation Network',
+        desc: 'Earn referral commissions across 10 levels of your downline. Your team\'s activity creates residual rewards that compound over time.',
+        color: 'from-emerald-500 to-teal-500',
+    },
+    {
+        icon: 'M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172',
+        title: '9 Exclusive Ranks',
+        desc: 'Progress through nine prestigious ranks. Each rank unlocks new commission tiers, support fund access, and community recognition.',
+        color: 'from-violet-500 to-purple-500',
+    },
+    {
+        icon: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z',
+        title: 'Full KYC Compliance',
+        desc: 'AML/KYC verified platform. Upload your ID, get verified, and unlock higher limits. All documents encrypted with bank-grade security.',
+        color: 'from-rose-500 to-pink-500',
+    },
+    {
+        icon: 'M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z',
+        title: 'Enterprise-Grade Security',
+        desc: 'Google Authenticator 2FA, encrypted sessions, CSRF protection. Your account and earnings are protected by industry-leading security.',
+        color: 'from-slate-500 to-gray-600',
+    },
+];
+
+const STEPS = [
+    { n: '01', title: 'Create Account', desc: 'Register in minutes. Use a sponsor\'s referral code to join their team automatically.' },
+    { n: '02', title: 'Make a Contribution', desc: 'Contribute $1–$10. Your deposit is recorded instantly on the immutable public ledger.' },
+    { n: '03', title: 'Build Your Network', desc: 'Share your unique referral link. Every member you refer becomes part of your team — 10 levels deep.' },
+    { n: '04', title: 'Qualify & Earn', desc: 'Meet activity thresholds to unlock commissions, rank upgrades, and community reward access.' },
+];
+
+const TRUST_ITEMS = [
+    'Registered England & Wales',
+    'Transparent Public Ledger',
+    'KYC/AML Compliant',
+    '2FA Security',
+    'Community Governed',
+    '10-Generation Network',
+    'Voluntary Contributions',
+    'No Hidden Fees',
+];
+
+/* ═══════════════════════════════════════════════════════
+   MAIN COMPONENT
+═══════════════════════════════════════════════════════ */
 export default function Home() {
-    const page = usePage<PageProps & { 
-        stats: { total_deposits: number; total_amount: string; members: number }; 
-        depositRules: { min: string; max: string } 
-    }>();
-    const { company } = page.props;
+    const page = usePage<PageProps & HomeProps>();
+    const { stats, settings, latestDeposits = [], company } = page.props;
 
-    const stats = [
-        { 
-            label: 'Completed Contributions', 
-            value: page.props.stats.total_deposits.toLocaleString(),
-            prefix: '',
-            suffix: '',
-            icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
-        },
-        { 
-            label: 'Community Total', 
-            value: Number(page.props.stats.total_amount).toLocaleString('en-US', { minimumFractionDigits: 2 }),
-            prefix: '$',
-            suffix: '',
-            icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
-        },
-        { 
-            label: 'Active Members', 
-            value: page.props.stats.members.toLocaleString(),
-            prefix: '',
-            suffix: '+',
-            icon: 'M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477'
-        },
-    ];
-
-    const features = [
-        {
-            title: 'Accessible Contributions',
-            description: `Contribute between ${page.props.depositRules.min} and ${page.props.depositRules.max} per deposit. Designed to be fair and equal for every member, regardless of background.`,
-            icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-            accent: 'bg-slate-900'
-        },
-        {
-            title: 'Transparent Ledger',
-            description: 'Every confirmed deposit receives a permanent public sequence number. Complete transparency with no hidden books or private records.',
-            icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-            accent: 'bg-emerald-700'
-        },
-        {
-            title: 'Community Governance',
-            description: 'Members participate in decision-making through transparent voting. Ranks reflect contribution history, not financial investment.',
-            icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-            accent: 'bg-amber-700'
-        },
-        {
-            title: 'Referral Network',
-            description: 'Build a team across up to 10 generations. Earn recognition through community participation, not recruitment incentives.',
-            icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-            accent: 'bg-indigo-700'
-        },
-        {
-            title: 'Support Fund',
-            description: 'Qualified members may access community support funds. Distributions are discretionary, transparent, and administered by elected members.',
-            icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-            accent: 'bg-rose-700'
-        },
-        {
-            title: 'Open Source Values',
-            description: 'Built on open principles. Our ledger, rules, and governance are publicly auditable. No proprietary algorithms or hidden mechanisms.',
-            icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
-            accent: 'bg-violet-700'
-        },
-    ];
-
-    const steps = [
-        { number: '01', title: 'Create Account', description: 'Register with your email. No KYC required for basic participation.' },
-        { number: '02', title: 'Make a Deposit', description: `Contribute between ${page.props.depositRules.min}–${page.props.depositRules.max}. Your deposit enters the public sequence.` },
-        { number: '03', title: 'Track Progress', description: 'Watch your sequence number advance. Transparency at every step.' },
-        { number: '04', title: 'Participate', description: 'Engage with the community, refer others, and qualify for support funds.' },
-    ];
+    // Typewriter effect for hero subtitle
+    const phrases = ['Build Your Team.', 'Earn Commissions.', 'Grow Together.', 'Join the Movement.'];
+    const [phraseIdx, setPhraseIdx] = useState(0);
+    const [typed, setTyped] = useState('');
+    const [deleting, setDeleting] = useState(false);
+    useEffect(() => {
+        const target = phrases[phraseIdx];
+        let timeout: ReturnType<typeof setTimeout>;
+        if (!deleting && typed.length < target.length) {
+            timeout = setTimeout(() => setTyped(target.slice(0, typed.length + 1)), 80);
+        } else if (!deleting && typed.length === target.length) {
+            timeout = setTimeout(() => setDeleting(true), 2200);
+        } else if (deleting && typed.length > 0) {
+            timeout = setTimeout(() => setTyped(typed.slice(0, -1)), 40);
+        } else if (deleting && typed.length === 0) {
+            setDeleting(false);
+            setPhraseIdx((i) => (i + 1) % phrases.length);
+        }
+        return () => clearTimeout(timeout);
+    }, [typed, deleting, phraseIdx]);
 
     return (
         <PublicLayout>
-            {/* Hero Section */}
-            <section className="relative overflow-hidden bg-white">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/white-wall.png')] opacity-50" />
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white" />
-                
-                <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
-                    <div className="mx-auto max-w-3xl text-center">
-                        <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-medium text-slate-700 border border-slate-200">
+
+            {/* ══════════════════════════════════════════
+                HERO — full viewport, split layout
+            ══════════════════════════════════════════ */}
+            <section className="relative flex min-h-screen overflow-hidden bg-[#050a14]">
+                {/* Particle canvas */}
+                <NetworkCanvas className="opacity-60" />
+
+                {/* Left atmospheric glow */}
+                <div className="pointer-events-none absolute -left-40 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-amber-500/8 blur-[130px]" />
+                {/* Right glow */}
+                <div className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-blue-500/5 blur-[100px]" />
+                {/* Top center glow */}
+                <div className="pointer-events-none absolute left-1/2 top-0 h-60 w-[800px] -translate-x-1/2 bg-amber-500/6 blur-[80px]" />
+
+                {/* Content */}
+                <div className="relative mx-auto flex w-full max-w-screen-xl flex-col items-center justify-center px-4 py-32 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-5xl text-center">
+
+                        {/* Badge */}
+                        <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-amber-500/20 bg-amber-500/8 px-5 py-2 backdrop-blur-sm">
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
                             </span>
-                            Live Ledger Active
-                        </span>
-                        
-                        <h1 className="mt-8 text-4xl font-light tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl">
-                            <span className="font-normal">{company.name}</span>
-                            <br />
-                            <span className="font-medium">Community Contribution Platform</span>
+                            <span className="text-[11px] font-black uppercase tracking-[.22em] text-amber-400/90">
+                                {company.name} · Live Network · Est. 2024
+                            </span>
+                        </div>
+
+                        {/* Main headline */}
+                        <h1 className="text-[clamp(3rem,7.5vw,6rem)] font-black leading-[1.02] tracking-[-0.02em] text-white">
+                            Earn Together.{' '}
+                            <br className="hidden sm:block" />
+                            <span className="relative inline-block">
+                                <span className="bg-gradient-to-r from-amber-300 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                                    Grow Together.
+                                </span>
+                                {/* Underline glow */}
+                                <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-amber-500/0 via-amber-500 to-amber-500/0" />
+                            </span>
                         </h1>
-                        
-                        <p className="mt-6 text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                            A transparent, member-governed platform for voluntary contributions. 
-                            Every deposit is recorded in a public sequential ledger. 
-                            No hidden algorithms. No guaranteed returns. Just community.
+
+                        {/* Typewriter line */}
+                        <div className="mt-6 flex items-center justify-center gap-2 text-xl font-semibold text-gray-400 sm:text-2xl">
+                            <span className="text-amber-400">{typed}</span>
+                            <span className="inline-block h-7 w-[2px] animate-[blink_.85s_step-end_infinite] rounded-full bg-amber-500 align-middle" />
+                            <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
+                        </div>
+
+                        {/* Description */}
+                        <p className="mx-auto mt-7 max-w-2xl text-base font-medium leading-relaxed text-gray-500 sm:text-lg">
+                            A transparent, member-governed community contribution platform registered in England & Wales.
+                            Make voluntary contributions, build your referral network, and qualify for community rewards.
                         </p>
-                        
+
+                        {/* CTA row */}
                         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                            <Link 
-                                href={route('register')} 
-                                className="group relative inline-flex items-center justify-center rounded-md bg-slate-900 px-8 py-3.5 text-base font-medium text-white transition-all duration-200 hover:bg-slate-700 hover:shadow-lg hover:shadow-slate-900/20 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
-                            >
-                                Join the Community
-                                <svg className="ml-3 h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
+                            <Link href={route('register')}
+                                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 px-10 py-4 text-base font-black text-gray-900 shadow-[0_0_50px_rgba(245,158,11,.45)] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_70px_rgba(245,158,11,.65)]">
+                                <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-white/30 transition-transform duration-700 group-hover:translate-x-full" />
+                                <span className="relative flex items-center gap-2.5">
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                                    Start Earning Today
+                                </span>
                             </Link>
-                            <Link 
-                                href={route('pages.how-it-works')} 
-                                className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-8 py-3.5 text-base font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
-                            >
+                            <Link href={route('pages.how-it-works')}
+                                className="group flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-base font-bold text-gray-300 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white">
                                 How It Works
+                                <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                             </Link>
+                        </div>
+
+                        {/* Trust micro-row */}
+                        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                            {[`Registered · ${company.registration}`, company.address, 'Public Ledger', 'KYC Compliant'].map((t, i) => (
+                                <span key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                                    <span className="h-1 w-1 rounded-full bg-amber-500/50" />{t}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Glassmorphism stat pills */}
+                        <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                            {[
+                                { label: 'Members', value: (stats?.members ?? 0).toLocaleString(), icon: '👥' },
+                                { label: 'Deposits', value: (stats?.deposits ?? 0).toLocaleString(), icon: '💎' },
+                                { label: 'Paid Out', value: `$${(stats?.paid_out ?? 0).toFixed(0)}`, icon: '💰' },
+                                { label: 'Countries', value: `${stats?.countries ?? 0}+`, icon: '🌍' },
+                            ].map((s) => (
+                                <div key={s.label}
+                                    className="flex flex-col items-center gap-1 rounded-2xl border border-white/8 bg-white/5 px-4 py-5 backdrop-blur-sm transition-all duration-300 hover:border-amber-500/20 hover:bg-amber-500/5">
+                                    <span className="text-2xl">{s.icon}</span>
+                                    <p className="text-xl font-black text-white tabular-nums">{s.value}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[.18em] text-gray-600">{s.label}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Scroll cue */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+                    <div className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-gray-700 pt-2">
+                        <div className="h-2 w-1 animate-[scrollDot_1.5s_ease-in-out_infinite] rounded-full bg-amber-500" />
+                        <style>{`@keyframes scrollDot { 0%,100%{transform:translateY(0);opacity:1} 50%{transform:translateY(6px);opacity:.3} }`}</style>
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                TICKER MARQUEE
+            ══════════════════════════════════════════ */}
+            <Ticker items={TRUST_ITEMS} />
+
+            {/* ══════════════════════════════════════════
+                ANIMATED STATS BAR
+            ══════════════════════════════════════════ */}
+            <section className="bg-gray-900 py-20">
+                <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+                    <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+                        <Counter end={stats?.members ?? 0} suffix="+" label="Registered Members" sub="and growing daily" />
+                        <Counter end={stats?.deposits ?? 0} suffix="+" label="Total Contributions" sub="publicly verifiable" />
+                        <Counter end={Math.round((stats?.paid_out ?? 0))} prefix="$" label="Total Disbursed (USD)" sub="to community members" />
+                        <Counter end={stats?.countries ?? 0} suffix="+" label="Countries Represented" sub="global community" />
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                HOW IT WORKS — horizontal stepper
+            ══════════════════════════════════════════ */}
+            <section className="bg-[#f8f9fb] py-28">
+                <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+                    <FadeUp>
+                        <div className="mb-20 text-center">
+                            <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-amber-600">
+                                The Process
+                            </span>
+                            <h2 className="mt-5 text-5xl font-black tracking-tight text-gray-900">
+                                How It Works
+                            </h2>
+                            <div className="mx-auto mt-4 h-[3px] w-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-400" />
+                            <p className="mx-auto mt-5 max-w-xl text-base text-gray-500">
+                                From sign-up to earning — four simple steps that power your financial journey.
+                            </p>
+                        </div>
+                    </FadeUp>
+
+                    <div className="relative">
+                        {/* Connector line */}
+                        <div className="absolute left-0 right-0 top-10 hidden h-[2px] bg-gradient-to-r from-transparent via-amber-300/60 to-transparent lg:block" />
+
+                        <div className="grid gap-8 lg:grid-cols-4">
+                            {STEPS.map((s, i) => (
+                                <FadeUp key={s.n} delay={i * 120}>
+                                    <div className="group relative flex flex-col items-center text-center">
+                                        {/* Step circle */}
+                                        <div className="relative z-10 mb-8 flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-gray-900 shadow-xl shadow-gray-200/60 ring-4 ring-gray-100 transition-all duration-500 group-hover:bg-amber-500 group-hover:ring-amber-200">
+                                            <span className="text-xl font-black text-amber-400 transition-colors duration-300 group-hover:text-gray-900">{s.n}</span>
+                                        </div>
+                                        <h3 className="mb-3 text-lg font-black text-gray-900">{s.title}</h3>
+                                        <p className="text-sm font-medium leading-relaxed text-gray-500">{s.desc}</p>
+                                    </div>
+                                </FadeUp>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Live Stats Preview */}
-                    <div className="mt-16 mx-auto max-w-3xl">
-                        <div className="rounded-xl border border-slate-200 bg-white/80 p-6 backdrop-blur-sm shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Live Ledger Preview</h3>
-                                <Link href={route('public.deposits')} className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
-                                    View Full Ledger →
+                    <FadeUp delay={500}>
+                        <div className="mt-16 text-center">
+                            <Link href={route('register')}
+                                className="group relative inline-flex overflow-hidden rounded-2xl bg-gray-900 px-10 py-4 text-sm font-black text-white transition-all duration-300 hover:bg-gray-800">
+                                <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-amber-500/20 transition-transform duration-700 group-hover:translate-x-full" />
+                                <span className="relative">Get Started Now →</span>
+                            </Link>
+                        </div>
+                    </FadeUp>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                LIVE ACTIVITY FEED (if data available)
+            ══════════════════════════════════════════ */}
+            {latestDeposits.length > 0 && (
+                <section className="relative overflow-hidden bg-gray-950 py-24">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.05),transparent_60%)]" />
+                    <div className="relative mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+                        <div className="grid gap-16 lg:grid-cols-2">
+                            <FadeUp>
+                                <div className="flex flex-col justify-center">
+                                    <span className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[.22em] text-amber-500">
+                                        <span className="relative flex h-2 w-2">
+                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                                        </span>
+                                        Live Activity
+                                    </span>
+                                    <h2 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-5xl">
+                                        Real-Time<br />
+                                        <span className="text-amber-400">Public Ledger</span>
+                                    </h2>
+                                    <p className="mt-5 text-base text-gray-400">
+                                        Every deposit made by members is permanently recorded and publicly visible. No hidden transactions — ever.
+                                    </p>
+                                    <Link href={route('public.deposits')}
+                                        className="mt-8 inline-flex w-fit items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-6 py-3 text-sm font-black text-amber-400 transition-all duration-300 hover:border-amber-500/60 hover:bg-amber-500/15">
+                                        View Full Ledger →
+                                    </Link>
+                                </div>
+                            </FadeUp>
+
+                            <FadeUp delay={150}>
+                                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
+                                    <div className="border-b border-white/10 px-6 py-4">
+                                        <p className="text-xs font-black uppercase tracking-[.18em] text-gray-400">Latest Contributions</p>
+                                    </div>
+                                    <div className="divide-y divide-white/5">
+                                        {latestDeposits.slice(0, 7).map((d, i) => (
+                                            <div key={d.reference} className="flex items-center justify-between px-6 py-3.5 transition-colors hover:bg-white/5">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-sm">
+                                                        💰
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-mono text-xs font-bold text-gray-300">{d.reference}</p>
+                                                        <p className="text-[11px] text-gray-600">{d.created_at}</p>
+                                                    </div>
+                                                </div>
+                                                <span className="text-sm font-black text-emerald-400">+${d.amount}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </FadeUp>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* ══════════════════════════════════════════
+                FEATURES GRID
+            ══════════════════════════════════════════ */}
+            <section className="bg-white py-28">
+                <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+                    <FadeUp>
+                        <div className="mb-20 text-center">
+                            <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-amber-600">
+                                Platform Features
+                            </span>
+                            <h2 className="mt-5 text-5xl font-black tracking-tight text-gray-900">
+                                Everything You Need
+                            </h2>
+                            <div className="mx-auto mt-4 h-[3px] w-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-400" />
+                            <p className="mx-auto mt-5 max-w-xl text-base text-gray-500">
+                                Built on transparency, fairness, and community governance — designed for serious network marketers.
+                            </p>
+                        </div>
+                    </FadeUp>
+
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        {FEATURES.map((f, i) => (
+                            <FadeUp key={f.title} delay={i * 70}>
+                                <div className="group relative flex flex-col gap-5 overflow-hidden rounded-2xl border border-gray-100 bg-white p-7 shadow-sm transition-all duration-400 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-gray-100">
+                                    {/* Background gradient on hover */}
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${f.color} opacity-0 transition-opacity duration-400 group-hover:opacity-[0.04]`} />
+
+                                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${f.color} p-[1px]`}>
+                                        <div className="flex h-full w-full items-center justify-center rounded-2xl bg-white transition-colors duration-300 group-hover:bg-transparent">
+                                            <svg className="h-7 w-7 text-gray-700 transition-colors duration-300 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d={f.icon} />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <div className="relative">
+                                        <h3 className="mb-2.5 text-base font-black text-gray-900">{f.title}</h3>
+                                        <p className="text-sm font-medium leading-relaxed text-gray-500">{f.desc}</p>
+                                    </div>
+                                </div>
+                            </FadeUp>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                COMMISSION HIGHLIGHT
+            ══════════════════════════════════════════ */}
+            <section className="bg-[#050a14] py-28">
+                <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+                    <div className="grid gap-16 lg:grid-cols-2">
+                        <FadeUp>
+                            <div>
+                                <span className="inline-block rounded-full border border-amber-500/25 bg-amber-500/10 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-amber-500">
+                                    Commission Structure
+                                </span>
+                                <h2 className="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl">
+                                    10-Level Deep<br />
+                                    <span className="text-amber-400">Earning Power</span>
+                                </h2>
+                                <p className="mt-5 text-base text-gray-400">
+                                    Earn commissions from every contribution made by members in your 10-generation downline.
+                                    Your network works for you around the clock.
+                                </p>
+                                <ul className="mt-8 space-y-3">
+                                    {['Direct referrals earn the highest commission rate', 'Commissions credited automatically to your wallet', 'Track every earning in real-time from your dashboard', 'No cap on how large your network can grow'].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3 text-sm text-gray-400">
+                                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-500 text-[10px]">✓</span>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <Link href={route('register')}
+                                    className="mt-10 inline-flex items-center gap-2 rounded-xl bg-amber-500 px-8 py-3.5 text-sm font-black text-gray-900 shadow-[0_0_30px_rgba(245,158,11,.3)] transition-all duration-300 hover:bg-amber-400 hover:shadow-[0_0_45px_rgba(245,158,11,.45)]">
+                                    Start Earning →
                                 </Link>
                             </div>
-                            <div className="space-y-3" role="list" aria-label="Recent contributions">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                    <div key={i} className="flex items-center justify-between py-2 border-t border-slate-100 last:border-0 transition-colors hover:bg-slate-50 rounded-lg px-2 -mx-2">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-sm font-mono text-slate-400">#{String(1247 - i).padStart(6, '0')}</span>
-                                            <span className="text-sm text-slate-500">•</span>
-                                            <span className="text-sm font-medium text-slate-700">$${(Math.random() * 10 + 1).toFixed(2)}</span>
-                                        </div>
-                                        <time className="text-xs text-slate-400 font-mono" dateTime="2024-01-15T14:30:00Z">
-                                            {new Date(Date.now() - i * 3600000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </time>
+                        </FadeUp>
+
+                        <FadeUp delay={150}>
+                            <div className="flex items-center">
+                                <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
+                                    <div className="border-b border-white/10 px-6 py-4">
+                                        <p className="text-xs font-black uppercase tracking-[.18em] text-gray-400">Generation Commission Tiers</p>
                                     </div>
-                                ))}
+                                    <div className="divide-y divide-white/5 px-2">
+                                        {[
+                                            { gen: 'Generation 1', label: 'Direct Referral', rate: '10%', active: true },
+                                            { gen: 'Generation 2', label: 'Level 2 Team', rate: '5%', active: false },
+                                            { gen: 'Generation 3', label: 'Level 3 Team', rate: '3%', active: false },
+                                            { gen: 'Generation 4–5', label: 'Mid-Level Team', rate: '2%', active: false },
+                                            { gen: 'Generation 6–10', label: 'Deep Network', rate: '1%', active: false },
+                                        ].map((row) => (
+                                            <div key={row.gen}
+                                                className={`flex items-center justify-between px-4 py-4 ${row.active ? 'bg-amber-500/10' : ''}`}>
+                                                <div>
+                                                    <p className={`text-sm font-black ${row.active ? 'text-amber-400' : 'text-gray-300'}`}>{row.gen}</p>
+                                                    <p className="text-xs text-gray-600">{row.label}</p>
+                                                </div>
+                                                <span className={`rounded-lg px-3 py-1 text-sm font-black ${row.active ? 'bg-amber-500 text-gray-900' : 'bg-white/10 text-gray-400'}`}>
+                                                    {row.rate}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="border-t border-white/10 bg-white/5 px-6 py-3">
+                                        <p className="text-[11px] text-gray-700">*Actual rates configured by club admin. For illustration only.</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </FadeUp>
                     </div>
                 </div>
             </section>
 
-            {/* Stats Section */}
-            <section className="bg-slate-900 text-white" aria-labelledby="stats-heading">
-                <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-                    <h2 id="stats-heading" className="sr-only">Platform Statistics</h2>
-                    <dl className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:grid-cols-3">
-                        {stats.map((stat, index) => (
-                            <div key={index} className="text-center">
-                                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 mb-4" aria-hidden="true">
-                                    <svg className="h-7 w-7 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={stat.icon} />
-                                    </svg>
-                                </div>
-                                <div className="flex items-baseline justify-center gap-1">
-                                    <span className="text-sm font-medium text-white/50">{stat.prefix}</span>
-                                    <dt className="text-4xl font-light tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">{stat.value}</dt>
-                                    <span className="text-sm font-medium text-white/50 self-end">{stat.suffix}</span>
-                                </div>
-                                <dd className="mt-2 text-sm text-white/60 font-medium">{stat.label}</dd>
-                            </div>
-                        ))}
-                    </dl>
-                </div>
-            </section>
+            {/* ══════════════════════════════════════════
+                FINAL CTA
+            ══════════════════════════════════════════ */}
+            <section className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-amber-400 to-orange-400 py-28">
+                {/* Pattern overlay */}
+                <div className="absolute inset-0 opacity-[0.07]"
+                    style={{ backgroundImage: 'repeating-linear-gradient(45deg,#000 0,#000 1px,transparent 0,transparent 50%)', backgroundSize: '20px 20px' }} />
 
-            {/* How It Works */}
-            <section className="bg-white" aria-labelledby="how-heading">
-                <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-                    <header className="mx-auto max-w-2xl text-center mb-16">
-                        <h2 id="how-heading" className="text-3xl font-light tracking-tight text-slate-900 sm:text-4xl">
-                            How It Works
+                <div className="relative mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8 text-center">
+                    <FadeUp>
+                        <span className="inline-block rounded-full border border-gray-900/20 bg-gray-900/10 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-gray-900/80">
+                            Join {company.name}
+                        </span>
+                        <h2 className="mt-5 text-5xl font-black tracking-tight text-gray-900 sm:text-6xl">
+                            Your Journey<br />Starts Now.
                         </h2>
-                        <p className="mt-4 text-lg text-slate-600">
-                            Four simple steps to participate in the community
+                        <p className="mx-auto mt-6 max-w-lg text-base font-semibold text-gray-800/70">
+                            Register for free. Make your first voluntary contribution.
+                            Start building your global network today.
                         </p>
-                    </header>
-                    
-                    <div className="relative">
-                        <div className="absolute hidden lg:block left-1/2 top-0 bottom-0 w-px bg-slate-200 -translate-x-1/2" />
-                        
-                        <ol className="grid grid-cols-1 gap-12 lg:grid-cols-2" role="list">
-                            {steps.map((step, index) => (
-                                <li key={step.number} className="relative">
-                                    <div className="relative lg:pr-12 lg:text-right" style={{ '--index': index + 1 }}>
-                                        <span className="inline-block w-12 h-12 rounded-full bg-slate-100 text-slate-900 font-mono font-bold text-lg flex items-center justify-center mb-4 lg:mx-auto lg:mb-4">
-                                            {step.number}
-                                        </span>
-                                        <h3 className="text-xl font-medium text-slate-900 mb-2">{step.title}</h3>
-                                        <p className="text-slate-600 leading-relaxed lg:max-w-md lg:mx-auto">{step.description}</p>
-                                    </div>
-                                    {index < steps.length - 1 && (
-                                        <div className="absolute left-1/2 top-16 bottom-0 w-px bg-slate-200 -translate-x-1/2 lg:hidden" />
-                                    )}
-                                </li>
-                            ))}
-                        </ol>
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Section */}
-            <section className="bg-slate-50" aria-labelledby="features-heading">
-                <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-                    <header className="mx-auto max-w-2xl text-center mb-16">
-                        <h2 id="features-heading" className="text-3xl font-light tracking-tight text-slate-900 sm:text-4xl">
-                            Platform Features
-                        </h2>
-                        <p className="mt-4 text-lg text-slate-600">
-                            Built on principles of transparency, fairness, and community governance
-                        </p>
-                    </header>
-                    
-                    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" role="list">
-                        {features.map((feature, index) => (
-                            <li key={index} className="group">
-                                <article className="h-full rounded-xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:border-slate-300 hover:shadow-lg hover:-translate-y-1">
-                                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-300 mb-4" aria-hidden="true">
-                                        <svg className="h-6 w-6 text-slate-900 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={feature.icon} />
-                                        </svg>
-                                    </div>
-                                    <h3 className="text-lg font-medium text-slate-900 mb-2">{feature.title}</h3>
-                                    <p className="text-slate-600 leading-relaxed">{feature.description}</p>
-                                </article>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </section>
-
-            {/* Disclosure Section */}
-            <section className="bg-slate-900 text-white" aria-labelledby="disclosure-heading">
-                <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-8 md:p-12">
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                            <div className="flex-1">
-                                <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70 uppercase tracking-wider mb-4">
-                                    <svg className="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
-                                    Important Disclosure
-                                </div>
-                                <h2 id="disclosure-heading" className="text-2xl font-light tracking-tight mb-3">
-                                    Contributions are voluntary donations — not investments
-                                </h2>
-                                <p className="text-white/70 leading-relaxed max-w-2xl">
-                                    Any return, reward, or commission is discretionary, never guaranteed, and only paid when configured and approved by administrators. 
-                                    Past performance does not indicate future results. Please review our
-                                    <Link href={route('pages.risk-disclosure')} className="font-medium text-amber-300 hover:text-amber-200 underline underline-offset-2 transition-colors">
-                                        Risk & Disclosure page
-                                    </Link>
-                                    before participating.
-                                </p>
-                            </div>
-                            <Link 
-                                href={route('pages.risk-disclosure')} 
-                                className="flex-shrink-0 inline-flex items-center justify-center rounded-md border border-white/20 bg-white/5 px-6 py-3 text-base font-medium text-white transition-all duration-200 hover:bg-white/10 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-slate-900"
-                            >
-                                Read Full Disclosure
-                                <svg className="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
+                        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                            <Link href={route('register')}
+                                className="group relative overflow-hidden rounded-2xl bg-gray-900 px-10 py-4 text-base font-black text-white shadow-2xl transition-all duration-300 hover:scale-[1.03] hover:shadow-gray-900/50">
+                                <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-white/10 transition-transform duration-700 group-hover:translate-x-full" />
+                                <span className="relative">Create Free Account →</span>
+                            </Link>
+                            <Link href={route('public.deposits')}
+                                className="text-sm font-bold text-gray-900/60 underline underline-offset-4 transition-colors hover:text-gray-900">
+                                View public ledger first
                             </Link>
                         </div>
-                    </div>
+                        <p className="mt-8 text-xs font-bold text-gray-900/40">
+                            Free to join · No minimum commitment · Contributions are voluntary
+                        </p>
+                    </FadeUp>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="bg-white" aria-labelledby="cta-heading">
-                <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8 md:p-12 lg:p-16 text-center">
-                        <h2 id="cta-heading" className="text-3xl font-light tracking-tight text-slate-900 sm:text-4xl">
-                            Ready to Join?
-                        </h2>
-                        <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-                            Become part of a transparent community. No hidden fees, no guaranteed returns — just voluntary contributions and public accountability.
-                        </p>
-                        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                            <Link 
-                                href={route('register')} 
-                                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-8 py-3.5 text-base font-medium text-white transition-all duration-200 hover:bg-slate-700 hover:shadow-lg hover:shadow-slate-900/20 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
-                            >
-                                Create Free Account
-                                <svg className="ml-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                </svg>
-                            </Link>
-                            <Link 
-                                href={route('public.deposits')} 
-                                className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-8 py-3.5 text-base font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
-                            >
-                                View Public Ledger
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </PublicLayout>
     );
 }

@@ -7,37 +7,75 @@ export default function About() {
 
     return (
         <PublicLayout>
-            <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-                <div className="overflow-hidden rounded-3xl bg-white shadow-xl shadow-gray-200/40 ring-1 ring-gray-100">
-                    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-16 text-center sm:px-16">
-                        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-                            About {company.name}
-                        </h1>
-                        <p className="mt-4 text-lg font-medium text-indigo-100">
-                            Learn more about our vision, our legal entity, and how our community contribution platform operates.
-                        </p>
-                    </div>
-                    
-                    <div className="px-8 py-12 sm:px-16 sm:py-16">
-                        <div className="prose prose-lg prose-indigo mx-auto text-gray-600">
-                            <p className="lead text-xl leading-relaxed text-gray-800">
+            {/* Page Hero */}
+            <section className="relative overflow-hidden bg-gray-950 py-24 sm:py-32">
+                <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"></div>
+                <div className="pointer-events-none absolute -top-40 left-1/4 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]"></div>
+
+                <div className="relative z-10 mx-auto max-w-screen-xl px-4 text-center sm:px-6 lg:px-8">
+                    <p className="text-xs font-black uppercase tracking-widest text-amber-500">Who We Are</p>
+                    <h1 className="mt-3 text-5xl font-black tracking-tight text-white sm:text-6xl">
+                        About {company.name}
+                    </h1>
+                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-amber-400 to-amber-600"></div>
+                    <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-relaxed text-gray-400">
+                        Learn more about our vision, our legal entity, and how our community contribution platform operates.
+                    </p>
+                </div>
+            </section>
+
+            {/* Content */}
+            <section className="bg-white py-24 sm:py-32">
+                <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+                    <div className="grid gap-16 lg:grid-cols-2 lg:items-start">
+                        {/* Left: Main Text */}
+                        <div>
+                            <p className="text-sm font-black uppercase tracking-widest text-amber-600">Our Mission</p>
+                            <h2 className="mt-3 text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
+                                A Community Built on Trust & Transparency
+                            </h2>
+                            <div className="mt-5 h-1 w-16 rounded bg-amber-500"></div>
+                            <p className="mt-8 text-lg font-medium leading-relaxed text-gray-600">
                                 {company.name} is a community contribution platform. Members make small voluntary contributions to a shared fund and may build teams through personal referrals.
                             </p>
-                            
-                            <div className="my-10 rounded-2xl border-l-4 border-indigo-500 bg-indigo-50 p-6 shadow-sm">
-                                <p className="m-0 text-base text-indigo-900">
-                                    The platform is operated by <strong className="font-bold text-indigo-950">{company.name}</strong>, a legal entity registered under registration number <strong className="font-bold text-indigo-950">{company.registration}</strong>. 
-                                    Our registered office is located at <strong className="font-bold text-indigo-950">{company.address}</strong>.
-                                </p>
-                            </div>
-                            
-                            <p className="text-base leading-relaxed">
+                            <p className="mt-6 text-base font-medium leading-relaxed text-gray-600">
                                 Contributions are voluntary donations — they are not investments, deposits with guaranteed yield, or securities. All business rules — contribution limits, referral commission percentages, rank requirements, support fund eligibility — are configurable by administrators and published openly on this site.
                             </p>
                         </div>
+
+                        {/* Right: Info Cards */}
+                        <div className="space-y-6">
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-8 shadow-sm">
+                                <p className="text-xs font-black uppercase tracking-widest text-amber-600">Legal Entity</p>
+                                <h3 className="mt-3 text-2xl font-black text-gray-900">{company.name}</h3>
+                                <p className="mt-3 text-base font-medium text-gray-600">
+                                    Registered and operating as a legal entity under registration number{' '}
+                                    <strong className="font-black text-gray-900">{company.registration}</strong>.
+                                </p>
+                            </div>
+
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-8 shadow-sm">
+                                <p className="text-xs font-black uppercase tracking-widest text-amber-600">Registered Office</p>
+                                <p className="mt-3 text-xl font-bold text-gray-900">{company.address}</p>
+                            </div>
+
+                            <div className="rounded-2xl border border-amber-200/50 bg-amber-50 p-8">
+                                <div className="flex items-start gap-4">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100">
+                                        <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-sm font-semibold leading-relaxed text-amber-900">
+                                        Contributions are voluntary donations and are not investments, deposits, or securities of any kind. Past participation does not guarantee future results.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </PublicLayout>
     );
 }
