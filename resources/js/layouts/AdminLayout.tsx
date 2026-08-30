@@ -23,6 +23,7 @@ const navigation = [
 export default function AdminLayout({ children }: PropsWithChildren) {
     const page = usePage<PageProps>();
     const user = page.props.auth.user!;
+    const { company } = page.props;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -43,7 +44,9 @@ export default function AdminLayout({ children }: PropsWithChildren) {
             >
                 <div className={cn("flex h-16 shrink-0 items-center justify-between border-b border-gray-800", isCollapsed ? "px-0 justify-center" : "px-5")}>
                     <Link href={route('home')} className={cn("flex items-center gap-2 text-base font-bold text-white", isCollapsed && "hidden")}>
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-sm">D</span>
+                        <div className="h-8 w-8 overflow-hidden rounded-lg bg-indigo-500 flex items-center justify-center">
+                            <img src={company.logo} alt="Logo" className="h-full w-full object-cover" />
+                        </div>
                         <span>Admin Panel</span>
                     </Link>
                     <button

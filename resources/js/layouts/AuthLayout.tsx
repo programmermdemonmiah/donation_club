@@ -35,9 +35,9 @@ export default function AuthLayout({ title, subtitle, children }: Props) {
 
                 {/* Logo */}
                 <Link href="/" className="relative z-10 flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500 text-lg font-black text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.4)]">
-                        {company.name.charAt(0)}
-                    </span>
+                    <div className="h-11 w-11 overflow-hidden rounded-xl bg-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                        <img src={company.logo} alt={company.name} className="h-full w-full object-cover" />
+                    </div>
                     <span className="text-lg font-black tracking-wide text-white">{company.name}</span>
                 </Link>
 
@@ -78,9 +78,9 @@ export default function AuthLayout({ title, subtitle, children }: Props) {
             <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16">
                 {/* Mobile logo */}
                 <Link href="/" className="mb-10 flex items-center gap-3 lg:hidden">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-base font-black text-gray-900">
-                        {company.name.charAt(0)}
-                    </span>
+                    <div className="h-10 w-10 overflow-hidden rounded-xl bg-amber-500">
+                        <img src={company.logo} alt={company.name} className="h-full w-full object-cover" />
+                    </div>
                     <span className="text-base font-black tracking-wide text-gray-900">{company.name}</span>
                 </Link>
 

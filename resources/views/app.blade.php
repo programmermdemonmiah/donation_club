@@ -7,7 +7,7 @@
 
         <title inertia>{{ config('app.name', 'Donation Club') }}</title>
 
-        <link rel="icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="{{ app(\App\Services\Settings\SettingsService::class)->get('company.favicon', '/favicon.ico') }}" type="image/x-icon">
 
         @routes
         @viteReactRefresh

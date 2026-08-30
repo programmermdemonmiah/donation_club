@@ -69,9 +69,9 @@ export default function AppLayout({ children }: PropsWithChildren) {
                 {/* Logo */}
                 <div className={cn('flex h-16 shrink-0 items-center border-b border-gray-800/50', isCollapsed ? 'justify-center px-0' : 'justify-between px-5')}>
                     <Link href={route('home')} className={cn('flex items-center gap-2.5', isCollapsed && 'hidden')}>
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500 text-sm font-black text-gray-900 shadow-[0_0_15px_rgba(245,158,11,0.35)]">
-                            {company.name.charAt(0)}
-                        </span>
+                        <div className="h-9 w-9 overflow-hidden rounded-xl bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.35)]">
+                            <img src={company.logo} alt={company.name} className="h-full w-full object-cover" />
+                        </div>
                         <span className="text-sm font-black text-white">{company.name}</span>
                     </Link>
                     <button

@@ -37,21 +37,20 @@ export default function PublicLayout({ children, title = '' }: { children: React
             </Head>
 
             {/* ── Navbar ─────────────────────────────────────────── */}
-            <header className={`sticky top-0 z-50 w-full transition-all duration-500 ${
-                scrolled
-                    ? 'border-b border-gray-800/80 bg-gray-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl'
-                    : 'border-b border-gray-800 bg-gray-950'
-            }`}>
+            <header className={`sticky top-0 z-50 w-full transition-all duration-500 ${scrolled
+                ? 'border-b border-gray-800/80 bg-gray-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl'
+                : 'border-b border-gray-800 bg-gray-950'
+                }`}>
                 <div className="mx-auto flex h-[68px] max-w-screen-xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
                     {/* Logo */}
                     <Link href={route('home')} className="group flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-base font-black text-gray-900 shadow-[0_0_16px_rgba(245,158,11,0.4)] transition-all duration-300 group-hover:shadow-[0_0_24px_rgba(245,158,11,0.6)]">
-                            {company.name.charAt(0)}
-                        </span>
-                        <span className="text-base font-black tracking-wide text-white transition-colors group-hover:text-amber-400">
+                        <div className="h-auto w-35 overflow-hidden rounded-sm">
+                            <img src={company.logo} alt={company.name} className="h-full w-full object-cover" />
+                        </div>
+                        {/* <span className="text-base font-black tracking-wide text-white transition-colors group-hover:text-amber-400">
                             {company.name}
-                        </span>
+                        </span> */}
                     </Link>
 
                     {/* Desktop Nav */}

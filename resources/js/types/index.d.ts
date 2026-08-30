@@ -20,6 +20,8 @@ export interface PageProps {
         address: string;
         phone: string;
         email: string;
+        logo: string;
+        favicon: string;
     };
     chat: {
         widget_code: string;

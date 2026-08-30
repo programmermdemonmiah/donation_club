@@ -23,7 +23,7 @@ export default function Register() {
                 {[
                     { label: 'Full name', key: 'name', type: 'text', placeholder: 'John Smith', autoFocus: true },
                     { label: 'Email address', key: 'email', type: 'email', placeholder: 'you@example.com' },
-                    { label: 'Referral code (optional)', key: 'referral_code', type: 'text', placeholder: 'ABC12345', upper: true },
+                    { label: 'Referral code', key: 'referral_code', type: 'text', placeholder: 'ABC12345', upper: true },
                     { label: 'Password', key: 'password', type: 'password', placeholder: '••••••••' },
                     { label: 'Confirm password', key: 'password_confirmation', type: 'password', placeholder: '••••••••' },
                 ].map(({ label, key, type, placeholder, autoFocus, upper }) => (
@@ -33,7 +33,7 @@ export default function Register() {
                             type={type}
                             value={(form.data as any)[key]}
                             onChange={(e) => form.setData(key as any, upper ? e.target.value.toUpperCase() : e.target.value)}
-                            required={key !== 'referral_code'}
+                            required
                             autoFocus={autoFocus}
                             placeholder={placeholder}
                             className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/20"

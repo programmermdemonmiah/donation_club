@@ -49,6 +49,19 @@ class ReferralServiceTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_registration_fails_without_referral_code(): void
+    {
+        $response = $this->from('/register')->post('/register', [
+            'name' => 'New Member',
+            'email' => 'no-ref@test.local',
+            'password' => 'Sup3r-Secret!',
+            'password_confirmation' => 'Sup3r-Secret!',
+        ]);
+
+        $response->assertSessionHasErrors('referral_code');
+        $this->assertGuest();
+    }
+
     public function test_self_referral_cannot_be_created(): void
     {
         $this->expectException(InvalidArgumentException::class);

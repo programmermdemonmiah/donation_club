@@ -8,6 +8,24 @@ use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\User;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/nai/kono/migration', function () {
+    Artisan::call('migrate');
+
+    return 'Migration run successfully';
+})->name('nai.kono.migration');
+
+Route::get('/optimize-clear', function () {
+    Artisan::call('optimize:clear');
+
+    return 'Optimize cleared successfully';
+})->name('optimize.clear');
+
+Route::get('/storage-link', function () {
+    Artisan::call('storage:link');
+
+    return 'Storage linked successfully';
+})->name('storage.link');
+
 /*
 |--------------------------------------------------------------------------
 | Public routes

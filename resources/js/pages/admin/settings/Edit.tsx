@@ -22,6 +22,8 @@ interface Settings {
     company_address: string;
     company_phone: string;
     company_email: string;
+    company_logo: string;
+    company_favicon: string;
     deposit_min_amount: string;
     deposit_max_amount: string;
     deposit_required_sequence_gap: number;
@@ -44,6 +46,7 @@ interface Settings {
 
 export default function AdminSettings() {
     const page = usePage<PageProps & { settings: Settings; ranks: Array<{ id: number; name: string; level: number }> }>();
+    const errors = (page.props.errors || {}) as Record<string, string>;
     const [rules, setRules] = useState<CommissionRule[]>(page.props.settings.commission_rules);
     const s = page.props.settings;
 
@@ -81,6 +84,56 @@ export default function AdminSettings() {
                         <Input label="Address" name="company_address" defaultValue={s.company_address} className="sm:col-span-2" />
                         <Input label="Phone" name="company_phone" defaultValue={s.company_phone} />
                         <Input label="Support Email" name="company_email" type="email" defaultValue={s.company_email} />
+
+                        <div className="sm:col-span-2 border-t border-gray-100 pt-4 mt-2">
+                            <label className="block text-sm font-semibold text-gray-700">Company Logo</label>
+                            <div className="mt-2 flex items-center gap-4">
+                                {s.company_logo && (
+                                    <div className="h-16 w-16 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center shadow-sm">
+                                        <img src={s.company_logo} alt="Current Logo" className="h-full w-full object-cover" />
+                                    </div>
+                                )}
+                                <div className="flex-1">
+                                    <input
+                                        type="file"
+                                        name="logo"
+                                        accept="image/*"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                    />
+                                    <p className="mt-1 text-xs text-gray-400 font-medium">Supported formats: JPEG, PNG, JPG, WebP, SVG. Max 2MB.</p>
+                                    {errors.logo && (
+                                        <p className="mt-1 text-xs font-semibold text-red-600">{errors.logo}</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="sm:col-span-2 border-t border-gray-100 pt-4">
+                            <label className="block text-sm font-semibold text-gray-700">Favicon</label>
+                            <div className="mt-2 flex items-center gap-4">
+                                {s.company_favicon && (
+                                    <div className="h-10 w-10 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center shadow-sm">
+                                        {s.company_favicon.endsWith('.ico') ? (
+                                            <span className="text-[10px] font-black text-gray-400 uppercase">ICO</span>
+                                        ) : (
+                                            <img src={s.company_favicon} alt="Current Favicon" className="h-full w-full object-contain p-1" />
+                                        )}
+                                    </div>
+                                )}
+                                <div className="flex-1">
+                                    <input
+                                        type="file"
+                                        name="favicon"
+                                        accept=".ico,image/png,image/x-icon,image/jpeg"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                    />
+                                    <p className="mt-1 text-xs text-gray-400 font-medium">Supported formats: ICO, PNG, JPG. Max 1MB.</p>
+                                    {errors.favicon && (
+                                        <p className="mt-1 text-xs font-semibold text-red-600">{errors.favicon}</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </CardBody>
                 </Card>
 

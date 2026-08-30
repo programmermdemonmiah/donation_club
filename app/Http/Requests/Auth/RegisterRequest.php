@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends FormRequest
 {
@@ -16,8 +17,8 @@ class RegisterRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:190', 'unique:users,email'],
-            'password' => ['required', 'string', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-            'referral_code' => ['nullable', 'string', 'max:16'],
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            'referral_code' => ['required', 'string', 'max:16'],
         ];
     }
 }

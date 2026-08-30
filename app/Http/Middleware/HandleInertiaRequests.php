@@ -49,6 +49,8 @@ class HandleInertiaRequests extends Middleware
                 'address' => $settings->get('company.address', '71-75 Shelton Street, London, UK'),
                 'phone' => $settings->get('company.phone', '+44 20 7946 0958'),
                 'email' => $settings->get('company.email', 'support@donationclub.eu'),
+                'logo' => $settings->get('company.logo', '/assets/images/logo.jpeg'),
+                'favicon' => $settings->get('company.favicon', '/favicon.ico'),
             ],
             'chat' => [
                 'widget_code' => $settings->get('chat.widget_code', ''),

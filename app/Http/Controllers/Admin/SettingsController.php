@@ -28,6 +28,8 @@ class SettingsController extends Controller
                 'company_address' => $this->settings->get('company.address', ''),
                 'company_phone' => $this->settings->get('company.phone', ''),
                 'company_email' => $this->settings->get('company.email', ''),
+                'company_logo' => $this->settings->get('company.logo', '/assets/images/logo.jpeg'),
+                'company_favicon' => $this->settings->get('company.favicon', '/favicon.ico'),
                 // deposits
                 'deposit_min_amount' => $this->settings->minDeposit(),
                 'deposit_max_amount' => $this->settings->maxDeposit(),
@@ -73,6 +75,8 @@ class SettingsController extends Controller
             'company_address' => ['nullable', 'string', 'max:500'],
             'company_phone' => ['nullable', 'string', 'max:50'],
             'company_email' => ['nullable', 'email', 'max:200'],
+            'logo' => ['nullable', 'file', 'max:2048'],
+            'favicon' => ['nullable', 'file', 'max:1024'],
             // chat
             'chat_widget_code' => ['nullable', 'string', 'max:5000'],
             // deposits
@@ -102,50 +106,89 @@ class SettingsController extends Controller
             'withdrawal_fee_percent' => ['required', 'numeric', 'min:0', 'max:50'],
         ]);
 
-        DB::transaction(function () use ($validated, $request) {
-            $old = [
-                'deposit' => [$this->settings->minDeposit(), $this->settings->maxDeposit(), $this->settings->requiredSequenceGap()],
-            ];
+        try {
+            DB::transaction(function () use ($validated, $request) {
+                $old = [
+                    'deposit' => [$this->settings->minDeposit(), $this->settings->maxDeposit(), $this->settings->requiredSequenceGap()],
+                ];
 
-            $this->settings->setMany([
-                'company.name' => $validated['company_name'],
-                'company.registration' => $validated['company_registration'] ?? '',
-                'company.address' => $validated['company_address'] ?? '',
-                'company.phone' => $validated['company_phone'] ?? '',
-                'company.email' => $validated['company_email'] ?? '',
-                'chat.widget_code' => $validated['chat_widget_code'] ?? '',
-                'deposit.min_amount' => Money::parse((string) $validated['deposit_min_amount']),
-                'deposit.max_amount' => Money::parse((string) $validated['deposit_max_amount']),
-                'deposit.required_sequence_gap' => (int) $validated['deposit_required_sequence_gap'],
-                'deposit.max_per_account_cycle' => (int) $validated['deposit_max_per_account_cycle'],
-                'commission.enabled' => (bool) ($validated['commission_enabled'] ?? false),
-                'withdrawal.enabled' => (bool) ($validated['withdrawal_enabled'] ?? false),
-                'withdrawal.min_amount' => Money::parse((string) $validated['withdrawal_min_amount']),
-                'withdrawal.max_amount' => Money::parse((string) $validated['withdrawal_max_amount']),
-                'withdrawal.fee_percent' => (string) $validated['withdrawal_fee_percent'],
-            ], 'business');
+                $this->settings->setMany([
+                    'company.name' => $validated['company_name'],
+                    'company.registration' => $validated['company_registration'] ?? '',
+                    'company.address' => $validated['company_address'] ?? '',
+                    'company.phone' => $validated['company_phone'] ?? '',
+                    'company.email' => $validated['company_email'] ?? '',
+                    'chat.widget_code' => $validated['chat_widget_code'] ?? '',
+                    'deposit.min_amount' => Money::parse((string) $validated['deposit_min_amount']),
+                    'deposit.max_amount' => Money::parse((string) $validated['deposit_max_amount']),
+                    'deposit.required_sequence_gap' => (int) $validated['deposit_required_sequence_gap'],
+                    'deposit.max_per_account_cycle' => (int) $validated['deposit_max_per_account_cycle'],
+                    'commission.enabled' => (bool) ($validated['commission_enabled'] ?? false),
+                    'withdrawal.enabled' => (bool) ($validated['withdrawal_enabled'] ?? false),
+                    'withdrawal.min_amount' => Money::parse((string) $validated['withdrawal_min_amount']),
+                    'withdrawal.max_amount' => Money::parse((string) $validated['withdrawal_max_amount']),
+                    'withdrawal.fee_percent' => (string) $validated['withdrawal_fee_percent'],
+                ], 'business');
 
-            foreach (($validated['commission_rules'] ?? []) as $ruleData) {
-                CommissionRule::whereKey($ruleData['id'])->update([
-                    'percentage' => number_format((float) $ruleData['percentage'], 3, '.', ''),
-                    'enabled' => (bool) ($ruleData['enabled'] ?? false),
-                    'trigger_event' => $ruleData['trigger_event'],
+                if ($request->hasFile('logo')) {
+                    $file = $request->file('logo');
+                    $filename = 'logo_'.time().'.'.$file->getClientOriginalExtension();
+                    $file->move(public_path('assets/images'), $filename);
+
+                    $oldLogo = $this->settings->get('company.logo');
+                    if ($oldLogo && $oldLogo !== '/assets/images/logo.jpeg') {
+                        $oldPath = public_path(ltrim($oldLogo, '/'));
+                        if (file_exists($oldPath)) {
+                            @unlink($oldPath);
+                        }
+                    }
+
+                    $this->settings->set('company.logo', '/assets/images/'.$filename, null, 'business');
+                }
+
+                if ($request->hasFile('favicon')) {
+                    $file = $request->file('favicon');
+                    $filename = 'favicon_'.time().'.'.$file->getClientOriginalExtension();
+                    $file->move(public_path('assets/images'), $filename);
+
+                    $oldFavicon = $this->settings->get('company.favicon');
+                    if ($oldFavicon && $oldFavicon !== '/favicon.ico') {
+                        $oldPath = public_path(ltrim($oldFavicon, '/'));
+                        if (file_exists($oldPath)) {
+                            @unlink($oldPath);
+                        }
+                    }
+
+                    $this->settings->set('company.favicon', '/assets/images/'.$filename, null, 'business');
+                }
+
+                foreach (($validated['commission_rules'] ?? []) as $ruleData) {
+                    CommissionRule::whereKey($ruleData['id'])->update([
+                        'percentage' => number_format((float) $ruleData['percentage'], 3, '.', ''),
+                        'enabled' => (bool) ($ruleData['enabled'] ?? false),
+                        'trigger_event' => $ruleData['trigger_event'],
+                    ]);
+                }
+
+                ReturnRule::query()->updateOrCreate([], [
+                    'enabled' => (bool) ($validated['return_enabled'] ?? false),
+                    'return_percent' => filled($validated['return_percent'] ?? null) ? number_format((float) $validated['return_percent'], 3, '.', '') : null,
+                    'minimum_direct_referrals' => (int) ($validated['return_min_direct_referrals'] ?? 2),
+                    'rank_requirement_id' => $validated['return_rank_requirement_id'] ?? null,
+                    'deposit_requirement' => (string) ($validated['return_deposit_requirement'] ?? '0'),
+                    'sequence_requirement' => (int) ($validated['return_sequence_requirement'] ?? 0),
+                    'terms_note' => $validated['return_terms_note'] ?? null,
                 ]);
-            }
 
-            ReturnRule::query()->updateOrCreate([], [
-                'enabled' => (bool) ($validated['return_enabled'] ?? false),
-                'return_percent' => filled($validated['return_percent'] ?? null) ? number_format((float) $validated['return_percent'], 3, '.', '') : null,
-                'minimum_direct_referrals' => (int) ($validated['return_min_direct_referrals'] ?? 2),
-                'rank_requirement_id' => $validated['return_rank_requirement_id'] ?? null,
-                'deposit_requirement' => (string) ($validated['return_deposit_requirement'] ?? '0'),
-                'sequence_requirement' => (int) ($validated['return_sequence_requirement'] ?? 0),
-                'terms_note' => $validated['return_terms_note'] ?? null,
+                AuditLogService::log('settings.updated', null, ['old_deposit' => $old], collect($validated)->except(['commission_rules', 'logo', 'favicon'])->all(), $request->user()->id);
+            });
+
+            return back()->with('success', 'Settings updated.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Settings update failed: ' . $e->getMessage(), [
+                'exception' => $e
             ]);
-
-            AuditLogService::log('settings.updated', null, ['old_deposit' => $old], collect($validated)->except('commission_rules')->all(), $request->user()->id);
-        });
-
-        return back()->with('success', 'Settings updated.');
+            return back()->withErrors(['logo' => 'Settings update failed: ' . $e->getMessage()]);
+        }
     }
 }
