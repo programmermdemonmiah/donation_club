@@ -140,7 +140,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                 <Link
                                     key={item.label}
                                     href={item.href}
-                                    className={`relative rounded-lg px-3 py-2 text-[13px] font-semibold transition-all duration-200 ${
+                                    className={`relative rounded-lg px-4 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         active
                                             ? 'bg-[#0f4d2a] text-white shadow-sm'
                                             : 'text-gray-600 hover:bg-[#0f4d2a]/5 hover:text-[#0f4d2a]'
@@ -241,7 +241,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                 </span>
                                 <span className="text-lg font-black text-white">{company.name}</span>
                             </Link>
-                            <p className="mt-4 max-w-xs text-sm font-medium leading-relaxed text-gray-500">
+                            <p className="mt-4 max-w-xs text-sm font-medium leading-relaxed text-blue-100/70">
                                 A transparent, member-governed platform for voluntary community contributions. Registered in England & Wales.
                             </p>
                             <div className="mt-5 space-y-1.5">
@@ -249,12 +249,12 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                     `Reg. No: ${company.registration}`,
                                     company.address,
                                 ].map((line) => (
-                                    <p key={line} className="text-xs font-medium text-gray-600">{line}</p>
+                                    <p key={line} className="text-xs font-medium text-blue-200/60">{line}</p>
                                 ))}
                             </div>
                         </div>
                         <div>
-                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Platform</h4>
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-blue-300">Platform</h4>
                             <ul className="mt-4 space-y-2.5">
                                 {[
                                     { href: route('public.deposits'), label: 'Public Ledger' },
@@ -264,7 +264,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                     { href: route('pages.contact'), label: 'Contact' },
                                 ].map((item) => (
                                     <li key={item.label}>
-                                        <Link href={item.href} className="text-sm font-medium text-gray-500 transition-colors hover:text-emerald-400">
+                                        <Link href={item.href} className="text-sm font-medium text-blue-100/80 transition-colors hover:text-white">
                                             {item.label}
                                         </Link>
                                     </li>
@@ -272,7 +272,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                             </ul>
                         </div>
                         <div>
-                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Legal</h4>
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-blue-300">Legal</h4>
                             <ul className="mt-4 space-y-2.5">
                                 {[
                                     { href: route('pages.terms'), label: 'Terms & Conditions' },
@@ -280,7 +280,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                     { href: route('pages.risk-disclosure'), label: 'Risk Disclosure' },
                                 ].map((item) => (
                                     <li key={item.label}>
-                                        <Link href={item.href} className="text-sm font-medium text-gray-500 transition-colors hover:text-emerald-400">
+                                        <Link href={item.href} className="text-sm font-medium text-blue-100/80 transition-colors hover:text-white">
                                             {item.label}
                                         </Link>
                                     </li>
@@ -298,10 +298,10 @@ export default function PublicLayout({ children, title = '' }: { children: React
                 </div>
                 <div className="border-t border-blue-900/30 bg-blue-950/80">
                     <div className="mx-auto flex max-w-screen-xl flex-col gap-2 px-4 py-5 sm:px-6 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-                        <p className="text-xs font-medium text-gray-600">
-                            © {new Date().getFullYear()} <span className="font-black text-blue-600">{company.name}</span>. All rights reserved. All donations are voluntary — no guarantees.
+                        <p className="text-xs font-medium text-blue-200/80">
+                            © {new Date().getFullYear()} <span className="font-black text-blue-400">{company.name}</span>. All rights reserved. All donations are voluntary — no guarantees.
                         </p>
-                        <p className="text-xs font-medium text-gray-700">
+                        <p className="text-xs font-medium text-blue-200/60">
                             Regulated · Transparent · Community-Governed
                         </p>
                     </div>

@@ -91,8 +91,8 @@ function Counter({ end, prefix = '', suffix = '', label, sub }: { end: number; p
             <p className="text-5xl font-black tracking-tight text-white lg:text-6xl tabular-nums">
                 {prefix}{n.toLocaleString()}{suffix}
             </p>
-            <p className="mt-1 text-xs font-black uppercase tracking-[.22em] text-blue-600">{label}</p>
-            {sub && <p className="text-[11px] text-gray-500">{sub}</p>}
+            <p className="mt-2 text-xs font-black uppercase tracking-[.22em] text-blue-400">{label}</p>
+            {sub && <p className="mt-1.5 text-[13px] font-medium text-blue-200/90">{sub}</p>}
         </div>
     );
 }
@@ -291,8 +291,8 @@ export default function Home() {
                         {/* Trust micro-row */}
                         <div className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                             {[`Registered · ${company.registration}`, company.address, 'Public Ledger', 'KYC Compliant'].map((t, i) => (
-                                <span key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
-                                    <span className="h-1 w-1 rounded-full bg-blue-600/50" />{t}
+                                <span key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-200">
+                                    <span className="h-1 w-1 rounded-full bg-blue-400/50" />{t}
                                 </span>
                             ))}
                         </div>
@@ -309,7 +309,7 @@ export default function Home() {
                                     className="flex flex-col items-center gap-1 rounded-2xl border border-white/8 bg-white/5 px-4 py-5 backdrop-blur-sm transition-all duration-300 hover:border-blue-600/20 hover:bg-blue-600/5">
                                     <span className="text-2xl">{s.icon}</span>
                                     <p className="text-xl font-black text-white tabular-nums">{s.value}</p>
-                                    <p className="text-[10px] font-bold uppercase tracking-[.18em] text-gray-600">{s.label}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[.18em] text-blue-300">{s.label}</p>
                                 </div>
                             ))}
                         </div>
@@ -553,7 +553,7 @@ export default function Home() {
                                                 className={`flex items-center justify-between px-4 py-4 ${row.active ? 'bg-blue-600/10' : ''}`}>
                                                 <div>
                                                     <p className={`text-sm font-black ${row.active ? 'text-blue-400' : 'text-gray-300'}`}>{row.gen}</p>
-                                                    <p className="text-xs text-gray-600">{row.label}</p>
+                                                    <p className="text-xs text-blue-200">{row.label}</p>
                                                 </div>
                                                 <span className={`rounded-lg px-3 py-1 text-sm font-black ${row.active ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-400'}`}>
                                                     {row.rate}
@@ -562,7 +562,7 @@ export default function Home() {
                                         ))}
                                     </div>
                                     <div className="border-t border-white/10 bg-white/5 px-6 py-3">
-                                        <p className="text-[11px] text-gray-700">*Actual rates configured by club admin. For illustration only.</p>
+                                        <p className="text-[11px] text-blue-200/70">*Actual rates configured by club admin. For illustration only.</p>
                                     </div>
                                 </div>
                             </div>
