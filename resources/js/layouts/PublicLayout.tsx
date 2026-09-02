@@ -163,9 +163,6 @@ export default function PublicLayout({ children, title = '' }: { children: React
                             </Link>
                         ) : (
                             <div className="flex items-center gap-2.5">
-                                <Link href={route('login')} className="hidden text-sm font-bold text-gray-600 hover:text-[#0f4d2a] xl:inline-flex transition-colors">
-                                    Login
-                                </Link>
                                 <div className="flex overflow-hidden rounded-lg border border-[#0f4d2a] bg-white shadow-sm">
                                     <Link href={route('login')} className="px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors">Login</Link>
                                     <span className="w-px bg-[#0f4d2a]"></span>
