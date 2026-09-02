@@ -78,6 +78,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Administrator',
                 'password' => env('ADMIN_PASSWORD', '12345678'),
                 'is_admin' => true,
+                'username' => "admin",
                 'status' => \App\Enums\UserStatus::Active->value,
                 'referral_code' => \App\Services\Referral\ReferralService::generateReferralCode(),
                 'email_verified_at' => now(),

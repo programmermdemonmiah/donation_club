@@ -6,12 +6,20 @@ use App\Http\Controllers\KycController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\User;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/nai/kono/migration', function () {
-    Artisan::call('migrate');
-
-    return 'Migration run successfully';
+    try {
+        Artisan::call('migrate');
+// :fresh', [
+//             '--seed' => true,
+//             '--force' => true,
+//         ]
+        return 'Migration run successfully<br><pre>'.e(Artisan::output()).'</pre>';
+    } catch (\Throwable $e) {
+        return response('Migration failed: '.$e->getMessage().'<br><pre>'.e(Artisan::output()).'</pre>', 500);
+    }
 })->name('nai.kono.migration');
 
 Route::get('/optimize-clear', function () {
