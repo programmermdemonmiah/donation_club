@@ -106,7 +106,7 @@ function Ticker({ items }: { items: string[] }) {
         <div className="relative overflow-hidden border-y border-blue-600/20 bg-blue-900/80 py-3 backdrop-blur-sm">
             <div className="flex animate-[marquee_30s_linear_infinite] whitespace-nowrap">
                 {list.map((item, i) => (
-                    <span key={i} className="mx-8 text-xs font-bold uppercase tracking-[.18em] text-blue-600/70">
+                    <span key={i} className="mx-8 text-xs font-bold uppercase tracking-[.18em] text-white">
                         ◆ {item}
                     </span>
                 ))}
