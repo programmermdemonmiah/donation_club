@@ -572,40 +572,164 @@ export default function Home() {
             </section>
 
             {/* ══════════════════════════════════════════
-                FINAL CTA
+                FINAL CTA - MOTIVATIONAL / UNIQUE DESIGN
             ══════════════════════════════════════════ */}
-            <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-600 to-emerald-500 py-28">
-                {/* Pattern overlay */}
-                <div className="absolute inset-0 opacity-[0.07]"
-                    style={{ backgroundImage: 'repeating-linear-gradient(45deg,#000 0,#000 1px,transparent 0,transparent 50%)', backgroundSize: '20px 20px' }} />
+            <section className="relative overflow-hidden bg-[#0a2e1a] py-20 sm:py-24 lg:py-28">
+                {/* Unique background - deep green with gold/blue accents */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0f4d2a] via-[#0a341c] to-[#071e12]"></div>
+                <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #c8a84e 1px, transparent 0)', backgroundSize: '28px 28px' }}></div>
+                {/* Gold glow - top left */}
+                <div className="pointer-events-none absolute -top-24 -left-24 h-[420px] w-[420px] rounded-full bg-[#c8a84e]/12 blur-[80px]"></div>
+                {/* Emerald glow - bottom right */}
+                <div className="pointer-events-none absolute -bottom-32 -right-32 h-[520px] w-[520px] rounded-full bg-emerald-500/10 blur-[90px]"></div>
+                {/* Blue glow - center */}
+                <div className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/8 blur-[70px]"></div>
+                {/* Decorative gold curve - top */}
+                <div className="pointer-events-none absolute right-0 top-0 hidden h-[90px] w-[320px] overflow-hidden lg:block">
+                    <div className="absolute right-[-20px] top-[-14px] h-[70px] w-[360px] rotate-[-2deg] rounded-bl-[32px] border-b border-[#c8a84e]/30 bg-white/[0.04]"></div>
+                </div>
 
-                <div className="relative mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8 text-center">
-                    <FadeUp>
-                        <span className="inline-block rounded-full border border-gray-900/20 bg-gray-900/10 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-gray-900/80">
-                            Join {company.name}
-                        </span>
-                        <h2 className="mt-5 text-5xl font-black tracking-tight text-gray-900 sm:text-6xl">
-                            Your Journey<br />Starts Now.
-                        </h2>
-                        <p className="mx-auto mt-6 max-w-lg text-base font-semibold text-gray-800/70">
-                            Register for free. Make your first voluntary contribution.
-                            Start building your global network today.
-                        </p>
-                        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                            <Link href={route('register')}
-                                className="group relative overflow-hidden rounded-2xl bg-gray-900 px-10 py-4 text-base font-black text-white shadow-2xl transition-all duration-300 hover:scale-[1.03] hover:shadow-gray-900/50">
-                                <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-white/10 transition-transform duration-700 group-hover:translate-x-full" />
-                                <span className="relative">Create Free Account →</span>
-                            </Link>
-                            <Link href={route('public.deposits')}
-                                className="text-sm font-bold text-gray-900/60 underline underline-offset-4 transition-colors hover:text-gray-900">
-                                View public ledger first
-                            </Link>
-                        </div>
-                        <p className="mt-8 text-xs font-bold text-gray-900/40">
-                            Free to join · No minimum commitment · Contributions are voluntary
-                        </p>
-                    </FadeUp>
+                <div className="relative mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+                    <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:items-center">
+                        {/* Left: Motivational Content */}
+                        <FadeUp>
+                            <div className="text-center lg:text-left">
+                                <span className="inline-flex items-center gap-2 rounded-full border border-[#c8a84e]/25 bg-[#c8a84e]/10 px-4 py-1.5 backdrop-blur-sm">
+                                    <span className="flex h-2 w-2 rounded-full bg-[#c8a84e] animate-pulse"></span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c8a84e]">Together for a Better Tomorrow</span>
+                                </span>
+
+                                <h2 className="mt-6 text-[32px] font-black leading-[0.95] tracking-[-0.02em] text-white sm:text-[42px] lg:text-[48px]">
+                                    Your Small
+                                    <span className="relative inline-block">
+                                        <span className="bg-gradient-to-r from-[#c8a84e] via-[#e6c878] to-[#c8a84e] bg-clip-text text-transparent"> Kindness</span>
+                                    </span>
+                                    <br />
+                                    <span className="text-white">Creates Big</span>{' '}
+                                    <span className="bg-gradient-to-r from-emerald-300 to-blue-300 bg-clip-text text-transparent">Hope.</span>
+                                </h2>
+
+                                <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium leading-relaxed text-white/70 lg:mx-0">
+                                    In a world where you can be anything — <span className="font-bold text-white">be generous</span>. Your voluntary donation is not just an amount, it is <span className="font-semibold text-[#e6c878]">hope for a family, education for a child, strength for a community.</span> Join thousands of hearts beating as one.
+                                </p>
+
+                                {/* Motivational pillars */}
+                                <div className="mx-auto mt-7 grid max-w-md grid-cols-3 gap-3 lg:mx-0">
+                                    {[
+                                        { icon: '♥', label: 'Give', sub: 'with Purpose' },
+                                        { icon: '🤝', label: 'Grow', sub: 'with Community' },
+                                        { icon: '✨', label: 'Glow', sub: 'with Gratitude' },
+                                    ].map((item) => (
+                                        <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.06] px-2 py-3 backdrop-blur-sm text-center">
+                                            <div className="text-[16px]">{item.icon}</div>
+                                            <div className="mt-1 text-[12px] font-black leading-none text-white">{item.label}</div>
+                                            <div className="text-[10px] font-semibold text-white/60">{item.sub}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:justify-start justify-center">
+                                    <Link
+                                        href={route('register')}
+                                        className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-r from-[#c8a84e] to-[#b89a3e] px-7 py-3.5 text-[14px] font-black text-[#0a2e1a] shadow-[0_8px_24px_rgba(200,168,78,0.3)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(200,168,78,0.4)] hover:scale-[1.02] sm:w-auto"
+                                    >
+                                        <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full"></span>
+                                        <span className="relative flex items-center gap-2">Start Giving Today <span className="text-base">→</span></span>
+                                    </Link>
+                                    <Link
+                                        href={route('public.deposits')}
+                                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-bold text-white/80 backdrop-blur-sm hover:bg-white/10 hover:text-white transition-colors sm:w-auto"
+                                    >
+                                        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        See Live Donations
+                                    </Link>
+                                </div>
+
+                                <p className="mt-4 text-center text-xs font-semibold tracking-wide text-white/40 lg:text-left">
+                                    No pressure · No promises · Just pure generosity · Be the reason someone believes in goodness
+                                </p>
+                            </div>
+                        </FadeUp>
+
+                        {/* Right: Unique Visual Card */}
+                        <FadeUp delay={120}>
+                            <div className="relative mx-auto w-full max-w-[420px] lg:ml-auto">
+                                {/* Card stack effect */}
+                                <div className="absolute -right-2 top-2 h-full w-full rounded-[24px] bg-[#c8a84e]/10 rotate-[1.5deg]"></div>
+                                <div className="absolute -right-1 top-1 h-full w-full rounded-[24px] bg-white/[0.04] rotate-[0.7deg]"></div>
+
+                                <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-white shadow-2xl">
+                                    {/* Card header - donation club branding */}
+                                    <div className="bg-gradient-to-r from-[#0f4d2a] to-[#134e2d] px-5 py-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 border border-white/20 text-white text-sm">♥</div>
+                                                <div>
+                                                    <div className="text-xs font-black tracking-wide text-white">DONATIONCLUB</div>
+                                                    <div className="text-[8px] font-bold tracking-[0.15em] text-[#c8a84e]">TOGETHER FOR A BETTER TOMORROW</div>
+                                                </div>
+                                            </div>
+                                            <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold text-white border border-white/15">Live</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Impact preview */}
+                                    <div className="p-5">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-xs font-black uppercase tracking-[0.14em] text-gray-400">Community Impact</p>
+                                            <span className="text-xs font-bold text-emerald-600 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Live</span>
+                                        </div>
+
+                                        <div className="mt-4 grid grid-cols-3 gap-2.5">
+                                            {[
+                                                { k: '12k+', l: 'Donors' },
+                                                { k: '$84k+', l: 'Shared' },
+                                                { k: '1.4k', l: 'Lives Touched' },
+                                            ].map((s) => (
+                                                <div key={s.k} className="rounded-xl bg-gradient-to-br from-blue-50 to-emerald-50/60 border border-blue-100/50 px-3 py-3 text-center">
+                                                    <div className="text-[14px] font-black text-[#0f4d2a]">{s.k}</div>
+                                                    <div className="text-[9px] font-bold uppercase tracking-wide text-gray-500">{s.l}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="mt-4 space-y-2.5">
+                                            {[
+                                                { name: 'Aarav P.', amount: '$10.00', time: '2m ago', initial: 'A' },
+                                                { name: 'Fatima K.', amount: '$5.00', time: '7m ago', initial: 'F' },
+                                                { name: 'John D.', amount: '$8.00', time: '12m ago', initial: 'J' },
+                                            ].map((d) => (
+                                                <div key={d.name} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/60 px-3 py-2.5">
+                                                    <div className="flex items-center gap-2.5">
+                                                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0f4d2a] text-[10px] font-black text-white">{d.initial}</span>
+                                                        <div>
+                                                            <div className="text-xs font-bold text-gray-900 leading-none">{d.name}</div>
+                                                            <div className="text-[10px] text-gray-500">{d.time} · Donated</div>
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-xs font-black text-emerald-600">+{d.amount}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="mt-4 rounded-xl bg-[#0f4d2a] px-4 py-3 text-center">
+                                            <p className="text-[11px] font-semibold leading-relaxed text-white/80">“I donated <span className="font-black text-[#c8a84e]">$5</span> — small for me, big for someone else. This feels like family.”</p>
+                                            <p className="mt-1 text-[10px] font-bold text-white/50">— Real member, verified donation</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Floating badge */}
+                                <div className="absolute -bottom-3 -left-3 rounded-xl bg-white px-3 py-2 shadow-xl border border-gray-100 hidden sm:flex items-center gap-2">
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white text-xs">✓</span>
+                                    <div>
+                                        <div className="text-xs font-black leading-none text-gray-900">100% Transparent</div>
+                                        <div className="text-[10px] font-medium text-gray-500">Public ledger verified</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </FadeUp>
+                    </div>
                 </div>
             </section>
 
