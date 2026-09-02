@@ -17,7 +17,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
     }, []);
 
     const nav = [
-        { href: route('public.deposits'), label: 'Deposits', name: 'public.deposits' },
+        { href: route('public.deposits'), label: 'Donors', name: 'public.deposits' },
         { href: route('pages.about'), label: 'About', name: 'pages.about' },
         { href: route('pages.how-it-works'), label: 'How It Works', name: 'pages.how-it-works' },
         { href: route('pages.faq'), label: 'FAQ', name: 'pages.faq' },
