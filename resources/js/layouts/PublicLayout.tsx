@@ -11,18 +11,18 @@ export default function PublicLayout({ children, title = '' }: { children: React
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 40);
+        const onScroll = () => setScrolled(window.scrollY > 10);
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
     const nav = [
-        { href: route('public.deposits'), label: 'Deposits' },
-        { href: route('pages.about'), label: 'About' },
-        { href: route('pages.how-it-works'), label: 'How It Works' },
-        { href: route('pages.faq'), label: 'FAQ' },
-        { href: route('pages.risk-disclosure'), label: 'Risk Disclosure' },
-        { href: route('pages.contact'), label: 'Contact' },
+        { href: route('public.deposits'), label: 'Deposits', name: 'public.deposits' },
+        { href: route('pages.about'), label: 'About', name: 'pages.about' },
+        { href: route('pages.how-it-works'), label: 'How It Works', name: 'pages.how-it-works' },
+        { href: route('pages.faq'), label: 'FAQ', name: 'pages.faq' },
+        { href: route('pages.risk-disclosure'), label: 'Risk Disclosure', name: 'pages.risk-disclosure' },
+        { href: route('pages.contact'), label: 'Contact', name: 'pages.contact' },
     ];
 
     const pageTitle = title ? `${title} — ${company.name}` : company.name;
@@ -36,100 +36,195 @@ export default function PublicLayout({ children, title = '' }: { children: React
                 <meta property="og:description" content={`${company.name} — transparent, fair, community governed.`} />
             </Head>
 
-            {/* ── Navbar ─────────────────────────────────────────── */}
-            <header className={`sticky top-0 z-50 w-full transition-all duration-500 ${scrolled
-                ? 'border-b border-blue-900/50 bg-blue-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl'
-                : 'border-b border-blue-900/50 bg-blue-950'
-                }`}>
-                <div className="mx-auto flex h-[68px] max-w-screen-xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            {/* ── Navbar - Full Fixed Complete Design ────────────────── */}
+            <header className={`sticky top-0 z-50 w-full bg-white ${scrolled ? 'shadow-lg shadow-gray-100/70 border-b border-gray-100' : 'border-b border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)]'}`}>
 
-                    {/* Logo */}
-                    <Link href={route('home')} className="group flex items-center gap-3">
-                        <div className="h-auto w-35 overflow-hidden rounded-sm">
-                            <img src={company.logo} alt={company.name} className="h-full w-full object-cover" />
+                {/* ===== Mobile Header - SAME AS IMAGE (320px-1024px) ===== */}
+                <div className="relative mx-auto flex h-[62px] max-w-screen-xl items-center justify-between gap-1.5 px-2 sm:h-[64px] sm:gap-2 sm:px-3 lg:hidden">
+                    {/* Left: Logo column - as image */}
+                    <Link href={route('home')} className="flex shrink-0 flex-col items-center -mt-1">
+                        <span className="text-[6px] font-medium leading-none tracking-wide text-gray-400">Logo</span>
+                        <div className="relative mt-[1px] flex h-[36px] w-[36px] items-center justify-center rounded-full border-[1.5px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden sm:h-[40px] sm:w-[40px]">
+                            {company.logo ? (
+                                <img src={company.logo} alt={company.name} className="h-[24px] w-[24px] object-contain sm:h-[26px] sm:w-[26px]" />
+                            ) : (
+                                <>
+                                    <div className="absolute inset-[3px] rounded-full border border-[#c8a84e]/40"></div>
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex gap-[1px] text-[#c8a84e] text-[5px] leading-none">★ ★ ★</div>
+                                        <span className="mt-[1px] text-[13px] leading-none">👐</span>
+                                    </div>
+                                </>
+                            )}
                         </div>
-                        {/* <span className="text-base font-black tracking-wide text-white transition-colors group-hover:text-emerald-400">
-                            {company.name}
-                        </span> */}
+                        <span className="mt-[1px] text-[5.5px] font-black leading-none tracking-[0.05em] text-[#0f4d2a]">DONATIONCLUB</span>
+                        <span className="text-[4px] font-bold leading-none tracking-[0.07em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
                     </Link>
 
-                    {/* Desktop Nav */}
-                    <nav className="hidden items-center gap-0.5 lg:flex">
-                        {nav.map((item) => (
-                            <Link
-                                key={item.label}
-                                href={item.href}
-                                className="relative rounded-lg px-4 py-2 text-sm font-semibold text-gray-400 transition-all duration-200 hover:bg-white/5 hover:text-white"
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
-                    </nav>
+                    {/* Center: Title - as image */}
+                    <div className="flex min-w-0 flex-1 flex-col items-center justify-center px-1">
+                        <h1 className="whitespace-nowrap text-center text-[14px] font-black leading-none tracking-[0.01em] text-[#0f3d2b] sm:text-[16px]">
+                            DONATION<span className="text-[#0f3d2b]">CLUB</span>
+                        </h1>
+                        <p className="mt-[1px] whitespace-nowrap text-center text-[4.5px] font-bold leading-none tracking-[0.18em] text-[#b89a3e] sm:text-[5.5px]">
+                            TOGETHER FOR A BETTER TOMORROW
+                        </p>
+                        <div className="mt-[3px] flex w-full max-w-[120px] items-center justify-center gap-1 sm:max-w-[140px]">
+                            <span className="h-[1.5px] flex-1 bg-gradient-to-r from-transparent to-[#c8a84e]/80"></span>
+                            <span className="h-[4px] w-[4px] shrink-0 rotate-45 border border-[#c8a84e] bg-[#c8a84e]/15"></span>
+                            <span className="h-[1.5px] flex-1 bg-gradient-to-l from-transparent to-[#c8a84e]/80"></span>
+                        </div>
+                    </div>
 
-                    {/* CTAs */}
-                    <div className="hidden items-center gap-3 lg:flex">
+                    {/* Right: Login | Register - as image */}
+                    <div className="flex shrink-0 items-center gap-1">
                         {user ? (
                             <Link
                                 href={user.is_admin ? '/admin' : route('dashboard')}
-                                className="group relative overflow-hidden rounded-xl bg-blue-600 px-5 py-2 text-sm font-black tracking-wide text-white shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(37,99,235,0.55)]"
+                                className="rounded-[6px] border border-gray-800 bg-white px-2.5 py-[5px] text-[10px] font-bold leading-none text-gray-800 shadow-sm hover:bg-gray-50"
                             >
-                                <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
-                                Dashboard →
+                                Dashboard
                             </Link>
                         ) : (
-                            <>
-                                <Link href={route('login')} className="text-sm font-bold text-gray-400 transition-colors hover:text-white">
-                                    Log in
-                                </Link>
-                                <Link
-                                    href={route('register')}
-                                    className="group relative overflow-hidden rounded-xl bg-blue-600 px-6 py-2 text-sm font-black tracking-wide text-white shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(37,99,235,0.55)]"
-                                >
-                                    <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
-                                    Join Now
-                                </Link>
-                            </>
+                            <div className="flex overflow-hidden rounded-[6px] border border-gray-800 bg-white shadow-sm">
+                                <Link href={route('login')} className="px-2 py-[5px] text-[10px] font-semibold leading-none text-gray-800 hover:bg-gray-50 sm:px-2.5 sm:text-[11px]">Login</Link>
+                                <span className="w-px bg-gray-800"></span>
+                                <Link href={route('register')} className="px-2 py-[5px] text-[10px] font-semibold leading-none text-gray-800 hover:bg-gray-50 sm:px-2.5 sm:text-[11px]">Register</Link>
+                            </div>
                         )}
+                        <button
+                            onClick={() => setMobileOpen(!mobileOpen)}
+                            aria-label="Toggle menu"
+                            aria-expanded={mobileOpen}
+                            className="flex h-[30px] w-[30px] items-center justify-center rounded-md bg-[#0f4d2a] text-white shadow-sm transition-colors hover:bg-[#0a341c] sm:h-8 sm:w-8"
+                        >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                {mobileOpen
+                                    ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                                }
+                            </svg>
+                        </button>
                     </div>
-
-                    {/* Mobile toggle */}
-                    <button
-                        className="flex items-center justify-center rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-900/50 hover:text-white lg:hidden"
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                    >
-                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            {mobileOpen
-                                ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                            }
-                        </svg>
-                    </button>
                 </div>
 
-                {/* Mobile menu */}
-                {mobileOpen && (
-                    <div className="border-t border-blue-900/50 bg-blue-950 lg:hidden">
-                        <div className="space-y-1 px-4 py-4">
-                            {nav.map((item) => (
-                                <Link key={item.label} href={item.href}
-                                    className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-400 transition-colors hover:bg-blue-900/50 hover:text-emerald-400"
-                                    onClick={() => setMobileOpen(false)}>
-                                    {item.label}
-                                </Link>
-                            ))}
-                            <div className="border-t border-blue-900/50 pt-4 pb-1 space-y-2">
-                                {user ? (
-                                    <Link href={user.is_admin ? '/admin' : route('dashboard')}
-                                        className="block rounded-xl bg-blue-600 px-4 py-2.5 text-center text-sm font-black text-white">
-                                        Dashboard
-                                    </Link>
+                {/* ===== Desktop Header - Complete ===== */}
+                <div className="relative mx-auto hidden h-[76px] max-w-screen-xl items-center justify-between gap-4 px-6 lg:flex xl:px-8">
+                    {/* Brand */}
+                    <Link href={route('home')} className="flex shrink-0 items-center gap-3 group">
+                        <div className="flex flex-col items-center">
+                            <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden group-hover:shadow-md transition-shadow">
+                                {company.logo ? (
+                                    <img src={company.logo} alt={company.name} className="h-7 w-7 object-contain" />
                                 ) : (
-                                    <>
-                                        <Link href={route('login')} className="block py-2 text-center text-sm font-bold text-gray-400">Log in</Link>
-                                        <Link href={route('register')} className="block rounded-xl bg-blue-600 px-4 py-2.5 text-center text-sm font-black text-white">Join Now</Link>
-                                    </>
+                                    <span className="text-base">🤲</span>
                                 )}
                             </div>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[19px] font-black leading-none tracking-[0.02em] text-[#0f3d2b]">DONATION<span className="text-[#0f3d2b]">CLUB</span></span>
+                            <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
+                            <div className="mt-[4px] flex items-center gap-1.5">
+                                <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
+                                <span className="h-[6px] w-[6px] rotate-45 border border-[#c8a84e] bg-[#c8a84e]/10"></span>
+                                <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
+                            </div>
+                        </div>
+                    </Link>
+
+                    {/* Navigation - Center */}
+                    <nav className="flex items-center gap-1">
+                        {nav.map((item) => {
+                            const active = typeof route !== 'undefined' && route().current(item.name);
+                            return (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    className={`relative rounded-lg px-3 py-2 text-[13px] font-semibold transition-all duration-200 ${
+                                        active
+                                            ? 'bg-[#0f4d2a] text-white shadow-sm'
+                                            : 'text-gray-600 hover:bg-[#0f4d2a]/5 hover:text-[#0f4d2a]'
+                                    }`}
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
+                    </nav>
+
+                    {/* Auth - Right */}
+                    <div className="flex shrink-0 items-center gap-2.5">
+                        {user ? (
+                            <Link
+                                href={user.is_admin ? '/admin' : route('dashboard')}
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-[#0f4d2a] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#0a341c]"
+                            >
+                                Dashboard <span className="text-white/70">→</span>
+                            </Link>
+                        ) : (
+                            <div className="flex items-center gap-2.5">
+                                <Link href={route('login')} className="hidden text-sm font-bold text-gray-600 hover:text-[#0f4d2a] xl:inline-flex transition-colors">
+                                    Login
+                                </Link>
+                                <div className="flex overflow-hidden rounded-lg border border-[#0f4d2a] bg-white shadow-sm">
+                                    <Link href={route('login')} className="px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors">Login</Link>
+                                    <span className="w-px bg-[#0f4d2a]"></span>
+                                    <Link href={route('register')} className="bg-[#0f4d2a] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#0a341c] transition-colors">Register</Link>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Mobile Dropdown - Full */}
+                {mobileOpen && (
+                    <div className="border-t border-gray-100 bg-white shadow-xl lg:hidden animate-[fadeIn_0.2s_ease]">
+                        <nav className="space-y-0.5 px-3 py-3">
+                            {nav.map((item) => {
+                                const active = typeof route !== 'undefined' && route().current(item.name);
+                                return (
+                                    <Link
+                                        key={item.label}
+                                        href={item.href}
+                                        onClick={() => setMobileOpen(false)}
+                                        className={`flex items-center justify-between rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
+                                            active ? 'bg-[#0f4d2a] text-white' : 'text-gray-700 hover:bg-[#0f4d2a]/5 hover:text-[#0f4d2a]'
+                                        }`}
+                                    >
+                                        {item.label}
+                                        <span className={`text-xs ${active ? 'text-white/60' : 'text-gray-300'}`}>›</span>
+                                    </Link>
+                                );
+                            })}
+                        </nav>
+                        <div className="border-t border-gray-100 bg-gray-50/70 px-3 py-3">
+                            {user ? (
+                                <Link
+                                    href={user.is_admin ? '/admin' : route('dashboard')}
+                                    onClick={() => setMobileOpen(false)}
+                                    className="flex w-full items-center justify-center rounded-lg bg-[#0f4d2a] px-4 py-3 text-sm font-bold text-white shadow"
+                                >
+                                    Go to Dashboard →
+                                </Link>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Link
+                                        href={route('login')}
+                                        onClick={() => setMobileOpen(false)}
+                                        className="rounded-lg border border-gray-300 bg-white px-4 py-3 text-center text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50"
+                                    >
+                                        Login
+                                    </Link>
+                                    <Link
+                                        href={route('register')}
+                                        onClick={() => setMobileOpen(false)}
+                                        className="rounded-lg bg-[#0f4d2a] px-4 py-3 text-center text-sm font-bold text-white shadow hover:bg-[#0a341c]"
+                                    >
+                                        Register
+                                    </Link>
+                                </div>
+                            )}
+                            <p className="mt-3 text-center text-[11px] font-medium text-gray-400">Together for a better tomorrow</p>
                         </div>
                     </div>
                 )}
@@ -140,10 +235,8 @@ export default function PublicLayout({ children, title = '' }: { children: React
 
             {/* ── Footer ─────────────────────────────────────────── */}
             <footer className="border-t border-blue-900/50 bg-blue-950">
-                {/* Main footer */}
                 <div className="mx-auto max-w-screen-xl px-4 py-14 sm:px-6 lg:px-8">
                     <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-                        {/* Brand */}
                         <div className="lg:col-span-2">
                             <Link href={route('home')} className="flex items-center gap-3">
                                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-base font-black text-white shadow-[0_0_16px_rgba(37,99,235,0.3)]">
@@ -163,8 +256,6 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                 ))}
                             </div>
                         </div>
-
-                        {/* Platform */}
                         <div>
                             <h4 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Platform</h4>
                             <ul className="mt-4 space-y-2.5">
@@ -183,8 +274,6 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                 ))}
                             </ul>
                         </div>
-
-                        {/* Legal */}
                         <div>
                             <h4 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Legal</h4>
                             <ul className="mt-4 space-y-2.5">
@@ -200,7 +289,6 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                     </li>
                                 ))}
                             </ul>
-
                             <div className="mt-8">
                                 <Link href={route('register')}
                                     className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-[0_0_20px_rgba(37,99,235,0.25)] transition-all duration-300 hover:bg-blue-500">
@@ -211,8 +299,6 @@ export default function PublicLayout({ children, title = '' }: { children: React
                         </div>
                     </div>
                 </div>
-
-                {/* Bottom bar */}
                 <div className="border-t border-blue-900/30 bg-blue-950/80">
                     <div className="mx-auto flex max-w-screen-xl flex-col gap-2 px-4 py-5 sm:px-6 sm:flex-row sm:items-center sm:justify-between lg:px-8">
                         <p className="text-xs font-medium text-gray-600">
