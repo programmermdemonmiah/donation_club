@@ -28,7 +28,7 @@ export default function AdminWallets() {
                             render: (w) =>
                                 w.user ? (
                                     <a href={route('admin.users.show', w.user.id)} className="group">
-                                        <span className="block font-medium text-gray-900 group-hover:text-indigo-600">{w.user.name}</span>
+                                        <span className="block font-medium text-gray-900 group-hover:text-blue-600">{w.user.name}</span>
                                         <span className="block text-xs text-gray-400">{w.user.email}</span>
                                     </a>
                                 ) : '—',

@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Commission;
 use App\Models\Deposit;
 use App\Models\DepositSequence;
+use App\Models\MemberReturn;
+use App\Models\User;
 use App\Services\Settings\SettingsService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Public pages. Only intentionally public information is exposed:
- * deposit sequence + amount — never personal data.
+ * Public pages. Public donation ledger exposes donor name, sequence and amount
+ * in permanent order for transparency — as requested.
  */
 class PublicController extends Controller
 {
-    public function __construct(private readonly SettingsService $settings)
-    {
-    }
+    public function __construct(private readonly SettingsService $settings) {}
 
     public function home(): Response
     {
@@ -28,8 +29,8 @@ class PublicController extends Controller
             ],
             'stats' => [
                 'deposits' => Deposit::query()->completed()->count(),
-                'paid_out' => \App\Models\Commission::query()->where('status', 'credited')->sum('amount') + \App\Models\MemberReturn::query()->where('status', 'completed')->sum('payout_amount'),
-                'members' => \App\Models\User::query()->where('is_admin', false)->count(),
+                'paid_out' => Commission::query()->where('status', 'credited')->sum('amount') + MemberReturn::query()->where('status', 'completed')->sum('payout_amount'),
+                'members' => User::query()->where('is_admin', false)->count(),
                 'countries' => 12, // Placeholder or User::distinct('country')->count() if country exists
             ],
             'latestDeposits' => Deposit::query()
@@ -50,9 +51,10 @@ class PublicController extends Controller
     {
         $sequences = DepositSequence::query()
             ->join('deposits', 'deposits.id', '=', 'deposit_sequences.deposit_id')
+            ->join('users', 'users.id', '=', 'deposits.user_id')
             ->where('deposits.status', 'completed')
             ->orderByDesc('deposit_sequences.sequence_number')
-            ->select('deposit_sequences.sequence_number', 'deposits.amount', 'deposits.completed_at')
+            ->select('deposit_sequences.sequence_number', 'deposits.amount', 'deposits.completed_at', 'users.name as donor_name')
             ->paginate(20);
 
         return Inertia::render('public/PublicDeposits', [
@@ -61,6 +63,8 @@ class PublicController extends Controller
                 'formatted' => sprintf('#%06d', $row->sequence_number),
                 'amount' => (string) $row->amount,
                 'completed_at' => optional($row->completed_at)?->toIso8601String(),
+                'donor_name' => (string) $row->donor_name,
+                'donor_initial' => strtoupper(mb_substr((string) $row->donor_name, 0, 1)),
             ]),
         ]);
     }

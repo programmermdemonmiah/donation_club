@@ -6,4 +6,26 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Brand palette: Blue primary, Emerald green secondary, White surfaces */
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-light: #dbeafe;
+    --color-secondary: #059669;
+    --color-secondary-hover: #047857;
+    --color-secondary-light: #d1fae5;
+    --color-surface: #ffffff;
+}
+
+/* Brand scrollbar and selection */
+::selection {
+    background-color: #2563eb;
+    color: white;
+}
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #2563eb, #059669);
+    border-radius: 9999px;
 }

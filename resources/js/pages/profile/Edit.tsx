@@ -19,7 +19,7 @@ function FormInput({ label, ...props }: { label: string } & React.InputHTMLAttri
     return (
         <div className="space-y-1">
             <label className="block text-sm font-bold text-gray-700">{label}</label>
-            <input {...props} className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/20 disabled:cursor-not-allowed disabled:opacity-50" />
+            <input {...props} className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/20 disabled:cursor-not-allowed disabled:opacity-50" />
         </div>
     );
 }
@@ -43,7 +43,7 @@ export default function Profile() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Account Settings</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Account Settings</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Profile & Security</h1>
             </div>
 
@@ -64,11 +64,11 @@ export default function Profile() {
                             <textarea
                                 rows={3} value={profile.data.bio}
                                 onChange={(e) => profile.setData('bio', e.target.value)}
-                                className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+                                className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/20"
                             />
                         </div>
                         <button type="submit" disabled={profile.processing}
-                            className="group relative overflow-hidden rounded-xl bg-amber-500 px-6 py-2.5 text-sm font-black text-gray-900 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all hover:bg-amber-400 disabled:opacity-60">
+                            className="group relative overflow-hidden rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-black text-white shadow-[0_0_15px_rgba(37,99,235,0.2)] transition-all hover:bg-blue-500 disabled:opacity-60">
                             <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                             {profile.processing ? 'Saving…' : 'Save Changes'}
                         </button>
@@ -86,7 +86,7 @@ export default function Profile() {
                                 <div key={key} className="space-y-1">
                                     <label className="block text-sm font-bold text-gray-700">{label}</label>
                                     <input type="password" value={(password.data as any)[key]} onChange={(e) => password.setData(key as any, e.target.value)} required
-                                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/20" />
+                                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/20" />
                                     {(password.errors as any)[key] && <p className="text-xs font-semibold text-red-600">{(password.errors as any)[key]}</p>}
                                 </div>
                             ))}

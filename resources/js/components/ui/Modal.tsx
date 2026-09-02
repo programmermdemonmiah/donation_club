@@ -66,7 +66,7 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, message, confir
                     disabled={processing}
                     className={cn(
                         'rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm disabled:opacity-50',
-                        danger ? 'bg-rose-600 hover:bg-rose-500' : 'bg-indigo-600 hover:bg-indigo-500',
+                        danger ? 'bg-rose-600 hover:bg-rose-500' : 'bg-blue-600 hover:bg-blue-500',
                     )}
                 >
                     {processing ? 'Working…' : confirmLabel}

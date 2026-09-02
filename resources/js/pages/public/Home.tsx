@@ -19,6 +19,7 @@ function NetworkCanvas({ className = '' }: { className?: string }) {
         const pts = Array.from({ length: N }, () => ({
             x: Math.random() * c.width, y: Math.random() * c.height,
             vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4,
+            isGreen: Math.random() > 0.6,
         }));
         const loop = () => {
             ctx.clearRect(0, 0, c.width, c.height);
@@ -27,14 +28,16 @@ function NetworkCanvas({ className = '' }: { className?: string }) {
                 if (p.x < 0 || p.x > c.width) p.vx *= -1;
                 if (p.y < 0 || p.y > c.height) p.vy *= -1;
                 ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(245,158,11,.5)'; ctx.fill();
+                ctx.fillStyle = p.isGreen ? 'rgba(16,185,129,.55)' : 'rgba(37,99,235,.55)'; ctx.fill();
             });
             for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
                 const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
                 const d = Math.hypot(dx, dy);
                 if (d < 130) {
                     ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
-                    ctx.strokeStyle = `rgba(245,158,11,${.15 * (1 - d / 130)})`; ctx.lineWidth = .7; ctx.stroke();
+                    const isGreenLink = pts[i].isGreen || pts[j].isGreen;
+                    const base = isGreenLink ? `rgba(16,185,129,` : `rgba(37,99,235,`;
+                    ctx.strokeStyle = `${base}${.13 * (1 - d / 130)})`; ctx.lineWidth = .7; ctx.stroke();
                 }
             }
             raf = requestAnimationFrame(loop);
@@ -88,7 +91,7 @@ function Counter({ end, prefix = '', suffix = '', label, sub }: { end: number; p
             <p className="text-5xl font-black tracking-tight text-white lg:text-6xl tabular-nums">
                 {prefix}{n.toLocaleString()}{suffix}
             </p>
-            <p className="mt-1 text-xs font-black uppercase tracking-[.22em] text-amber-500">{label}</p>
+            <p className="mt-1 text-xs font-black uppercase tracking-[.22em] text-blue-600">{label}</p>
             {sub && <p className="text-[11px] text-gray-500">{sub}</p>}
         </div>
     );
@@ -100,10 +103,10 @@ function Counter({ end, prefix = '', suffix = '', label, sub }: { end: number; p
 function Ticker({ items }: { items: string[] }) {
     const list = [...items, ...items];
     return (
-        <div className="relative overflow-hidden border-y border-amber-500/20 bg-gray-900/80 py-3 backdrop-blur-sm">
+        <div className="relative overflow-hidden border-y border-blue-600/20 bg-blue-900/80 py-3 backdrop-blur-sm">
             <div className="flex animate-[marquee_30s_linear_infinite] whitespace-nowrap">
                 {list.map((item, i) => (
-                    <span key={i} className="mx-8 text-xs font-bold uppercase tracking-[.18em] text-amber-500/70">
+                    <span key={i} className="mx-8 text-xs font-bold uppercase tracking-[.18em] text-blue-600/70">
                         ◆ {item}
                     </span>
                 ))}
@@ -125,12 +128,12 @@ interface HomeProps {
 /* ═══════════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════════ */
-const FEATURES = [
+    const FEATURES = [
     {
         icon: 'M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.87c1.355 0 2.697.055 4.024.165C17.155 8.51 18 9.473 18 10.608v2.513m-3-4.87v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.379a48.474 48.474 0 00-6-.371c-2.032 0-4.034.126-6 .371',
         title: 'Voluntary Contributions',
         desc: 'Contribute freely between $1–$10 per deposit. No lock-in, no hidden fees. Every deposit is timestamped on the public ledger permanently.',
-        color: 'from-amber-500 to-orange-500',
+        color: 'from-blue-600 to-emerald-500',
     },
     {
         icon: 'M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z',
@@ -140,14 +143,14 @@ const FEATURES = [
     },
     {
         icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-        title: '10-Generation Network',
-        desc: 'Earn referral commissions across 10 levels of your downline. Your team\'s activity creates residual rewards that compound over time.',
+        title: '10-Generation Community',
+        desc: 'Share voluntary donations across 10 levels of your community. Your team\'s contributions create shared support that grows over time.',
         color: 'from-emerald-500 to-teal-500',
     },
     {
         icon: 'M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172',
-        title: '9 Exclusive Ranks',
-        desc: 'Progress through nine prestigious ranks. Each rank unlocks new commission tiers, support fund access, and community recognition.',
+        title: '9 Community Levels',
+        desc: 'Progress through nine community levels. Each level unlocks broader support access, recognition, and community participation.',
         color: 'from-violet-500 to-purple-500',
     },
     {
@@ -159,7 +162,7 @@ const FEATURES = [
     {
         icon: 'M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z',
         title: 'Enterprise-Grade Security',
-        desc: 'Google Authenticator 2FA, encrypted sessions, CSRF protection. Your account and earnings are protected by industry-leading security.',
+        desc: 'Google Authenticator 2FA, encrypted sessions, CSRF protection. Your account and donation records are protected by industry-leading security.',
         color: 'from-slate-500 to-gray-600',
     },
 ];
@@ -168,7 +171,7 @@ const STEPS = [
     { n: '01', title: 'Create Account', desc: 'Register in minutes. Use a sponsor\'s referral code to join their team automatically.' },
     { n: '02', title: 'Make a Contribution', desc: 'Contribute $1–$10. Your deposit is recorded instantly on the immutable public ledger.' },
     { n: '03', title: 'Build Your Network', desc: 'Share your unique referral link. Every member you refer becomes part of your team — 10 levels deep.' },
-    { n: '04', title: 'Qualify & Earn', desc: 'Meet activity thresholds to unlock commissions, rank upgrades, and community reward access.' },
+    { n: '04', title: 'Qualify & Support', desc: 'Meet activity thresholds to unlock community recognition, level upgrades, and ongoing community support.' },
 ];
 
 const TRUST_ITEMS = [
@@ -190,7 +193,7 @@ export default function Home() {
     const { stats, settings, latestDeposits = [], company } = page.props;
 
     // Typewriter effect for hero subtitle
-    const phrases = ['Build Your Team.', 'Earn Commissions.', 'Grow Together.', 'Join the Movement.'];
+    const phrases = ['Build Your Team.', 'Share Donations.', 'Grow Together.', 'Join the Movement.'];
     const [phraseIdx, setPhraseIdx] = useState(0);
     const [typed, setTyped] = useState('');
     const [deleting, setDeleting] = useState(false);
@@ -216,66 +219,66 @@ export default function Home() {
             {/* ══════════════════════════════════════════
                 HERO — full viewport, split layout
             ══════════════════════════════════════════ */}
-            <section className="relative flex min-h-screen overflow-hidden bg-[#050a14]">
+            <section className="relative flex min-h-screen overflow-hidden bg-blue-950">
                 {/* Particle canvas */}
                 <NetworkCanvas className="opacity-60" />
 
-                {/* Left atmospheric glow */}
-                <div className="pointer-events-none absolute -left-40 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-amber-500/8 blur-[130px]" />
-                {/* Right glow */}
-                <div className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-blue-500/5 blur-[100px]" />
-                {/* Top center glow */}
-                <div className="pointer-events-none absolute left-1/2 top-0 h-60 w-[800px] -translate-x-1/2 bg-amber-500/6 blur-[80px]" />
+                {/* Left atmospheric glow - blue */}
+                <div className="pointer-events-none absolute -left-40 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-blue-600/10 blur-[130px]" />
+                {/* Right glow - green */}
+                <div className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-emerald-500/10 blur-[100px]" />
+                {/* Top center glow - blue */}
+                <div className="pointer-events-none absolute left-1/2 top-0 h-60 w-[800px] -translate-x-1/2 bg-blue-600/8 blur-[80px]" />
 
                 {/* Content */}
                 <div className="relative mx-auto flex w-full max-w-screen-xl flex-col items-center justify-center px-4 py-32 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-5xl text-center">
 
                         {/* Badge */}
-                        <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-amber-500/20 bg-amber-500/8 px-5 py-2 backdrop-blur-sm">
+                        <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-blue-600/20 bg-blue-600/8 px-5 py-2 backdrop-blur-sm">
                             <span className="relative flex h-2 w-2">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                                <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
                             </span>
-                            <span className="text-[11px] font-black uppercase tracking-[.22em] text-amber-400/90">
+                            <span className="text-[11px] font-black uppercase tracking-[.22em] text-blue-400/90">
                                 {company.name} · Live Network · Est. 2024
                             </span>
                         </div>
 
                         {/* Main headline */}
                         <h1 className="text-[clamp(3rem,7.5vw,6rem)] font-black leading-[1.02] tracking-[-0.02em] text-white">
-                            Earn Together.{' '}
+                            Donate Together.{' '}
                             <br className="hidden sm:block" />
                             <span className="relative inline-block">
-                                <span className="bg-gradient-to-r from-amber-300 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                                <span className="bg-gradient-to-r from-blue-400 via-blue-600 to-emerald-400 bg-clip-text text-transparent">
                                     Grow Together.
                                 </span>
                                 {/* Underline glow */}
-                                <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-amber-500/0 via-amber-500 to-amber-500/0" />
+                                <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-blue-600/0 via-blue-600 to-blue-600/0" />
                             </span>
                         </h1>
 
                         {/* Typewriter line */}
                         <div className="mt-6 flex items-center justify-center gap-2 text-xl font-semibold text-gray-400 sm:text-2xl">
-                            <span className="text-amber-400">{typed}</span>
-                            <span className="inline-block h-7 w-[2px] animate-[blink_.85s_step-end_infinite] rounded-full bg-amber-500 align-middle" />
+                            <span className="text-blue-400">{typed}</span>
+                            <span className="inline-block h-7 w-[2px] animate-[blink_.85s_step-end_infinite] rounded-full bg-blue-600 align-middle" />
                             <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
                         </div>
 
                         {/* Description */}
                         <p className="mx-auto mt-7 max-w-2xl text-base font-medium leading-relaxed text-gray-500 sm:text-lg">
                             A transparent, member-governed community contribution platform registered in England & Wales.
-                            Make voluntary contributions, build your referral network, and qualify for community rewards.
+                            Make voluntary donations, build your community network, and support one another.
                         </p>
 
                         {/* CTA row */}
                         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                             <Link href={route('register')}
-                                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 px-10 py-4 text-base font-black text-gray-900 shadow-[0_0_50px_rgba(245,158,11,.45)] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_70px_rgba(245,158,11,.65)]">
+                                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 px-10 py-4 text-base font-black text-white shadow-[0_0_50px_rgba(37,99,235,.45)] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_70px_rgba(16,185,129,.35)]">
                                 <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-white/30 transition-transform duration-700 group-hover:translate-x-full" />
                                 <span className="relative flex items-center gap-2.5">
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                                    Start Earning Today
+                                    Start Donating Today
                                 </span>
                             </Link>
                             <Link href={route('pages.how-it-works')}
@@ -289,7 +292,7 @@ export default function Home() {
                         <div className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                             {[`Registered · ${company.registration}`, company.address, 'Public Ledger', 'KYC Compliant'].map((t, i) => (
                                 <span key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
-                                    <span className="h-1 w-1 rounded-full bg-amber-500/50" />{t}
+                                    <span className="h-1 w-1 rounded-full bg-blue-600/50" />{t}
                                 </span>
                             ))}
                         </div>
@@ -303,7 +306,7 @@ export default function Home() {
                                 { label: 'Countries', value: `${stats?.countries ?? 0}+`, icon: '🌍' },
                             ].map((s) => (
                                 <div key={s.label}
-                                    className="flex flex-col items-center gap-1 rounded-2xl border border-white/8 bg-white/5 px-4 py-5 backdrop-blur-sm transition-all duration-300 hover:border-amber-500/20 hover:bg-amber-500/5">
+                                    className="flex flex-col items-center gap-1 rounded-2xl border border-white/8 bg-white/5 px-4 py-5 backdrop-blur-sm transition-all duration-300 hover:border-blue-600/20 hover:bg-blue-600/5">
                                     <span className="text-2xl">{s.icon}</span>
                                     <p className="text-xl font-black text-white tabular-nums">{s.value}</p>
                                     <p className="text-[10px] font-bold uppercase tracking-[.18em] text-gray-600">{s.label}</p>
@@ -316,7 +319,7 @@ export default function Home() {
                 {/* Scroll cue */}
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
                     <div className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-gray-700 pt-2">
-                        <div className="h-2 w-1 animate-[scrollDot_1.5s_ease-in-out_infinite] rounded-full bg-amber-500" />
+                        <div className="h-2 w-1 animate-[scrollDot_1.5s_ease-in-out_infinite] rounded-full bg-blue-600" />
                         <style>{`@keyframes scrollDot { 0%,100%{transform:translateY(0);opacity:1} 50%{transform:translateY(6px);opacity:.3} }`}</style>
                     </div>
                 </div>
@@ -330,7 +333,7 @@ export default function Home() {
             {/* ══════════════════════════════════════════
                 ANIMATED STATS BAR
             ══════════════════════════════════════════ */}
-            <section className="bg-gray-900 py-20">
+            <section className="bg-blue-950 py-20">
                 <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                     <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
                         <Counter end={stats?.members ?? 0} suffix="+" label="Registered Members" sub="and growing daily" />
@@ -344,34 +347,34 @@ export default function Home() {
             {/* ══════════════════════════════════════════
                 HOW IT WORKS — horizontal stepper
             ══════════════════════════════════════════ */}
-            <section className="bg-[#f8f9fb] py-28">
+            <section className="bg-white py-28">
                 <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                     <FadeUp>
                         <div className="mb-20 text-center">
-                            <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-amber-600">
+                            <span className="inline-block rounded-full border border-emerald-200 bg-emerald-50 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-emerald-700">
                                 The Process
                             </span>
                             <h2 className="mt-5 text-5xl font-black tracking-tight text-gray-900">
                                 How It Works
                             </h2>
-                            <div className="mx-auto mt-4 h-[3px] w-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-400" />
+                            <div className="mx-auto mt-4 h-[3px] w-16 rounded-full bg-gradient-to-r from-blue-600 to-emerald-500" />
                             <p className="mx-auto mt-5 max-w-xl text-base text-gray-500">
-                                From sign-up to earning — four simple steps that power your financial journey.
+                                From sign-up to supporting — four simple steps to support your community.
                             </p>
                         </div>
                     </FadeUp>
 
                     <div className="relative">
                         {/* Connector line */}
-                        <div className="absolute left-0 right-0 top-10 hidden h-[2px] bg-gradient-to-r from-transparent via-amber-300/60 to-transparent lg:block" />
+                        <div className="absolute left-0 right-0 top-10 hidden h-[2px] bg-gradient-to-r from-transparent via-blue-300/40 via-emerald-300/30 to-transparent lg:block" />
 
                         <div className="grid gap-8 lg:grid-cols-4">
                             {STEPS.map((s, i) => (
                                 <FadeUp key={s.n} delay={i * 120}>
                                     <div className="group relative flex flex-col items-center text-center">
                                         {/* Step circle */}
-                                        <div className="relative z-10 mb-8 flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-gray-900 shadow-xl shadow-gray-200/60 ring-4 ring-gray-100 transition-all duration-500 group-hover:bg-amber-500 group-hover:ring-amber-200">
-                                            <span className="text-xl font-black text-amber-400 transition-colors duration-300 group-hover:text-gray-900">{s.n}</span>
+                                        <div className="relative z-10 mb-8 flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-gray-900 shadow-xl shadow-gray-200/60 ring-4 ring-gray-100 transition-all duration-500 group-hover:bg-blue-600 group-hover:ring-blue-200">
+                                            <span className="text-xl font-black text-blue-400 transition-colors duration-300 group-hover:text-gray-900">{s.n}</span>
                                         </div>
                                         <h3 className="mb-3 text-lg font-black text-gray-900">{s.title}</h3>
                                         <p className="text-sm font-medium leading-relaxed text-gray-500">{s.desc}</p>
@@ -385,7 +388,7 @@ export default function Home() {
                         <div className="mt-16 text-center">
                             <Link href={route('register')}
                                 className="group relative inline-flex overflow-hidden rounded-2xl bg-gray-900 px-10 py-4 text-sm font-black text-white transition-all duration-300 hover:bg-gray-800">
-                                <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-amber-500/20 transition-transform duration-700 group-hover:translate-x-full" />
+                                <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-blue-600/20 transition-transform duration-700 group-hover:translate-x-full" />
                                 <span className="relative">Get Started Now →</span>
                             </Link>
                         </div>
@@ -397,13 +400,13 @@ export default function Home() {
                 LIVE ACTIVITY FEED (if data available)
             ══════════════════════════════════════════ */}
             {latestDeposits.length > 0 && (
-                <section className="relative overflow-hidden bg-gray-950 py-24">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.05),transparent_60%)]" />
+                <section className="relative overflow-hidden bg-blue-950 py-24">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.05),transparent_60%)]" />
                     <div className="relative mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                         <div className="grid gap-16 lg:grid-cols-2">
                             <FadeUp>
                                 <div className="flex flex-col justify-center">
-                                    <span className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[.22em] text-amber-500">
+                                    <span className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[.22em] text-blue-600">
                                         <span className="relative flex h-2 w-2">
                                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                                             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -412,13 +415,13 @@ export default function Home() {
                                     </span>
                                     <h2 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-5xl">
                                         Real-Time<br />
-                                        <span className="text-amber-400">Public Ledger</span>
+                                        <span className="text-blue-400">Public Ledger</span>
                                     </h2>
                                     <p className="mt-5 text-base text-gray-400">
                                         Every deposit made by members is permanently recorded and publicly visible. No hidden transactions — ever.
                                     </p>
                                     <Link href={route('public.deposits')}
-                                        className="mt-8 inline-flex w-fit items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-6 py-3 text-sm font-black text-amber-400 transition-all duration-300 hover:border-amber-500/60 hover:bg-amber-500/15">
+                                        className="mt-8 inline-flex w-fit items-center gap-2 rounded-xl border border-blue-600/30 bg-blue-600/10 px-6 py-3 text-sm font-black text-blue-400 transition-all duration-300 hover:border-blue-600/60 hover:bg-blue-600/15">
                                         View Full Ledger →
                                     </Link>
                                 </div>
@@ -459,13 +462,13 @@ export default function Home() {
                 <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                     <FadeUp>
                         <div className="mb-20 text-center">
-                            <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-amber-600">
+                            <span className="inline-block rounded-full border border-blue-200 bg-blue-50 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-blue-600">
                                 Platform Features
                             </span>
                             <h2 className="mt-5 text-5xl font-black tracking-tight text-gray-900">
                                 Everything You Need
                             </h2>
-                            <div className="mx-auto mt-4 h-[3px] w-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-400" />
+                            <div className="mx-auto mt-4 h-[3px] w-16 rounded-full bg-gradient-to-r from-blue-600 to-emerald-500" />
                             <p className="mx-auto mt-5 max-w-xl text-base text-gray-500">
                                 Built on transparency, fairness, and community governance — designed for serious network marketers.
                             </p>
@@ -501,33 +504,33 @@ export default function Home() {
             {/* ══════════════════════════════════════════
                 COMMISSION HIGHLIGHT
             ══════════════════════════════════════════ */}
-            <section className="bg-[#050a14] py-28">
+            <section className="bg-blue-950 py-28">
                 <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                     <div className="grid gap-16 lg:grid-cols-2">
                         <FadeUp>
                             <div>
-                                <span className="inline-block rounded-full border border-amber-500/25 bg-amber-500/10 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-amber-500">
-                                    Commission Structure
+                                <span className="inline-block rounded-full border border-blue-600/25 bg-blue-600/10 px-5 py-1.5 text-[11px] font-black uppercase tracking-[.22em] text-blue-600">
+                                    Community Growth
                                 </span>
                                 <h2 className="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl">
                                     10-Level Deep<br />
-                                    <span className="text-amber-400">Earning Power</span>
+                                    <span className="text-blue-400">Community Impact</span>
                                 </h2>
                                 <p className="mt-5 text-base text-gray-400">
-                                    Earn commissions from every contribution made by members in your 10-generation downline.
-                                    Your network works for you around the clock.
+                                    Every voluntary donation strengthens your 10-level community network.
+                                    Together, members grow and support one another around the clock.
                                 </p>
                                 <ul className="mt-8 space-y-3">
-                                    {['Direct referrals earn the highest commission rate', 'Commissions credited automatically to your wallet', 'Track every earning in real-time from your dashboard', 'No cap on how large your network can grow'].map((item, i) => (
+                                    {['Direct referrals have the highest community impact', 'Donations recorded automatically in your account', 'Track every contribution in real-time from your dashboard', 'No cap on how large your network can grow'].map((item, i) => (
                                         <li key={i} className="flex items-start gap-3 text-sm text-gray-400">
-                                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-500 text-[10px]">✓</span>
+                                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600/15 text-blue-600 text-[10px]">✓</span>
                                             {item}
                                         </li>
                                     ))}
                                 </ul>
                                 <Link href={route('register')}
-                                    className="mt-10 inline-flex items-center gap-2 rounded-xl bg-amber-500 px-8 py-3.5 text-sm font-black text-gray-900 shadow-[0_0_30px_rgba(245,158,11,.3)] transition-all duration-300 hover:bg-amber-400 hover:shadow-[0_0_45px_rgba(245,158,11,.45)]">
-                                    Start Earning →
+                                    className="mt-10 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3.5 text-sm font-black text-white shadow-[0_0_30px_rgba(37,99,235,.3)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_45px_rgba(37,99,235,.45)]">
+                                    Start Donating →
                                 </Link>
                             </div>
                         </FadeUp>
@@ -536,7 +539,7 @@ export default function Home() {
                             <div className="flex items-center">
                                 <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
                                     <div className="border-b border-white/10 px-6 py-4">
-                                        <p className="text-xs font-black uppercase tracking-[.18em] text-gray-400">Generation Commission Tiers</p>
+                                        <p className="text-xs font-black uppercase tracking-[.18em] text-gray-400">Community Level Overview</p>
                                     </div>
                                     <div className="divide-y divide-white/5 px-2">
                                         {[
@@ -547,12 +550,12 @@ export default function Home() {
                                             { gen: 'Generation 6–10', label: 'Deep Network', rate: '1%', active: false },
                                         ].map((row) => (
                                             <div key={row.gen}
-                                                className={`flex items-center justify-between px-4 py-4 ${row.active ? 'bg-amber-500/10' : ''}`}>
+                                                className={`flex items-center justify-between px-4 py-4 ${row.active ? 'bg-blue-600/10' : ''}`}>
                                                 <div>
-                                                    <p className={`text-sm font-black ${row.active ? 'text-amber-400' : 'text-gray-300'}`}>{row.gen}</p>
+                                                    <p className={`text-sm font-black ${row.active ? 'text-blue-400' : 'text-gray-300'}`}>{row.gen}</p>
                                                     <p className="text-xs text-gray-600">{row.label}</p>
                                                 </div>
-                                                <span className={`rounded-lg px-3 py-1 text-sm font-black ${row.active ? 'bg-amber-500 text-gray-900' : 'bg-white/10 text-gray-400'}`}>
+                                                <span className={`rounded-lg px-3 py-1 text-sm font-black ${row.active ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-400'}`}>
                                                     {row.rate}
                                                 </span>
                                             </div>
@@ -571,7 +574,7 @@ export default function Home() {
             {/* ══════════════════════════════════════════
                 FINAL CTA
             ══════════════════════════════════════════ */}
-            <section className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-amber-400 to-orange-400 py-28">
+            <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-600 to-emerald-500 py-28">
                 {/* Pattern overlay */}
                 <div className="absolute inset-0 opacity-[0.07]"
                     style={{ backgroundImage: 'repeating-linear-gradient(45deg,#000 0,#000 1px,transparent 0,transparent 50%)', backgroundSize: '20px 20px' }} />

@@ -8,12 +8,12 @@ const risks = [
     },
     {
         title: 'No guarantees.',
-        body: 'The platform does not promise any return, profit, interest, or fixed payout date. Any reward described anywhere on this site is discretionary and conditional on admin approval and configured rules.',
+        body: 'The platform does not promise any return or profit. Any community support described is voluntary and conditional on admin approval and configured rules.',
         icon: 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636',
     },
     {
         title: 'Referral programs.',
-        body: 'Multi-generation commissions may be restricted or prohibited under the law of some jurisdictions. Participation is your responsibility; check local regulations.',
+        body: 'Multi-level community support may be restricted or prohibited under the law of some jurisdictions. Participation is your responsibility; check local regulations.',
         icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064',
     },
     {
@@ -27,14 +27,14 @@ export default function RiskDisclosure() {
     return (
         <PublicLayout>
             {/* Hero */}
-            <section className="relative overflow-hidden bg-gray-950 py-24 sm:py-32">
+            <section className="relative overflow-hidden bg-blue-950 py-24 sm:py-32">
                 <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"></div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950"></div>
                 <div className="pointer-events-none absolute -top-40 right-1/3 h-96 w-96 rounded-full bg-red-500/8 blur-[120px]"></div>
                 <div className="relative z-10 mx-auto max-w-screen-xl px-4 text-center sm:px-6 lg:px-8">
                     <p className="text-xs font-black uppercase tracking-widest text-red-400">Legal</p>
                     <h1 className="mt-3 text-5xl font-black tracking-tight text-white sm:text-6xl">Risk & Disclosure Statement</h1>
-                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-red-400 to-amber-500"></div>
+                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-red-400 to-blue-600"></div>
                     <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-relaxed text-gray-400">
                         Please read this carefully before participating. Your understanding of the risks involved is essential.
                     </p>

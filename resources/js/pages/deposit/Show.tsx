@@ -37,8 +37,8 @@ export default function DepositShow() {
                         <Row label="Completed" value={formatDateTime(deposit.completed_at)} />
                         {memberReturn && (
                             <>
-                                <Row label="Linked Return Status" value={memberReturn.status} />
-                                <Row label="Return Payout" value={formatMoney(memberReturn.payout_amount)} />
+                                <Row label="Community Support Status" value={memberReturn.status} />
+                                <Row label="Support Amount" value={formatMoney(memberReturn.payout_amount)} />
                             </>
                         )}
                     </CardBody>

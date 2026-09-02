@@ -9,7 +9,7 @@ export default function TwoFactor() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Security</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Security</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Two-Factor Authentication</h1>
                 <p className="mt-1 text-sm font-medium text-gray-500">Add an extra layer of security using Google Authenticator.</p>
             </div>
@@ -42,7 +42,7 @@ export default function TwoFactor() {
 
                     <div className="mt-6">
                         <Link href={route('security.2fa.setup')}
-                            className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-black transition-all duration-300 ${enabled ? 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50' : 'bg-amber-500 text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:bg-amber-400 hover:shadow-[0_0_35px_rgba(245,158,11,0.4)]'}`}>
+                            className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-black transition-all duration-300 ${enabled ? 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50' : 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.25)] hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(37,99,235,0.4)]'}`}>
                             {enabled ? 'Manage 2FA' : 'Enable 2FA →'}
                         </Link>
                     </div>

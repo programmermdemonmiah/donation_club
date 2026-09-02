@@ -18,7 +18,7 @@ export default function Rank() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Achievement</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Achievement</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Rank Progress</h1>
             </div>
 
@@ -63,9 +63,9 @@ export default function Rank() {
                 {/* Rank ladder */}
                 <div className="grid gap-4 content-start lg:col-span-3 sm:grid-cols-2 xl:grid-cols-3">
                     {page.props.ladder.map((rank) => (
-                        <div key={rank.id} className={`relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition-all duration-300 ${rank.is_current ? 'border-amber-400 shadow-amber-100' : 'border-gray-100 hover:border-gray-200'}`}>
+                        <div key={rank.id} className={`relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition-all duration-300 ${rank.is_current ? 'border-blue-500 shadow-blue-100' : 'border-gray-100 hover:border-gray-200'}`}>
                             {rank.is_current && (
-                                <div className="absolute right-3 top-3 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-black text-gray-900">
+                                <div className="absolute right-3 top-3 rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-black text-white">
                                     CURRENT
                                 </div>
                             )}
@@ -106,7 +106,7 @@ export default function Rank() {
                                 <span className="text-sm font-semibold text-gray-700">
                                     <span className="text-gray-400">{entry.old ?? 'None'}</span>
                                     <span className="mx-2 text-gray-300">→</span>
-                                    <span className="font-black text-amber-600">{entry.new ?? '—'}</span>
+                                    <span className="font-black text-blue-600">{entry.new ?? '—'}</span>
                                 </span>
                                 <span className="text-xs text-gray-400">{formatDate(entry.at)}</span>
                             </div>

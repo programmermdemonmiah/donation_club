@@ -63,7 +63,7 @@ export default function PaymentShow() {
                     <CardHeader title="Complete your deposit" subtitle={`Deposit ${page.props.depositReference} — ${formatMoney(payment.amount)} ${payment.currency}`} />
                     <CardBody className="space-y-4">
                         {(initiation.account_name || initiation.account_number) && (
-                            <div className="rounded-lg bg-indigo-50 p-4 text-sm text-indigo-900 ring-1 ring-inset ring-indigo-600/10">
+                            <div className="rounded-lg bg-blue-50 p-4 text-sm text-indigo-900 ring-1 ring-inset ring-blue-600/10">
                                 <p><strong>{initiation.account_name}</strong></p>
                                 <p className="font-mono">{initiation.account_number}</p>
                             </div>
@@ -72,7 +72,7 @@ export default function PaymentShow() {
                         <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center">
                             <p className="text-xs uppercase tracking-wide text-gray-400">Send exactly</p>
                             <p className="text-2xl font-bold text-gray-900">{formatMoney(payment.amount)}</p>
-                            <p className="mt-1 font-mono text-sm text-indigo-600">Ref: {payment.reference}</p>
+                            <p className="mt-1 font-mono text-sm text-blue-600">Ref: {payment.reference}</p>
                         </div>
                     </CardBody>
                 </Card>

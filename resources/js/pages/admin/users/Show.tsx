@@ -103,14 +103,14 @@ export default function AdminUserShow() {
                 <div className="space-y-6 lg:col-span-2">
                     <Card>
                         <CardHeader title="Recent deposits" subtitle={`${member.stats.direct_referrals} direct referrals`} action={
-                            <a href={route('admin.deposits.index')} className="text-xs font-medium text-indigo-600">View all →</a>
+                            <a href={route('admin.deposits.index')} className="text-xs font-medium text-blue-600">View all →</a>
                         } />
                         <CardBody className="space-y-2">
                             {page.props.recentDeposits.length === 0 && <p className="text-sm text-gray-500">No deposits.</p>}
                             {page.props.recentDeposits.map((d) => (
                                 <div key={d.reference} className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5">
                                     <span className="font-mono text-xs text-gray-500">{d.reference}</span>
-                                    <span className="font-semibold text-indigo-600">{formatSequence(d.sequence_number)}</span>
+                                    <span className="font-semibold text-blue-600">{formatSequence(d.sequence_number)}</span>
                                     <span>{formatMoney(d.amount)}</span>
                                     <Badge value={d.status} />
                                 </div>
@@ -122,7 +122,7 @@ export default function AdminUserShow() {
                         <CardHeader
                             title="Wallet adjustment"
                             subtitle="Manual credit/debit — fully audited with ledger entry"
-                            action={<a href={route('admin.wallets.transactions')} className="text-xs font-medium text-indigo-600">Ledger →</a>}
+                            action={<a href={route('admin.wallets.transactions')} className="text-xs font-medium text-blue-600">Ledger →</a>}
                         />
                         <CardBody className="space-y-2">
                             {page.props.recentTransactions.length === 0 && <p className="text-sm text-gray-500">No transactions.</p>}
@@ -143,12 +143,12 @@ export default function AdminUserShow() {
                                     router.post(route('admin.wallets.adjust', member.id), fd, { preserveScroll: true });
                                 }}
                             >
-                                <select name="direction" className="rounded-lg border-gray-300 py-2 pl-3 pr-8 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <select name="direction" className="rounded-lg border-gray-300 py-2 pl-3 pr-8 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <option value="credit">Credit +</option>
                                     <option value="debit">Debit −</option>
                                 </select>
-                                <input name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required className="w-28 rounded-lg border-gray-300 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-                                <input name="reason" placeholder="Reason (required)" required className="min-w-0 flex-1 rounded-lg border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                                <input name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required className="w-28 rounded-lg border-gray-300 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                                <input name="reason" placeholder="Reason (required)" required className="min-w-0 flex-1 rounded-lg border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
                                 <Button type="submit" size="sm" variant="outline">Apply</Button>
                             </form>
                         </CardBody>

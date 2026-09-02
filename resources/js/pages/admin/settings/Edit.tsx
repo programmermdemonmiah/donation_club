@@ -98,7 +98,7 @@ export default function AdminSettings() {
                                         type="file"
                                         name="logo"
                                         accept="image/*"
-                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                                     />
                                     <p className="mt-1 text-xs text-gray-400 font-medium">Supported formats: JPEG, PNG, JPG, WebP, SVG. Max 2MB.</p>
                                     {errors.logo && (
@@ -125,7 +125,7 @@ export default function AdminSettings() {
                                         type="file"
                                         name="favicon"
                                         accept=".ico,image/png,image/x-icon,image/jpeg"
-                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                                     />
                                     <p className="mt-1 text-xs text-gray-400 font-medium">Supported formats: ICO, PNG, JPG. Max 1MB.</p>
                                     {errors.favicon && (
@@ -152,11 +152,11 @@ export default function AdminSettings() {
                 </Card>
 
                 <Card>
-                    <CardHeader title="Referral commissions" subtitle="Master switch + per-generation percentages" />
+                    <CardHeader title="Referral donations" subtitle="Master switch + per-generation percentages" />
                     <CardBody className="space-y-4">
-                        <label className="flex items-center gap-3 rounded-lg bg-indigo-50/60 p-3 ring-1 ring-inset ring-indigo-600/10">
-                            <input type="checkbox" name="commission_enabled" value="1" defaultChecked={s.commission_enabled} className="h-4 w-4 rounded border-gray-300 text-indigo-600" />
-                            <span className="text-sm font-medium text-gray-800">Commissions module enabled</span>
+                        <label className="flex items-center gap-3 rounded-lg bg-blue-50/60 p-3 ring-1 ring-inset ring-blue-600/10">
+                            <input type="checkbox" name="commission_enabled" value="1" defaultChecked={s.commission_enabled} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                            <span className="text-sm font-medium text-gray-800">Donation sharing enabled</span>
                         </label>
 
                         <div className="overflow-x-auto rounded-lg border border-gray-100">
@@ -183,14 +183,14 @@ export default function AdminSettings() {
                                                     max="100"
                                                     value={rule.percentage}
                                                     onChange={(e) => updateRule(rule.id, { percentage: e.target.value })}
-                                                    className="w-24 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                    className="w-24 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500"
                                                 />
                                             </td>
                                             <td className="px-3 py-2">
                                                 <select
                                                     value={rule.trigger_event}
                                                     onChange={(e) => updateRule(rule.id, { trigger_event: e.target.value })}
-                                                    className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm capitalize focus:border-indigo-500 focus:ring-indigo-500"
+                                                    className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm capitalize focus:border-blue-500 focus:ring-blue-500"
                                                 >
                                                     <option value="deposit">On member deposit</option>
                                                     <option value="return_payout">On member return</option>
@@ -201,7 +201,7 @@ export default function AdminSettings() {
                                                     type="checkbox"
                                                     checked={rule.enabled}
                                                     onChange={(e) => updateRule(rule.id, { enabled: e.target.checked })}
-                                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                                                    className="h-4 w-4 rounded border-gray-300 text-blue-600"
                                                 />
                                             </td>
                                         </tr>
@@ -213,14 +213,14 @@ export default function AdminSettings() {
                 </Card>
 
                 <Card>
-                    <CardHeader title="Return / reward rules" subtitle="No fixed dates are promised to members; payouts require explicit admin approval" />
+                    <CardHeader title="Community support rules" subtitle="No fixed dates are promised to members; payouts require explicit admin approval" />
                     <CardBody className="space-y-4">
-                        <label className="flex items-center gap-3 rounded-lg bg-amber-50/70 p-3 ring-1 ring-inset ring-amber-600/20">
-                            <input type="checkbox" name="return_enabled" value="1" defaultChecked={s.return_enabled} className="h-4 w-4 rounded border-gray-300 text-amber-600" />
-                            <span className="text-sm font-medium text-amber-900">Returns module enabled (legal review required before enabling)</span>
+                        <label className="flex items-center gap-3 rounded-lg bg-blue-50/70 p-3 ring-1 ring-inset ring-blue-600/20">
+                            <input type="checkbox" name="return_enabled" value="1" defaultChecked={s.return_enabled} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-900">Community support module enabled (legal review required before enabling)</span>
                         </label>
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                            <Input label="Return (% of deposit)" name="return_percent" type="number" step="0.001" min="0" defaultValue={s.return_percent} />
+                            <Input label="Support (% of donation)" name="return_percent" type="number" step="0.001" min="0" defaultValue={s.return_percent} />
                             <Input label="Min direct referrals" name="return_min_direct_referrals" type="number" min="0" defaultValue={String(s.return_min_direct_referrals)} />
                             <Select label="Rank requirement" name="return_rank_requirement_id" defaultValue={s.return_rank_requirement_id ?? ''}>
                                 <option value="">None</option>

@@ -45,7 +45,7 @@ export default function AdminWithdrawalShow() {
                     <h1 className="text-xl font-bold text-gray-900">Withdrawal {w.reference}</h1>
                     <p className="text-sm text-gray-500">
                         {w.user ? (
-                            <a href={route('admin.users.show', w.user.id)} className="text-indigo-600 hover:text-indigo-500">{w.user.name}</a>
+                            <a href={route('admin.users.show', w.user.id)} className="text-blue-600 hover:text-blue-500">{w.user.name}</a>
                         ) : '—'}{' '}
                         · requested {formatDateTime(w.requested_at)}
                     </p>

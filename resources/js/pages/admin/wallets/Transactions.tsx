@@ -51,7 +51,7 @@ export default function AdminWalletTransactions() {
                             header: 'Member',
                             render: (t) =>
                                 t.user ? (
-                                    <a href={route('admin.users.show', t.user.id)} className="text-indigo-600 hover:text-indigo-500">{t.user.name}</a>
+                                    <a href={route('admin.users.show', t.user.id)} className="text-blue-600 hover:text-blue-500">{t.user.name}</a>
                                 ) : '—',
                         },
                         { header: 'Type', render: (t) => humanizeType(t.type) },

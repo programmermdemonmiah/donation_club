@@ -38,8 +38,8 @@ export default function PublicLayout({ children, title = '' }: { children: React
 
             {/* ── Navbar ─────────────────────────────────────────── */}
             <header className={`sticky top-0 z-50 w-full transition-all duration-500 ${scrolled
-                ? 'border-b border-gray-800/80 bg-gray-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl'
-                : 'border-b border-gray-800 bg-gray-950'
+                ? 'border-b border-blue-900/50 bg-blue-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl'
+                : 'border-b border-blue-900/50 bg-blue-950'
                 }`}>
                 <div className="mx-auto flex h-[68px] max-w-screen-xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
@@ -48,7 +48,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                         <div className="h-auto w-35 overflow-hidden rounded-sm">
                             <img src={company.logo} alt={company.name} className="h-full w-full object-cover" />
                         </div>
-                        {/* <span className="text-base font-black tracking-wide text-white transition-colors group-hover:text-amber-400">
+                        {/* <span className="text-base font-black tracking-wide text-white transition-colors group-hover:text-emerald-400">
                             {company.name}
                         </span> */}
                     </Link>
@@ -71,7 +71,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                         {user ? (
                             <Link
                                 href={user.is_admin ? '/admin' : route('dashboard')}
-                                className="group relative overflow-hidden rounded-xl bg-amber-500 px-5 py-2 text-sm font-black tracking-wide text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all duration-300 hover:bg-amber-400 hover:shadow-[0_0_35px_rgba(245,158,11,0.55)]"
+                                className="group relative overflow-hidden rounded-xl bg-blue-600 px-5 py-2 text-sm font-black tracking-wide text-white shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(37,99,235,0.55)]"
                             >
                                 <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                                 Dashboard →
@@ -83,7 +83,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                 </Link>
                                 <Link
                                     href={route('register')}
-                                    className="group relative overflow-hidden rounded-xl bg-amber-500 px-6 py-2 text-sm font-black tracking-wide text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all duration-300 hover:bg-amber-400 hover:shadow-[0_0_35px_rgba(245,158,11,0.55)]"
+                                    className="group relative overflow-hidden rounded-xl bg-blue-600 px-6 py-2 text-sm font-black tracking-wide text-white shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(37,99,235,0.55)]"
                                 >
                                     <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                                     Join Now
@@ -94,7 +94,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
 
                     {/* Mobile toggle */}
                     <button
-                        className="flex items-center justify-center rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white lg:hidden"
+                        className="flex items-center justify-center rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-900/50 hover:text-white lg:hidden"
                         onClick={() => setMobileOpen(!mobileOpen)}
                     >
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -108,25 +108,25 @@ export default function PublicLayout({ children, title = '' }: { children: React
 
                 {/* Mobile menu */}
                 {mobileOpen && (
-                    <div className="border-t border-gray-800 bg-gray-950 lg:hidden">
+                    <div className="border-t border-blue-900/50 bg-blue-950 lg:hidden">
                         <div className="space-y-1 px-4 py-4">
                             {nav.map((item) => (
                                 <Link key={item.label} href={item.href}
-                                    className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-400 transition-colors hover:bg-gray-800 hover:text-amber-400"
+                                    className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-400 transition-colors hover:bg-blue-900/50 hover:text-emerald-400"
                                     onClick={() => setMobileOpen(false)}>
                                     {item.label}
                                 </Link>
                             ))}
-                            <div className="border-t border-gray-800 pt-4 pb-1 space-y-2">
+                            <div className="border-t border-blue-900/50 pt-4 pb-1 space-y-2">
                                 {user ? (
                                     <Link href={user.is_admin ? '/admin' : route('dashboard')}
-                                        className="block rounded-xl bg-amber-500 px-4 py-2.5 text-center text-sm font-black text-gray-900">
+                                        className="block rounded-xl bg-blue-600 px-4 py-2.5 text-center text-sm font-black text-white">
                                         Dashboard
                                     </Link>
                                 ) : (
                                     <>
                                         <Link href={route('login')} className="block py-2 text-center text-sm font-bold text-gray-400">Log in</Link>
-                                        <Link href={route('register')} className="block rounded-xl bg-amber-500 px-4 py-2.5 text-center text-sm font-black text-gray-900">Join Now</Link>
+                                        <Link href={route('register')} className="block rounded-xl bg-blue-600 px-4 py-2.5 text-center text-sm font-black text-white">Join Now</Link>
                                     </>
                                 )}
                             </div>
@@ -139,14 +139,14 @@ export default function PublicLayout({ children, title = '' }: { children: React
             <main className="flex-1 w-full">{children}</main>
 
             {/* ── Footer ─────────────────────────────────────────── */}
-            <footer className="border-t border-gray-800 bg-gray-950">
+            <footer className="border-t border-blue-900/50 bg-blue-950">
                 {/* Main footer */}
                 <div className="mx-auto max-w-screen-xl px-4 py-14 sm:px-6 lg:px-8">
                     <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
                         {/* Brand */}
                         <div className="lg:col-span-2">
                             <Link href={route('home')} className="flex items-center gap-3">
-                                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500 text-base font-black text-gray-900 shadow-[0_0_16px_rgba(245,158,11,0.3)]">
+                                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-base font-black text-white shadow-[0_0_16px_rgba(37,99,235,0.3)]">
                                     {company.name.charAt(0)}
                                 </span>
                                 <span className="text-lg font-black text-white">{company.name}</span>
@@ -176,7 +176,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                     { href: route('pages.contact'), label: 'Contact' },
                                 ].map((item) => (
                                     <li key={item.label}>
-                                        <Link href={item.href} className="text-sm font-medium text-gray-500 transition-colors hover:text-amber-400">
+                                        <Link href={item.href} className="text-sm font-medium text-gray-500 transition-colors hover:text-emerald-400">
                                             {item.label}
                                         </Link>
                                     </li>
@@ -194,7 +194,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                     { href: route('pages.risk-disclosure'), label: 'Risk Disclosure' },
                                 ].map((item) => (
                                     <li key={item.label}>
-                                        <Link href={item.href} className="text-sm font-medium text-gray-500 transition-colors hover:text-amber-400">
+                                        <Link href={item.href} className="text-sm font-medium text-gray-500 transition-colors hover:text-emerald-400">
                                             {item.label}
                                         </Link>
                                     </li>
@@ -203,7 +203,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
 
                             <div className="mt-8">
                                 <Link href={route('register')}
-                                    className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-xl bg-amber-500 py-3 text-sm font-black text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.25)] transition-all duration-300 hover:bg-amber-400">
+                                    className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-[0_0_20px_rgba(37,99,235,0.25)] transition-all duration-300 hover:bg-blue-500">
                                     <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                                     Join {company.name} →
                                 </Link>
@@ -213,10 +213,10 @@ export default function PublicLayout({ children, title = '' }: { children: React
                 </div>
 
                 {/* Bottom bar */}
-                <div className="border-t border-gray-800/60 bg-gray-950/80">
+                <div className="border-t border-blue-900/30 bg-blue-950/80">
                     <div className="mx-auto flex max-w-screen-xl flex-col gap-2 px-4 py-5 sm:px-6 sm:flex-row sm:items-center sm:justify-between lg:px-8">
                         <p className="text-xs font-medium text-gray-600">
-                            © {new Date().getFullYear()} <span className="font-black text-amber-500">{company.name}</span>. All rights reserved. Contributions are voluntary — returns are never guaranteed.
+                            © {new Date().getFullYear()} <span className="font-black text-blue-600">{company.name}</span>. All rights reserved. All donations are voluntary — no guarantees.
                         </p>
                         <p className="text-xs font-medium text-gray-700">
                             Regulated · Transparent · Community-Governed

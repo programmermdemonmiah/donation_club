@@ -16,13 +16,13 @@ function Tree({ nodes, depth }: { nodes: TreeNode[]; depth: number }) {
             {nodes.map((node) => (
                 <li key={node.id}>
                     <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-gray-50">
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-black text-amber-700">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black text-blue-700">
                             {node.name.charAt(0).toUpperCase()}
                         </span>
                         <span className="text-sm font-semibold text-gray-800">{node.name}</span>
                         <span className="text-xs font-medium text-gray-400">since {node.joined_at}</span>
                         {node.children.length > 0 && (
-                            <span className="ml-auto rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black text-amber-600">
+                            <span className="ml-auto rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-black text-blue-600">
                                 +{node.children.length}
                             </span>
                         )}
@@ -52,7 +52,7 @@ export default function Referrals() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Your Network</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Your Network</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Referrals</h1>
             </div>
 
@@ -63,8 +63,8 @@ export default function Referrals() {
                     { label: 'Total Team Size', value: page.props.teamSize, icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
                 ].map((s) => (
                     <div key={s.label} className="flex items-center gap-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-amber-50 ring-1 ring-amber-100">
-                            <svg className="h-7 w-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-blue-50 ring-1 ring-blue-100">
+                            <svg className="h-7 w-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d={s.icon} />
                             </svg>
                         </div>
@@ -83,8 +83,8 @@ export default function Referrals() {
                         <h2 className="text-sm font-black text-gray-900">Your Referral Link</h2>
                     </div>
                     <div className="p-6 space-y-4">
-                        <div className="rounded-xl bg-amber-50 p-4 text-center ring-1 ring-amber-200/50">
-                            <p className="font-mono text-xl font-black tracking-[0.25em] text-amber-700">{page.props.referralCode}</p>
+                        <div className="rounded-xl bg-blue-50 p-4 text-center ring-1 ring-blue-200/50">
+                            <p className="font-mono text-xl font-black tracking-[0.25em] text-blue-700">{page.props.referralCode}</p>
                         </div>
                         <input
                             readOnly value={page.props.referralLink}
@@ -92,7 +92,7 @@ export default function Referrals() {
                         />
                         <button
                             onClick={copy}
-                            className={`group relative w-full overflow-hidden rounded-xl py-3 text-sm font-black transition-all duration-300 ${copied ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:bg-amber-400'}`}
+                            className={`group relative w-full overflow-hidden rounded-xl py-3 text-sm font-black transition-all duration-300 ${copied ? 'bg-emerald-500 text-white' : 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.25)] hover:bg-blue-500'}`}
                         >
                             <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                             {copied ? '✓ Copied!' : 'Copy Invite Link'}
@@ -129,7 +129,7 @@ export default function Referrals() {
                     columns={[
                         { header: 'Name', render: (r) => (
                             <div className="flex items-center gap-3">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-xs font-black text-amber-700">{r.name.charAt(0).toUpperCase()}</span>
+                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-xs font-black text-blue-700">{r.name.charAt(0).toUpperCase()}</span>
                                 <span className="font-semibold text-gray-900">{r.name}</span>
                             </div>
                         )},

@@ -40,7 +40,7 @@ export default function KycShow() {
     const statusColor = (s: string) => {
         switch (s) {
             case 'approved': return 'emerald';
-            case 'pending': return 'amber';
+            case 'pending': return 'blue';
             case 'rejected': return 'rose';
             default: return 'gray';
         }

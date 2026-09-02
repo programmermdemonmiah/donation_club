@@ -31,7 +31,7 @@ export default function KycIndex() {
     const statusColor = (s: string) => {
         switch (s) {
             case 'approved': return 'emerald';
-            case 'pending': return 'amber';
+            case 'pending': return 'blue';
             case 'rejected': return 'rose';
             default: return 'gray';
         }
@@ -55,7 +55,7 @@ export default function KycIndex() {
                 <select
                     value={filters.status ?? ''}
                     onChange={(e) => search('status', e.target.value)}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                 >
                     <option value="">All statuses</option>
                     <option value="pending">Pending</option>
@@ -94,7 +94,7 @@ export default function KycIndex() {
                                         <td className="px-3 py-3">
                                             <Link
                                                 href={route('admin.kyc.show', doc.id)}
-                                                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                                                className="text-sm font-medium text-blue-600 hover:text-blue-500"
                                             >
                                                 Review
                                             </Link>
@@ -115,7 +115,7 @@ export default function KycIndex() {
                                 <Link
                                     key={i}
                                     href={link.url ?? '#'}
-                                    className={`rounded px-3 py-1 text-sm ${link.active ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    className={`rounded px-3 py-1 text-sm ${link.active ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                     preserveState
                                 />

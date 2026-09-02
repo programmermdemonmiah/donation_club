@@ -32,15 +32,15 @@ export default function Contact() {
     return (
         <PublicLayout>
             {/* Page Hero */}
-            <section className="relative overflow-hidden bg-gray-950 py-24 sm:py-32">
+            <section className="relative overflow-hidden bg-blue-950 py-24 sm:py-32">
                 <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"></div>
-                <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]"></div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950"></div>
+                <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full bg-blue-600/10 blur-[120px]"></div>
 
                 <div className="relative z-10 mx-auto max-w-screen-xl px-4 text-center sm:px-6 lg:px-8">
-                    <p className="text-xs font-black uppercase tracking-widest text-amber-500">Get In Touch</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-blue-600">Get In Touch</p>
                     <h1 className="mt-3 text-5xl font-black tracking-tight text-white sm:text-6xl">Contact Us</h1>
-                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-amber-400 to-amber-600"></div>
+                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-blue-500 to-blue-700"></div>
                     <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-relaxed text-gray-400">
                         We're here to help. Reach out through our official channels below.
                     </p>
@@ -51,14 +51,14 @@ export default function Contact() {
             <section className="bg-white py-24 sm:py-32">
                 <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                     {/* Warning */}
-                    <div className="mx-auto mb-16 max-w-3xl rounded-2xl border border-amber-200/50 bg-amber-50 p-6">
+                    <div className="mx-auto mb-16 max-w-3xl rounded-2xl border border-blue-200/50 bg-blue-50 p-6">
                         <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100">
-                                <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100">
+                                <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
-                            <p className="text-sm font-semibold leading-relaxed text-amber-900">
+                            <p className="text-sm font-semibold leading-relaxed text-blue-900">
                                 For questions about your account, contributions or withdrawals, contact the club operator through the official support channels below.{' '}
                                 <strong>Always verify you are communicating with the real operating entity before sharing any information.</strong>
                             </p>
@@ -68,15 +68,15 @@ export default function Contact() {
                     {/* Contact Cards */}
                     <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {contacts.map((item) => (
-                            <div key={item.label} className="group rounded-2xl border border-gray-100 bg-gray-50 p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:bg-white hover:shadow-xl hover:shadow-amber-100/50">
-                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 group-hover:border-amber-300 group-hover:bg-amber-50">
-                                    <svg className="h-7 w-7 text-gray-500 transition-colors duration-300 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                            <div key={item.label} className="group rounded-2xl border border-gray-100 bg-gray-50 p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-xl hover:shadow-blue-100/50">
+                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 group-hover:border-blue-300 group-hover:bg-blue-50">
+                                    <svg className="h-7 w-7 text-gray-500 transition-colors duration-300 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                                     </svg>
                                 </div>
                                 <p className="text-xs font-black uppercase tracking-widest text-gray-400">{item.label}</p>
                                 {item.isLink ? (
-                                    <a href={item.href!} className="mt-2 block text-lg font-bold text-gray-900 hover:text-amber-600 transition-colors">
+                                    <a href={item.href!} className="mt-2 block text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">
                                         {item.value}
                                     </a>
                                 ) : (

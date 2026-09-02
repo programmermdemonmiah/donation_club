@@ -27,13 +27,13 @@ export default function Privacy() {
     return (
         <PublicLayout>
             {/* Hero */}
-            <section className="relative overflow-hidden bg-gray-950 py-24 sm:py-32">
+            <section className="relative overflow-hidden bg-blue-950 py-24 sm:py-32">
                 <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"></div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950"></div>
                 <div className="relative z-10 mx-auto max-w-screen-xl px-4 text-center sm:px-6 lg:px-8">
-                    <p className="text-xs font-black uppercase tracking-widest text-amber-500">Legal</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-blue-600">Legal</p>
                     <h1 className="mt-3 text-5xl font-black tracking-tight text-white sm:text-6xl">Privacy Policy</h1>
-                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-amber-400 to-amber-600"></div>
+                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-blue-500 to-blue-700"></div>
                     <p className="mx-auto mt-6 max-w-xl text-lg font-medium leading-relaxed text-gray-400">
                         We take your privacy seriously. Here's exactly what we collect and how we protect it.
                     </p>
@@ -47,7 +47,7 @@ export default function Privacy() {
                         {sections.map((section, i) => (
                             <div key={i} className="rounded-2xl border border-gray-100 bg-gray-50 p-8">
                                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm">
-                                    <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={section.icon} />
                                     </svg>
                                 </div>

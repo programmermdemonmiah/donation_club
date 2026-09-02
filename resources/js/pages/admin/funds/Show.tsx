@@ -37,7 +37,7 @@ export default function AdminFundShow() {
                     <h1 className="text-xl font-bold text-gray-900">Fund request {r.reference}</h1>
                     <p className="text-sm text-gray-500">
                         {r.user ? (
-                            <a href={route('admin.users.show', r.user.id)} className="text-indigo-600 hover:text-indigo-500">{r.user.name}</a>
+                            <a href={route('admin.users.show', r.user.id)} className="text-blue-600 hover:text-blue-500">{r.user.name}</a>
                         ) : '—'}{' '}
                         · {r.fund?.name} · {formatDateTime(r.created_at)}
                     </p>
@@ -92,7 +92,7 @@ function ApproveForm({ onApprove }: { onApprove: (amount: string, note: string) 
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-3 rounded-lg bg-indigo-50/60 p-4 ring-1 ring-inset ring-indigo-600/10">
+        <form onSubmit={handleSubmit} className="space-y-3 rounded-lg bg-blue-50/60 p-4 ring-1 ring-inset ring-blue-600/10">
             <Input name="amount" label="Approved amount" type="number" step="0.01" min="0.01" required />
             <Input name="note" label="Note (optional)" placeholder="e.g. verified employment plan" />
             <Button type="submit" className="w-full">Approve</Button>

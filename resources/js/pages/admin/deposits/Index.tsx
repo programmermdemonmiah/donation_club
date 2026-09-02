@@ -57,7 +57,7 @@ export default function AdminDeposits() {
                             header: 'Deposit',
                             render: (d) => (
                                 <a href={route('admin.deposits.show', d.id)} className="group">
-                                    <span className="block font-medium text-gray-900 group-hover:text-indigo-600">{formatSequence(d.sequence_number)}</span>
+                                    <span className="block font-medium text-gray-900 group-hover:text-blue-600">{formatSequence(d.sequence_number)}</span>
                                     <span className="font-mono text-xs text-gray-400">{d.reference}</span>
                                 </a>
                             ),
@@ -66,7 +66,7 @@ export default function AdminDeposits() {
                             header: 'Member',
                             render: (d) =>
                                 d.user ? (
-                                    <a href={route('admin.users.show', d.user.id)} className="text-sm text-indigo-600 hover:text-indigo-500">
+                                    <a href={route('admin.users.show', d.user.id)} className="text-sm text-blue-600 hover:text-blue-500">
                                         {d.user.name}
                                     </a>
                                 ) : '—',

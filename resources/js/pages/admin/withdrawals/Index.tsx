@@ -46,7 +46,7 @@ export default function AdminWithdrawals() {
                             header: 'Withdrawal',
                             render: (w) => (
                                 <a href={route('admin.withdrawals.show', w.id)} className="group">
-                                    <span className="block font-medium text-gray-900 group-hover:text-indigo-600">{formatMoney(w.net_amount)}</span>
+                                    <span className="block font-medium text-gray-900 group-hover:text-blue-600">{formatMoney(w.net_amount)}</span>
                                     <span className="font-mono text-xs text-gray-400">{w.reference}</span>
                                 </a>
                             ),
@@ -55,7 +55,7 @@ export default function AdminWithdrawals() {
                             header: 'Member',
                             render: (w) =>
                                 w.user ? (
-                                    <a href={route('admin.users.show', w.user.id)} className="text-indigo-600 hover:text-indigo-500">{w.user.name}</a>
+                                    <a href={route('admin.users.show', w.user.id)} className="text-blue-600 hover:text-blue-500">{w.user.name}</a>
                                 ) : '—',
                         },
                         { header: 'Amount', render: (w) => formatMoney(w.amount) },

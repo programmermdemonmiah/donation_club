@@ -22,13 +22,13 @@ const steps = [
     {
         number: '04',
         title: 'Qualify',
-        body: 'Meet configurable requirements (direct referrals, rank, deposit totals) to become eligible for discretionary rewards.',
+        body: 'Meet configurable requirements (direct referrals, level, donation totals) to become eligible for community support.',
         icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
     },
     {
         number: '05',
-        title: 'Rewards & Funds',
-        body: 'Approved rewards are paid into your wallet. Qualified ranks can request employment support funds.',
+        title: 'Community Support',
+        body: 'Approved support is reflected in your account. Qualified ranks can request employment support funds.',
         icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
     },
     {
@@ -43,16 +43,16 @@ export default function HowItWorks() {
     return (
         <PublicLayout>
             {/* Hero */}
-            <section className="relative overflow-hidden bg-gray-950 py-24 sm:py-32">
+            <section className="relative overflow-hidden bg-blue-950 py-24 sm:py-32">
                 <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"></div>
-                <div className="pointer-events-none absolute -bottom-40 right-1/4 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]"></div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950"></div>
+                <div className="pointer-events-none absolute -bottom-40 right-1/4 h-96 w-96 rounded-full bg-blue-600/10 blur-[120px]"></div>
                 <div className="relative z-10 mx-auto max-w-screen-xl px-4 text-center sm:px-6 lg:px-8">
-                    <p className="text-xs font-black uppercase tracking-widest text-amber-500">Step by Step</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-blue-600">Step by Step</p>
                     <h1 className="mt-3 text-5xl font-black tracking-tight text-white sm:text-6xl">How It Works</h1>
-                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-amber-400 to-amber-600"></div>
+                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-blue-500 to-blue-700"></div>
                     <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-relaxed text-gray-400">
-                        Six simple steps to participate, grow your network, and qualify for community rewards.
+                        Six simple steps to participate, grow your community, and support one another.
                     </p>
                 </div>
             </section>
@@ -62,14 +62,14 @@ export default function HowItWorks() {
                 <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                     <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                         {steps.map((step, i) => (
-                            <div key={i} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-lg shadow-gray-200/40 transition-all duration-300 hover:-translate-y-2 hover:border-amber-200 hover:shadow-xl hover:shadow-amber-100/50">
+                            <div key={i} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-lg shadow-gray-200/40 transition-all duration-300 hover:-translate-y-2 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-100/50">
                                 <div className="mb-6 flex items-center gap-4">
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 transition-all duration-300 group-hover:border-amber-300 group-hover:bg-amber-50">
-                                        <svg className="h-7 w-7 text-gray-500 transition-colors duration-300 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 transition-all duration-300 group-hover:border-blue-300 group-hover:bg-blue-50">
+                                        <svg className="h-7 w-7 text-gray-500 transition-colors duration-300 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={step.icon} />
                                         </svg>
                                     </div>
-                                    <span className="text-4xl font-black text-gray-100 transition-colors duration-300 group-hover:text-amber-100">{step.number}</span>
+                                    <span className="text-4xl font-black text-gray-100 transition-colors duration-300 group-hover:text-blue-100">{step.number}</span>
                                 </div>
                                 <h2 className="text-xl font-black text-gray-900">{step.title}</h2>
                                 <p className="mt-3 text-base font-medium leading-relaxed text-gray-600">{step.body}</p>
@@ -78,15 +78,15 @@ export default function HowItWorks() {
                     </div>
 
                     {/* Disclaimer */}
-                    <div className="mt-16 rounded-2xl border border-amber-200/50 bg-amber-50 p-8">
+                    <div className="mt-16 rounded-2xl border border-blue-200/50 bg-blue-50 p-8">
                         <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100">
-                                <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100">
+                                <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
-                            <p className="text-base font-semibold leading-relaxed text-amber-900">
-                                Rewards, commissions and returns are never guaranteed and depend on administrator approval and configured rules.
+                            <p className="text-base font-semibold leading-relaxed text-blue-900">
+                                All community support is managed transparently and depends on administrator approval and configured rules.
                             </p>
                         </div>
                     </div>

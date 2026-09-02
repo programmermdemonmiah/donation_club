@@ -23,10 +23,10 @@ export default function Returns() {
         <AppLayout>
             <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Community Rewards</p>
-                    <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Returns & Rewards</h1>
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Community Support</p>
+                    <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Community Support</h1>
                     <p className="mt-2 max-w-xl text-sm font-medium text-gray-500">
-                        Discretionary community rewards. No fixed payout date; each return requires eligibility and administrator approval.
+                        Voluntary community support. No fixed distribution date; each request requires eligibility and administrator approval.
                     </p>
                 </div>
                 <span className={`mt-1 rounded-full px-4 py-1.5 text-xs font-black ${page.props.eligibility.eligible ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -38,7 +38,7 @@ export default function Returns() {
                 <div className="mb-6 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
                     <div className="border-b border-gray-50 bg-gray-50/60 px-6 py-4">
                         <h2 className="text-sm font-black text-gray-900">Eligibility Checklist</h2>
-                        <p className="mt-0.5 text-xs text-gray-400">Requirements to meet before qualifying for rewards</p>
+                        <p className="mt-0.5 text-xs text-gray-400">Requirements to meet before qualifying for community support</p>
                     </div>
                     <ul className="divide-y divide-gray-50 px-6">
                         {page.props.eligibility.failed.map((item) => (
@@ -48,7 +48,7 @@ export default function Returns() {
                                     <span className="text-sm font-semibold text-gray-700">{item.requirement}</span>
                                 </div>
                                 <span className="text-xs font-medium text-gray-500">
-                                    Need <strong className="text-gray-800">{item.required}</strong> · yours <strong className="text-amber-600">{item.actual}</strong>
+                                    Need <strong className="text-gray-800">{item.required}</strong> · yours <strong className="text-blue-600">{item.actual}</strong>
                                 </span>
                             </li>
                         ))}
@@ -57,14 +57,14 @@ export default function Returns() {
             )}
 
             {page.props.termsNote && (
-                <div className="mb-6 rounded-2xl border border-amber-200/50 bg-amber-50 p-5">
-                    <p className="text-sm font-semibold text-amber-900">{page.props.termsNote}</p>
+                <div className="mb-6 rounded-2xl border border-blue-200/50 bg-blue-50 p-5">
+                    <p className="text-sm font-semibold text-blue-900">{page.props.termsNote}</p>
                 </div>
             )}
 
             <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
                 <div className="border-b border-gray-50 px-6 py-4">
-                    <h2 className="text-sm font-black text-gray-900">Returns History</h2>
+                    <h2 className="text-sm font-black text-gray-900">Support History</h2>
                 </div>
                 <Table<ReturnRow>
                     columns={[
@@ -78,7 +78,7 @@ export default function Returns() {
                     ]}
                     rows={page.props.returns.data}
                     rowKey={(r) => r.id}
-                    emptyMessage="No returns yet. They are created automatically once the club enables the reward module."
+                    emptyMessage="No support records yet. They are created automatically once the community support module is enabled."
                 />
                 <div className="border-t border-gray-50 bg-gray-50/50 px-5 py-3">
                     <Pagination currentPage={page.props.returns.current_page} lastPage={page.props.returns.last_page} />

@@ -10,11 +10,11 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<Variant, string> = {
-    primary: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:ring-indigo-600',
+    primary: 'bg-blue-600 text-white hover:bg-blue-500 focus-visible:ring-blue-600',
     secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-500',
     danger: 'bg-rose-600 text-white hover:bg-rose-500 focus-visible:ring-rose-600',
     ghost: 'text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-400',
-    outline: 'border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 focus-visible:ring-indigo-600',
+    outline: 'border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 focus-visible:ring-blue-600',
 };
 
 export default function Button({ variant = 'primary', size = 'md', loading, className, disabled, children, ...props }: Props) {

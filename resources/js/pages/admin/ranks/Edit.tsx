@@ -70,11 +70,11 @@ export default function AdminRankEdit() {
                                 id="rank-description"
                                 rows={2}
                                 defaultValue={page.props.rank.description ?? ''}
-                                className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             />
                         </div>
                         <label className="flex items-center gap-2 text-sm text-gray-700">
-                            <input id="rank-active" type="checkbox" defaultChecked={page.props.rank.active} className="h-4 w-4 rounded border-gray-300 text-indigo-600" />
+                            <input id="rank-active" type="checkbox" defaultChecked={page.props.rank.active} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
                             Rank is active
                         </label>
                     </CardBody>
@@ -101,7 +101,7 @@ export default function AdminRankEdit() {
                                     <select
                                         value={req.key}
                                         onChange={(e) => updateRequirement(index, { key: e.target.value })}
-                                        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     >
                                         {Object.entries(page.props.requirementKeys).map(([key, label]) => (
                                             <option key={key} value={key}>{label}</option>

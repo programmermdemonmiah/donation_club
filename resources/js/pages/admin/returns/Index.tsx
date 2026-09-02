@@ -29,7 +29,7 @@ export default function AdminReturns() {
     return (
         <AdminLayout>
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <h1 className="text-xl font-bold text-gray-900">Returns / Rewards</h1>
+                <h1 className="text-xl font-bold text-gray-900">Community Support</h1>
                 {!page.props.moduleEnabled && (
                     <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 ring-1 ring-inset ring-rose-600/20">
                         Module disabled — enable in Settings
@@ -54,7 +54,7 @@ export default function AdminReturns() {
                             header: 'Member',
                             render: (r) =>
                                 r.user ? (
-                                    <a href={route('admin.users.show', r.user.id)} className="text-sm text-indigo-600 hover:text-indigo-500">
+                                    <a href={route('admin.users.show', r.user.id)} className="text-sm text-blue-600 hover:text-blue-500">
                                         {r.user.name}
                                     </a>
                                 ) : '—',
@@ -77,7 +77,7 @@ export default function AdminReturns() {
                                     )}
                                     {r.status === 'approved' && <ActionBtn route="admin.returns.process" id={r.id} label="Process" />}
                                     {(r.status === 'processing' || r.status === 'approved') && (
-                                        <ActionBtn route="admin.returns.complete" id={r.id} label="Complete & pay" confirm={`Credit ${formatMoney(r.payout_amount)} to member wallet and run upline commissions?`} />
+                                        <ActionBtn route="admin.returns.complete" id={r.id} label="Approve & process" confirm={`Credit ${formatMoney(r.payout_amount)} to member account and update community records?`} />
                                     )}
                                     {r.status === 'completed' && <ActionBtn route="admin.returns.reverse" id={r.id} label="Reverse" danger prompt="Reason for reversal?" />}
                                 </div>
@@ -86,7 +86,7 @@ export default function AdminReturns() {
                     ]}
                     rows={page.props.returns.data}
                     rowKey={(r) => r.id}
-                    emptyMessage="No returns found."
+                    emptyMessage="No community support records found."
                 />
                 <Pagination currentPage={page.props.returns.current_page} lastPage={page.props.returns.last_page} />
             </div>
@@ -125,7 +125,7 @@ function ActionBtn({ route: routeName, id, label, danger, confirm, prompt }: {
             className={
                 danger
                     ? 'rounded-md bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100'
-                    : 'rounded-md bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-100'
+                    : 'rounded-md bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100'
             }
         >
             {label}

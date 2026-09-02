@@ -34,7 +34,7 @@ export default function Fund() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Community Aid</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Community Aid</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Support Fund</h1>
                 <p className="mt-1 text-sm font-medium text-gray-500">Apply for community support funds that you are eligible for.</p>
             </div>
@@ -47,7 +47,7 @@ export default function Fund() {
                     </div>
                 )}
                 {page.props.funds.map((fund) => (
-                    <div key={fund.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:border-amber-200 hover:shadow-md">
+                    <div key={fund.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:border-blue-200 hover:shadow-md">
                         <div className="border-b border-gray-50 bg-gray-50/60 px-6 py-4">
                             <h2 className="text-sm font-black text-gray-900">{fund.name}</h2>
                             <p className="mt-0.5 text-xs font-medium text-gray-400">
@@ -61,14 +61,14 @@ export default function Fund() {
                                 <span className="text-sm font-black text-gray-900">{formatMoney(fund.min_amount)} – {formatMoney(fund.max_amount)}</span>
                             </div>
                             {fund.requires_proof && (
-                                <p className="flex items-center gap-2 text-xs font-semibold text-amber-600">
+                                <p className="flex items-center gap-2 text-xs font-semibold text-blue-600">
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                                     Supporting document required
                                 </p>
                             )}
                             {fund.eligible ? (
                                 <button onClick={() => openForm(fund)}
-                                    className="group relative w-full overflow-hidden rounded-xl bg-amber-500 py-2.5 text-sm font-black text-gray-900 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all hover:bg-amber-400">
+                                    className="group relative w-full overflow-hidden rounded-xl bg-blue-600 py-2.5 text-sm font-black text-white shadow-[0_0_15px_rgba(37,99,235,0.2)] transition-all hover:bg-blue-500">
                                     <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                                     Request Support
                                 </button>
@@ -112,28 +112,28 @@ export default function Fund() {
                         <div key={key} className="space-y-1">
                             <label className="block text-sm font-bold text-gray-700">{label}</label>
                             <input type={type} step="0.01" min={min} max={max} value={(form.data as any)[key]} onChange={(e) => form.setData(key as any, e.target.value)} required
-                                className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20" />
+                                className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/20" />
                             {(form.errors as any)[key] && <p className="text-xs font-semibold text-red-600">{(form.errors as any)[key]}</p>}
                         </div>
                     ))}
                     <div className="space-y-1">
                         <label className="block text-sm font-bold text-gray-700">Purpose (min 20 characters)</label>
                         <textarea rows={4} value={form.data.purpose} onChange={(e) => form.setData('purpose', e.target.value)} required
-                            className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20" />
+                            className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/20" />
                         {form.errors.purpose && <p className="text-xs font-semibold text-red-600">{form.errors.purpose as string}</p>}
                     </div>
                     {selectedFund?.requires_proof && (
                         <div className="space-y-1">
                             <label className="block text-sm font-bold text-gray-700">Proof document (PDF/JPG/PNG)</label>
                             <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => form.setData('proof', e.target.files?.[0] ?? null)}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-bold file:text-amber-700 hover:file:bg-amber-100" />
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-bold file:text-blue-700 hover:file:bg-blue-100" />
                             {form.errors.proof && <p className="text-xs font-semibold text-red-600">{form.errors.proof as string}</p>}
                         </div>
                     )}
                     <div className="flex justify-end gap-3 pt-2">
                         <button type="button" onClick={close} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50">Cancel</button>
                         <button type="submit" disabled={form.processing}
-                            className="rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-black text-gray-900 hover:bg-amber-400 disabled:opacity-60">
+                            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white hover:bg-blue-500 disabled:opacity-60">
                             {form.processing ? 'Submitting…' : 'Submit Request'}
                         </button>
                     </div>

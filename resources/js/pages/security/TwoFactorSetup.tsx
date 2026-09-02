@@ -16,7 +16,7 @@ export default function TwoFactorSetup() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Security</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Security</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">
                     {enabled ? 'Manage 2FA' : 'Set Up Two-Factor Authentication'}
                 </h1>
@@ -31,7 +31,7 @@ export default function TwoFactorSetup() {
                             <p className="mt-0.5 text-xs text-gray-400">Open Google Authenticator and scan this QR code</p>
                         </div>
                         <div className="flex flex-col items-center p-8 gap-6">
-                            <div className="rounded-2xl border-2 border-dashed border-amber-200 bg-amber-50/30 p-6">
+                            <div className="rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50/30 p-6">
                                 <img
                                     src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCodeUrl)}`}
                                     alt="2FA QR Code"
@@ -40,7 +40,7 @@ export default function TwoFactorSetup() {
                             </div>
                             <div className="text-center">
                                 <p className="text-xs font-semibold text-gray-400">Or enter this secret manually:</p>
-                                <code className="mt-2 inline-block rounded-xl bg-gray-900 px-5 py-2.5 font-mono text-sm font-bold tracking-[0.25em] text-amber-400 shadow-inner">
+                                <code className="mt-2 inline-block rounded-xl bg-gray-900 px-5 py-2.5 font-mono text-sm font-bold tracking-[0.25em] text-blue-400 shadow-inner">
                                     {secret}
                                 </code>
                             </div>
@@ -61,12 +61,12 @@ export default function TwoFactorSetup() {
                                         value={enableForm.data.otp}
                                         onChange={(e) => enableForm.setData('otp', e.target.value)}
                                         placeholder="000000" maxLength={6} required
-                                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-center font-mono text-2xl font-black tracking-[0.4em] text-gray-900 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+                                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-center font-mono text-2xl font-black tracking-[0.4em] text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/20"
                                     />
                                     {enableForm.errors.otp && <p className="text-xs font-semibold text-red-600">{enableForm.errors.otp}</p>}
                                 </div>
                                 <button type="submit" disabled={enableForm.processing}
-                                    className="group relative w-full overflow-hidden rounded-xl bg-amber-500 py-3 text-sm font-black text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.25)] transition-all hover:bg-amber-400 disabled:opacity-60">
+                                    className="group relative w-full overflow-hidden rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-[0_0_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-500 disabled:opacity-60">
                                     <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                                     {enableForm.processing ? 'Enabling…' : 'Enable 2FA'}
                                 </button>
@@ -83,8 +83,8 @@ export default function TwoFactorSetup() {
                         <p className="mt-0.5 text-xs text-gray-400">Enter an OTP code from your authenticator to disable 2FA</p>
                     </div>
                     <div className="p-6">
-                        <div className="mb-5 rounded-xl border border-amber-200/50 bg-amber-50 p-4">
-                            <p className="text-sm font-semibold text-amber-900">
+                        <div className="mb-5 rounded-xl border border-blue-200/50 bg-blue-50 p-4">
+                            <p className="text-sm font-semibold text-blue-900">
                                 ⚠️ Disabling 2FA will make your account less secure. Only do this if you've lost access to your authenticator app.
                             </p>
                         </div>

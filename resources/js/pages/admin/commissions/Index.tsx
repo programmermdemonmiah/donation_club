@@ -20,7 +20,7 @@ interface CommissionRow {
     credited_at: string | null;
 }
 
-export default function AdminCommissions() {
+export default function AdminDonations() {
     const page = usePage<PageProps & { commissions: { data: CommissionRow[]; current_page: number; last_page: number }; filters: { status?: string; generation?: string } }>();
 
     const setFilter = (key: 'status' | 'generation', value: string) => {
@@ -30,7 +30,7 @@ export default function AdminCommissions() {
 
     return (
         <AdminLayout>
-            <h1 className="text-xl font-bold text-gray-900">Commissions</h1>
+            <h1 className="text-xl font-bold text-gray-900">Donations</h1>
 
             <div className="mt-4 flex gap-3">
                 <div className="w-40">
@@ -59,7 +59,7 @@ export default function AdminCommissions() {
                             header: 'Beneficiary',
                             render: (c) =>
                                 c.user ? (
-                                    <a href={route('admin.users.show', c.user.id)} className="text-indigo-600 hover:text-indigo-500">{c.user.name}</a>
+                                    <a href={route('admin.users.show', c.user.id)} className="text-blue-600 hover:text-blue-500">{c.user.name}</a>
                                 ) : '—',
                         },
                         { header: 'Source member', render: (c) => c.from_user?.name ?? '—' },
@@ -72,7 +72,7 @@ export default function AdminCommissions() {
                     ]}
                     rows={page.props.commissions.data}
                     rowKey={(c) => c.id}
-                    emptyMessage="No commissions found."
+                    emptyMessage="No donations found."
                 />
                 <Pagination currentPage={page.props.commissions.current_page} lastPage={page.props.commissions.last_page} />
             </div>

@@ -30,14 +30,14 @@ export default function Wallet() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Financial Overview</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Financial Overview</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">My Wallet</h1>
                 <p className="mt-1 text-sm font-medium text-gray-500">Every wallet movement is permanently recorded below.</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
                 <BalanceCard label="Total Balance" value={formatMoney(page.props.balance)}
-                    accent="border-amber-200/50 bg-gradient-to-br from-amber-50 to-amber-100/50 text-amber-900" />
+                    accent="border-blue-200/50 bg-gradient-to-br from-blue-50 to-emerald-50/50 text-blue-900" />
                 <BalanceCard label="Available Balance" value={formatMoney(page.props.availableBalance)}
                     sub="Excludes locked withdrawal holds"
                     accent="border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-900" />

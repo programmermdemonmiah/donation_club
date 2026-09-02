@@ -29,7 +29,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     </Button>
                 </form>
                 <p className="text-center text-sm">
-                    <button onClick={(e) => { e.preventDefault(); window.location.href = route('logout'); }} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <button onClick={(e) => { e.preventDefault(); window.location.href = route('logout'); }} className="font-medium text-blue-600 hover:text-blue-500">
                         Log out
                     </button>
                 </p>

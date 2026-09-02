@@ -37,7 +37,7 @@ export default function Pagination({ currentPage, lastPage }: Props) {
                         preserveScroll
                         className={
                             page === currentPage
-                                ? 'rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white'
+                                ? 'rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white'
                                 : 'rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100'
                         }
                     >

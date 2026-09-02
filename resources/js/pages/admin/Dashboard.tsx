@@ -54,12 +54,12 @@ export default function AdminDashboard() {
             <h2 className="mt-8 text-xs font-semibold uppercase tracking-wider text-gray-400">Financial</h2>
             <dl className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard label="Total Deposits" value={formatMoney(s.deposits.total_amount)} sub={`${s.deposits.count} completed`} />
-                <StatCard label="Today's Deposits" value={formatMoney(s.deposits.today_amount)} accent="text-indigo-600" />
-                <StatCard label="Pending Payments" value={s.deposits.pending_payments} accent="text-amber-600" />
-                <StatCard label="Returns Paid" value={formatMoney(s.returns.total_payout)} sub={`${s.returns.pending} pending`} />
-                <StatCard label="Commissions Paid" value={formatMoney(s.commissions.total)} />
+                <StatCard label="Today's Deposits" value={formatMoney(s.deposits.today_amount)} accent="text-blue-600" />
+                <StatCard label="Pending Payments" value={s.deposits.pending_payments} accent="text-blue-600" />
+                <StatCard label="Support Provided" value={formatMoney(s.returns.total_payout)} sub={`${s.returns.pending} pending`} />
+                <StatCard label="Donations Shared" value={formatMoney(s.commissions.total)} />
                 <StatCard label="Withdrawals Paid" value={formatMoney(s.withdrawals.total)} sub={`${s.withdrawals.count} completed`} />
-                <StatCard label="Pending Withdrawals" value={s.withdrawals.pending} accent="text-amber-600" />
+                <StatCard label="Pending Withdrawals" value={s.withdrawals.pending} accent="text-blue-600" />
                 <StatCard label="Funds Disbursed" value={formatMoney(s.funds.disbursed)} sub={`${s.funds.requests} requests`} />
             </dl>
 
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
             <dl className="mt-2 grid gap-4 sm:grid-cols-3">
                 <StatCard label="Referral Links" value={s.referrals.relationships} />
                 <StatCard label="Ranked Members" value={s.ranks.distributed} />
-                <StatCard label="Return Records" value={s.returns.count} />
+                <StatCard label="Support Records" value={s.returns.count} />
             </dl>
 
             {/* Chart */}
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
                                 <div key={row.day} className="group flex flex-1 flex-col items-center justify-end">
                                     <span className="mb-1 hidden text-xs font-semibold text-gray-600 group-hover:block">${Number(row.total).toFixed(0)}</span>
                                     <div
-                                        className="w-full rounded-t bg-indigo-500/80 transition-colors group-hover:bg-indigo-600"
+                                        className="w-full rounded-t bg-blue-500/80 transition-colors group-hover:bg-blue-600"
                                         style={{ height: `${(Number(row.total) / maxChart) * 100}%`, minHeight: '4px' }}
                                     />
                                     <span className="mt-1 text-[10px] text-gray-400">{formatDate(row.day)}</span>

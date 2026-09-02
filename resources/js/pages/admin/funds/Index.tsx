@@ -46,7 +46,7 @@ export default function AdminFunds() {
                             header: 'Request',
                             render: (r) => (
                                 <a href={route('admin.funds.show', r.id)} className="group">
-                                    <span className="block font-medium text-gray-900 group-hover:text-indigo-600">{formatMoney(r.requested_amount)}</span>
+                                    <span className="block font-medium text-gray-900 group-hover:text-blue-600">{formatMoney(r.requested_amount)}</span>
                                     <span className="font-mono text-xs text-gray-400">{r.reference}</span>
                                 </a>
                             ),
@@ -55,7 +55,7 @@ export default function AdminFunds() {
                             header: 'Member',
                             render: (r) =>
                                 r.user ? (
-                                    <a href={route('admin.users.show', r.user.id)} className="text-indigo-600 hover:text-indigo-500">{r.user.name}</a>
+                                    <a href={route('admin.users.show', r.user.id)} className="text-blue-600 hover:text-blue-500">{r.user.name}</a>
                                 ) : '—',
                         },
                         { header: 'Fund', render: (r) => r.fund?.name ?? '—' },

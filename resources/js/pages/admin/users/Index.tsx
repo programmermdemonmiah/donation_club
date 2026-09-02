@@ -56,7 +56,7 @@ export default function AdminUsers() {
                             header: 'Member',
                             render: (u) => (
                                 <a href={route('admin.users.show', u.id)} className="group">
-                                    <span className="block font-medium text-gray-900 group-hover:text-indigo-600">{u.name}</span>
+                                    <span className="block font-medium text-gray-900 group-hover:text-blue-600">{u.name}</span>
                                     <span className="block text-xs text-gray-400">{u.email}</span>
                                 </a>
                             ),
@@ -69,7 +69,7 @@ export default function AdminUsers() {
                                 u.email_verified ? (
                                     <span className="text-emerald-600">✓</span>
                                 ) : (
-                                    <span className="text-amber-500">pending</span>
+                                    <span className="text-blue-600">pending</span>
                                 ),
                         },
                         { header: 'Role', render: (u) => (u.is_admin ? <Badge value="active" label="Admin" /> : 'Member') },

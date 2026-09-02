@@ -34,7 +34,7 @@ export default function Withdrawals() {
     return (
         <AppLayout>
             <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Cash Out</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Cash Out</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Withdrawals</h1>
                 <p className="mt-1 text-sm font-medium text-gray-500">
                     Available balance: <span className="font-black text-emerald-600">{formatMoney(page.props.availableBalance)}</span>
@@ -48,8 +48,8 @@ export default function Withdrawals() {
                     </div>
                     <div className="p-6">
                         {!page.props.rules.enabled ? (
-                            <div className="rounded-xl border border-amber-200/50 bg-amber-50 p-4">
-                                <p className="text-sm font-semibold text-amber-800">Withdrawals are temporarily disabled by the club.</p>
+                            <div className="rounded-xl border border-blue-200/50 bg-blue-50 p-4">
+                                <p className="text-sm font-semibold text-blue-800">Withdrawals are temporarily disabled by the club.</p>
                             </div>
                         ) : (
                             <form onSubmit={submit} className="space-y-4">
@@ -64,7 +64,7 @@ export default function Withdrawals() {
                                             type={type} {...(extra as any)}
                                             value={(form.data as any)[key]}
                                             onChange={(e) => form.setData(key as any, e.target.value)}
-                                            className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+                                            className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/20"
                                         />
                                         {(form.errors as any)[key] && <p className="text-xs font-semibold text-red-600">{(form.errors as any)[key]}</p>}
                                     </div>
@@ -75,7 +75,7 @@ export default function Withdrawals() {
                                     <select
                                         value={form.data.method}
                                         onChange={(e) => form.setData('method', e.target.value)}
-                                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+                                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
                                     >
                                         <option value="bank">Bank Transfer</option>
                                     </select>
@@ -94,7 +94,7 @@ export default function Withdrawals() {
 
                                 <button
                                     type="submit" disabled={form.processing}
-                                    className="group relative w-full overflow-hidden rounded-xl bg-amber-500 py-3 text-sm font-black text-gray-900 shadow-[0_0_20px_rgba(245,158,11,0.25)] transition-all hover:bg-amber-400 disabled:opacity-60"
+                                    className="group relative w-full overflow-hidden rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-[0_0_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-500 disabled:opacity-60"
                                 >
                                     <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                                     {form.processing ? 'Processing…' : 'Request Withdrawal'}

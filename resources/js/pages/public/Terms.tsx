@@ -5,7 +5,7 @@ import type { PageProps } from '@/types';
 const clauses = [
     { number: '1', title: 'Nature of contributions.', body: '' }, // filled dynamically
     { number: '2', title: 'Eligibility.', body: 'You must be legally permitted to participate in such community programs in your jurisdiction. It is your responsibility to confirm local legality.' },
-    { number: '3', title: 'Rewards.', body: 'Commissions, returns and fund disbursements are discretionary benefits governed by configurable platform rules and require administrative approval. No payout date is promised.' },
+    { number: '3', title: 'Community Support.', body: 'Community support distributions are voluntary benefits governed by configurable platform rules and require administrative approval. No payout date is promised.' },
     { number: '4', title: 'Accounts.', body: 'One account per person. Circumventing limits, fraudulent payments or abuse of the referral system results in permanent suspension without refund.' },
 ];
 
@@ -21,13 +21,13 @@ export default function Terms() {
     return (
         <PublicLayout>
             {/* Hero */}
-            <section className="relative overflow-hidden bg-gray-950 py-24 sm:py-32">
+            <section className="relative overflow-hidden bg-blue-950 py-24 sm:py-32">
                 <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"></div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950"></div>
                 <div className="relative z-10 mx-auto max-w-screen-xl px-4 text-center sm:px-6 lg:px-8">
-                    <p className="text-xs font-black uppercase tracking-widest text-amber-500">Legal</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-blue-600">Legal</p>
                     <h1 className="mt-3 text-5xl font-black tracking-tight text-white sm:text-6xl">Terms of Service</h1>
-                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-amber-400 to-amber-600"></div>
+                    <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-blue-500 to-blue-700"></div>
                 </div>
             </section>
 
@@ -38,7 +38,7 @@ export default function Terms() {
                         {allClauses.map((clause) => (
                             <div key={clause.number} className="p-8">
                                 <div className="flex items-start gap-5">
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-sm font-black text-amber-600 ring-1 ring-amber-200">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-black text-blue-600 ring-1 ring-blue-200">
                                         {clause.number}
                                     </span>
                                     <div>

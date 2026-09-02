@@ -48,7 +48,7 @@ export default function AdminAuditLogs() {
                     columns={[
                         { header: 'Time', render: (l) => <span className="text-xs text-gray-500">{formatDateTime(l.created_at)}</span> },
                         { header: 'Actor', render: (l) => l.actor?.name ?? <span className="italic text-gray-400">system</span> },
-                        { header: 'Action', render: (l) => <span className="font-mono text-xs font-semibold text-indigo-600">{l.action}</span> },
+                        { header: 'Action', render: (l) => <span className="font-mono text-xs font-semibold text-blue-600">{l.action}</span> },
                         { header: 'Model', render: (l) => (l.model_type ? `${l.model_type.split('\\').pop()}#${l.model_id}` : '—') },
                         {
                             header: 'Changes',

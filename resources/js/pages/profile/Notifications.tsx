@@ -31,11 +31,11 @@ export default function Notifications() {
 
             <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 {page.props.notifications.data.length === 0 ? (
-                    <EmptyState title="No notifications yet" message="Deposit confirmations, commissions and rank updates will appear here." />
+                    <EmptyState title="No notifications yet" message="Deposit confirmations, donations and level updates will appear here." />
                 ) : (
                     <ul className="divide-y divide-gray-100">
                         {page.props.notifications.data.map((notification) => (
-                            <li key={notification.id} className={`flex items-start justify-between gap-4 px-5 py-4 ${!notification.read_at ? 'bg-indigo-50/40' : ''}`}>
+                            <li key={notification.id} className={`flex items-start justify-between gap-4 px-5 py-4 ${!notification.read_at ? 'bg-blue-50/40' : ''}`}>
                                 <div className="min-w-0">
                                     <p className="text-sm font-semibold text-gray-900">{notification.title}</p>
                                     <p className="mt-0.5 text-sm text-gray-600">{notification.message}</p>
@@ -43,7 +43,7 @@ export default function Notifications() {
                                 </div>
                                 <div className="flex shrink-0 items-center gap-3">
                                     {notification.url && (
-                                        <a href={notification.url} className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
+                                        <a href={notification.url} className="text-xs font-medium text-blue-600 hover:text-blue-500">
                                             View
                                         </a>
                                     )}

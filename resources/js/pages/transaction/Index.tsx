@@ -24,14 +24,14 @@ export default function Transactions() {
         <AppLayout>
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Audit Trail</p>
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Audit Trail</p>
                     <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Transactions</h1>
                 </div>
                 <div className="w-56">
                     <select
                         value={page.props.filters?.type ?? ''}
                         onChange={(e) => setType(e.target.value)}
-                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+                        className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
                     >
                         <option value="">All types</option>
                         {types.map((type) => (

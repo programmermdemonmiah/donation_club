@@ -41,10 +41,10 @@ export default function AdminReturnShow() {
         <AdminLayout>
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-xl font-bold text-gray-900">Return {r.reference}</h1>
+                    <h1 className="text-xl font-bold text-gray-900">Community Support {r.reference}</h1>
                     <p className="text-sm text-gray-500">
                         {r.user ? (
-                            <a href={route('admin.users.show', r.user.id)} className="text-indigo-600 hover:text-indigo-500">{r.user.name}</a>
+                            <a href={route('admin.users.show', r.user.id)} className="text-blue-600 hover:text-blue-500">{r.user.name}</a>
                         ) : '—'}{' '}
                         · deposit {r.deposit?.reference}
                     </p>
@@ -77,13 +77,13 @@ export default function AdminReturnShow() {
                         {r.status === 'approved' && (
                             <>
                                 <Button className="w-full" onClick={() => act('process')}>Start processing</Button>
-                                <Button className="w-full" variant="outline" onClick={() => act('complete', false, 'Credit payout to member wallet and run upline commissions?')}>
+                                <Button className="w-full" variant="outline" onClick={() => act('complete', false, 'Credit support to member account and update community records?')}>
                                     Complete & credit
                                 </Button>
                             </>
                         )}
                         {r.status === 'processing' && (
-                            <Button className="w-full" onClick={() => act('complete', false, 'Credit payout to member wallet and run upline commissions?')}>
+                            <Button className="w-full" onClick={() => act('complete', false, 'Credit support to member account and update community records?')}>
                                 Complete & credit
                             </Button>
                         )}

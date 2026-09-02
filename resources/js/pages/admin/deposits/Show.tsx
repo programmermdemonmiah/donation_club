@@ -51,7 +51,7 @@ export default function AdminDepositShow() {
                     <p className="text-sm text-gray-500">
                         <span className="font-mono">{deposit.reference}</span> ·{' '}
                         {deposit.user ? (
-                            <a href={route('admin.users.show', deposit.user.id)} className="text-indigo-600 hover:text-indigo-500">
+                            <a href={route('admin.users.show', deposit.user.id)} className="text-blue-600 hover:text-blue-500">
                                 {deposit.user.name}
                             </a>
                         ) : '—'}{' '}
@@ -102,7 +102,7 @@ export default function AdminDepositShow() {
                                                 <li key={tx.id} className="flex items-center justify-between rounded bg-white px-3 py-2 text-sm ring-1 ring-inset ring-gray-200/60">
                                                     <span>
                                                         Submitted tx: <strong className="font-mono">{tx.external_reference}</strong>
-                                                        {!tx.processed && <span className="ml-2 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">unprocessed</span>}
+                                                        {!tx.processed && <span className="ml-2 rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">unprocessed</span>}
                                                     </span>
                                                     <span className="text-xs text-gray-400">{formatDateTime(tx.created_at)}</span>
                                                 </li>
