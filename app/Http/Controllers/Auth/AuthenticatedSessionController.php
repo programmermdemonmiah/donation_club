@@ -19,11 +19,11 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('username', 'password');
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => 'These credentials do not match our records.',
+                'username' => 'These credentials do not match our records.',
             ]);
         }
 
@@ -41,7 +41,7 @@ class AuthenticatedSessionController extends Controller
             $request->session()->regenerateToken();
 
             throw ValidationException::withMessages([
-                'email' => 'Your account has been blocked. Please contact support.',
+                'username' => 'Your account has been blocked. Please contact support.',
             ]);
         }
 

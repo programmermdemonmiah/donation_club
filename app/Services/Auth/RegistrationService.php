@@ -32,6 +32,7 @@ class RegistrationService
             /** @var User $user */
             $user = User::create([
                 'name' => trim($data['name']),
+                'username' => strtolower(trim($data['username'])),
                 'email' => strtolower(trim($data['email'])),
                 'password' => $data['password'],
                 'referral_code' => ReferralService::generateReferralCode(),

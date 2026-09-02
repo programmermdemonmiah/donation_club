@@ -6,6 +6,7 @@ export default function Register() {
 
     const form = useForm({
         name: '',
+        username: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -22,10 +23,11 @@ export default function Register() {
             <form onSubmit={submit} className="space-y-4">
                 {[
                     { label: 'Full name', key: 'name', type: 'text', placeholder: 'John Smith', autoFocus: true },
+                    { label: 'Username', key: 'username', type: 'text', placeholder: 'Enter your username' },
                     { label: 'Email address', key: 'email', type: 'email', placeholder: 'you@example.com' },
                     { label: 'Referral code', key: 'referral_code', type: 'text', placeholder: 'ABC12345', upper: true },
-                    { label: 'Password', key: 'password', type: 'password', placeholder: '••••••••' },
-                    { label: 'Confirm password', key: 'password_confirmation', type: 'password', placeholder: '••••••••' },
+                    { label: 'Password', key: 'password', type: 'password', placeholder: 'Enter your password' },
+                    { label: 'Confirm password', key: 'password_confirmation', type: 'password', placeholder: 'Confirm your password' },
                 ].map(({ label, key, type, placeholder, autoFocus, upper }) => (
                     <div key={key} className="space-y-1">
                         <label className="block text-sm font-bold text-gray-700">{label}</label>

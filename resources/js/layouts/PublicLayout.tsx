@@ -124,7 +124,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                         <div className="flex flex-col">
                             <span className="text-[19px] font-black leading-none tracking-[0.02em] text-[#0f3d2b]">DONATION<span className="text-[#0f3d2b]">CLUB</span></span>
                             <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
-                            <div className="mt-[4px] flex items-center gap-1.5">
+                            <div className="mt-[4px] flex w-full items-center justify-center gap-1.5">
                                 <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
                                 <span className="h-[6px] w-[6px] rotate-45 border border-[#c8a84e] bg-[#c8a84e]/10"></span>
                                 <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
