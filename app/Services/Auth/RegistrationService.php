@@ -34,9 +34,19 @@ class RegistrationService
                 'name' => trim($data['name']),
                 'username' => strtolower(trim($data['username'])),
                 'email' => strtolower(trim($data['email'])),
+                'email_verified_at' => now(),
                 'password' => $data['password'],
                 'referral_code' => ReferralService::generateReferralCode(),
             ]);
+
+            // Mark secret code as used
+            $pin = \App\Models\Pin::where('pin_code', strtoupper($data['secret_code']))->first();
+            if ($pin) {
+                $pin->update([
+                    'is_used' => true,
+                    'used_by_user_id' => $user->id,
+                ]);
+            }
 
             UserProfile::create(['user_id' => $user->id]);
             Wallet::create(['user_id' => $user->id, 'balance' => '0.00', 'locked_balance' => '0.00']);

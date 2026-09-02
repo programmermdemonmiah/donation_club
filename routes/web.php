@@ -45,7 +45,7 @@ foreach (['about', 'how-it-works', 'faq', 'contact', 'terms', 'privacy', 'risk-d
 */
 Route::middleware('guest')->group(function () {
     Route::get('/register', [Auth\RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/register', [Auth\RegisteredUserController::class, 'store']);
+    Route::post('/register', [Auth\RegisteredUserController::class, 'store'])->middleware('throttle:5,1');
 
     Route::get('/login', [Auth\AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [Auth\AuthenticatedSessionController::class, 'store'])->middleware('throttle:auth');
@@ -77,10 +77,10 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated + verified user area
+| Authenticated + active user area
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified', 'active'])->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [User\DashboardController::class, 'index'])->name('dashboard');
 
@@ -144,7 +144,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
 */
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'verified', 'active', 'admin'])
+    ->middleware(['auth', 'active', 'admin'])
     ->group(function () {
         Route::get('/', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
@@ -199,6 +199,9 @@ Route::prefix('admin')
 
         Route::get('/settings', [Admin\SettingsController::class, 'edit'])->name('settings.edit');
         Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
+
+        Route::get('/pins', [Admin\PinController::class, 'index'])->name('pins.index');
+        Route::post('/pins', [Admin\PinController::class, 'store'])->name('pins.store');
 
         Route::get('/audit-logs', [Admin\AuditLogController::class, 'index'])->name('audit-logs.index');
     });

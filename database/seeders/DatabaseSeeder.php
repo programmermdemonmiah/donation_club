@@ -73,7 +73,7 @@ class DatabaseSeeder extends Seeder
     private function seedAdmin(): void
     {
         User::query()->firstOrCreate(
-            ['email' => env('ADMIN_EMAIL', 'admin@donationclub.test')],
+            ['email' => env('ADMIN_EMAIL', 'admin@donationclub.com')],
             [
                 'name' => 'Administrator',
                 'password' => env('ADMIN_PASSWORD', '12345678'),

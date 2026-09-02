@@ -20,6 +20,12 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'string', 'lowercase', 'email', 'max:190', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed', Password::defaults()],
             'referral_code' => ['required', 'string', 'max:16'],
+            'secret_code' => ['required', 'string', 'size:6', function ($attribute, $value, $fail) {
+                $pin = \App\Models\Pin::where('pin_code', strtoupper($value))->first();
+                if (!$pin || $pin->is_used) {
+                    $fail('The secret code is invalid.');
+                }
+            }],
         ];
     }
 }
