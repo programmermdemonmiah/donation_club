@@ -39,21 +39,18 @@ export default function PublicLayout({ children, title = '' }: { children: React
             {/* ── Navbar - Full Fixed Complete Design ────────────────── */}
             <header className={`sticky top-0 z-50 w-full bg-white ${scrolled ? 'shadow-lg shadow-gray-100/70 border-b border-gray-100' : 'border-b border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)]'}`}>
 
-                {/* ===== Mobile Header - SAME AS IMAGE (320px-1024px) ===== */}
-                <div className="relative mx-auto flex h-[62px] max-w-screen-xl items-center justify-between gap-1.5 px-2 sm:h-[64px] sm:gap-2 sm:px-3 lg:hidden">
-                    {/* Left: Logo column - as image */}
-                    <Link href={route('home')} className="flex shrink-0 flex-col items-center -mt-1">
-                        <div className="relative mt-[1px] flex h-auto w-[200px] shadow-sm overflow-hidden">
+                {/* ===== Mobile Header - Logo BIG (full width cover) ===== */}
+                <div className="relative mx-auto flex h-[72px] max-w-screen-xl items-center justify-between gap-2 px-2 sm:h-[76px] sm:gap-3 sm:px-3 lg:hidden">
+                    {/* Left: Logo - BIG full header width cover */}
+                    <Link href={route('home')} className="flex flex-1 min-w-0 items-center">
+                        <div className="flex w-full max-w-[380px] items-center overflow-hidden sm:max-w-[320px]">
                             {company.logo ? (
-                                <img src={company.logo} alt={company.name} className="h-[24px] w-[24px] object-contain sm:h-[26px] sm:w-[26px]" />
+                                <img src={company.logo} alt={company.name} className="h-auto max-h-[54px] w-full object-cover sm:max-h-[58px]" />
                             ) : (
-                                <>
-                                    <div className="absolute inset-[3px] rounded-full border border-[#c8a84e]/40"></div>
-                                    <div className="flex flex-col items-center">
-                                        <div className="flex gap-[1px] text-[#c8a84e] text-[5px] leading-none">★ ★ ★</div>
-                                        <span className="mt-[1px] text-[13px] leading-none">👐</span>
-                                    </div>
-                                </>
+                                <div className="flex items-center gap-2">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#c8a84e]/40 bg-[#0f4d2a] text-[13px] leading-none">👐</div>
+                                    <span className="text-[13px] font-black leading-none tracking-[0.02em] text-[#0f3d2b]">DONATIONCLUB</span>
+                                </div>
                             )}
                         </div>
                     </Link>
@@ -90,28 +87,28 @@ export default function PublicLayout({ children, title = '' }: { children: React
                     </div>
                 </div>
 
-                {/* ===== Desktop Header - Complete ===== */}
-                <div className="relative mx-auto hidden h-[76px] max-w-screen-xl items-center justify-between gap-4 px-6 lg:flex xl:px-8">
-                    {/* Brand */}
-                    <Link href={route('home')} className="flex shrink-0 items-center gap-3 group">
-                        <div className="flex flex-col items-center">
-                            <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden group-hover:shadow-md transition-shadow">
-                                {company.logo ? (
-                                    <img src={company.logo} alt={company.name} className="h-7 w-7 object-contain" />
-                                ) : (
+                {/* ===== Desktop Header - Logo BIG (full width) / Logo B before nav ===== */}
+                <div className="relative mx-auto hidden h-[88px] max-w-screen-xl items-center justify-between gap-4 px-6 lg:flex xl:px-8">
+                    {/* Brand - Logo B BIG before nav menus */}
+                    <Link href={route('home')} className="flex shrink-0 items-center">
+                        {company.logo ? (
+                            <img src={company.logo} alt={company.name} className="h-auto max-h-[72px] w-[320px] object-cover xl:w-[380px]" />
+                        ) : (
+                            <div className="flex items-center gap-3 group">
+                                <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden group-hover:shadow-md transition-shadow">
                                     <span className="text-base">🤲</span>
-                                )}
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[19px] font-black leading-none tracking-[0.02em] text-[#0f3d2b]">DONATIONCLUB</span>
+                                    <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
+                                    <div className="mt-[4px] flex w-full items-center justify-center gap-1.5">
+                                        <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
+                                        <span className="h-[6px] w-[6px] rotate-45 border border-[#c8a84e] bg-[#c8a84e]/10"></span>
+                                        <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-[19px] font-black leading-none tracking-[0.02em] text-[#0f3d2b]">DONATION<span className="text-[#0f3d2b]">CLUB</span></span>
-                            <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
-                            <div className="mt-[4px] flex w-full items-center justify-center gap-1.5">
-                                <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
-                                <span className="h-[6px] w-[6px] rotate-45 border border-[#c8a84e] bg-[#c8a84e]/10"></span>
-                                <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
-                            </div>
-                        </div>
+                        )}
                     </Link>
 
                     {/* Navigation - Center */}
