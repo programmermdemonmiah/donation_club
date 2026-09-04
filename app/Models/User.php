@@ -26,6 +26,7 @@ class User extends Authenticatable
         'referral_code',
         'referred_by',
         'is_admin',
+        'is_agent',
         'status',
         'kyc_status',
         'google2fa_secret',
@@ -44,6 +45,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_agent' => 'boolean',
             'status' => UserStatus::class,
         ];
     }
@@ -129,6 +131,11 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;
+    }
+
+    public function isAgent(): bool
+    {
+        return (bool) $this->is_agent;
     }
 
     public function isActive(): bool

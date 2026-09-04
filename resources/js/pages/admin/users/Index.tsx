@@ -13,6 +13,7 @@ interface UserRow {
     email: string;
     status: string;
     is_admin: boolean;
+    is_agent: boolean;
     email_verified: boolean;
     referral_code: string;
     direct_referrals: number;
@@ -72,7 +73,7 @@ export default function AdminUsers() {
                                     <span className="text-blue-600">pending</span>
                                 ),
                         },
-                        { header: 'Role', render: (u) => (u.is_admin ? <Badge value="active" label="Admin" /> : 'Member') },
+                        { header: 'Role', render: (u) => (u.is_admin ? <Badge value="active" label="Admin" /> : u.is_agent ? <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">Agent</span> : 'Member') },
                         { header: 'Status', render: (u) => <Badge value={u.status} /> },
                         { header: 'Joined', render: (u) => u.joined_at },
                     ]}

@@ -10,6 +10,8 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Services\Audit\AuditLogService;
 use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\Wallet\WalletService;
+use App\Enums\WalletTransactionType;
 use App\Support\Money;
 use App\Support\ReferenceGenerator;
 use Illuminate\Support\Facades\DB;
@@ -57,6 +59,70 @@ class DepositService
             ]);
 
             return [$deposit, $payment, $initiation];
+        });
+    }
+
+    /**
+     * Validate + create a completed deposit using the user's wallet balance.
+     */
+    public function initiateFromWallet(User $user, string $amount): Deposit
+    {
+        $amountMoney = Money::parse($amount);
+
+        $result = $this->eligibility->check($user, $amountMoney);
+
+        if (! $result['eligible']) {
+            throw new RuntimeException($result['reason'] ?? 'Deposit not allowed.');
+        }
+        
+        $wallet = $user->wallet()->first();
+        if (! $wallet || ! Money::gte($wallet->availableBalance(), $amountMoney)) {
+            throw new RuntimeException('Insufficient wallet balance to make this donation.');
+        }
+
+        return DB::transaction(function () use ($user, $amountMoney, $result) {
+            WalletService::debit(
+                user: $user,
+                amount: $amountMoney,
+                type: WalletTransactionType::Adjustment,
+                description: 'Wallet Donation'
+            );
+
+            $deposit = Deposit::create([
+                'reference' => ReferenceGenerator::generate('DEP'),
+                'user_id' => $user->id,
+                'amount' => $amountMoney,
+                'status' => DepositStatus::Completed->value,
+                'eligibility_snapshot' => $this->eligibility->snapshot($result),
+                'completed_at' => now(),
+            ]);
+
+            $payment = Payment::create([
+                'reference' => ReferenceGenerator::generate('PAY'),
+                'deposit_id' => $deposit->id,
+                'gateway' => 'wallet',
+                'amount' => $amountMoney,
+                'status' => \App\Enums\PaymentStatus::Successful->value,
+                'paid_at' => now(),
+            ]);
+
+            $sequenceNumber = $this->allocateSequenceNumber();
+
+            DepositSequence::create([
+                'sequence_number' => $sequenceNumber,
+                'deposit_id' => $deposit->id,
+                'allocated_at' => now(),
+            ]);
+
+            AuditLogService::log('deposit.completed_from_wallet', $deposit, [], [
+                'status' => DepositStatus::Completed->value,
+                'sequence' => sprintf('#%06d', $sequenceNumber),
+                'amount' => Money::parse((string) $deposit->amount),
+            ]);
+
+            DepositCompleted::dispatch($deposit->refresh(), $payment);
+
+            return $deposit;
         });
     }
 

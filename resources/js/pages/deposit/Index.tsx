@@ -35,7 +35,7 @@ export default function Deposits() {
                 {/* New deposit card */}
                 <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm shadow-gray-200/50">
                     <div className="border-b border-gray-50 bg-gray-50/60 px-6 py-4">
-                        <h2 className="text-sm font-black text-gray-900">Make a Contribution</h2>
+                        <h2 className="text-sm font-black text-gray-900">Donate from Wallet Balance</h2>
                         <p className="mt-0.5 text-xs font-medium text-gray-400">Amount in USD</p>
                     </div>
                     <div className="p-6">
@@ -62,7 +62,7 @@ export default function Deposits() {
                                     className="group relative w-full overflow-hidden rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-[0_0_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(37,99,235,0.4)] disabled:opacity-60"
                                 >
                                     <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
-                                    {form.processing ? 'Processing…' : 'Continue to Payment →'}
+                                    {form.processing ? 'Processing…' : 'Donate Now →'}
                                 </button>
                             </form>
                         ) : (
@@ -83,7 +83,7 @@ export default function Deposits() {
                 {/* History */}
                 <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm shadow-gray-200/50 lg:col-span-2">
                     <div className="border-b border-gray-50 px-6 py-4">
-                        <h2 className="text-sm font-black text-gray-900">Deposit History</h2>
+                        <h2 className="text-sm font-black text-gray-900">Donation History</h2>
                     </div>
                     <Table<DepositRow>
                         columns={[
@@ -95,7 +95,7 @@ export default function Deposits() {
                         ]}
                         rows={deposits.data}
                         rowKey={(d) => d.id}
-                        emptyMessage="No deposits yet. Make your first contribution above."
+                        emptyMessage="No donations yet. Make your first contribution above."
                     />
                     <div className="border-t border-gray-50 bg-gray-50/50 px-5 py-3">
                         <Pagination currentPage={deposits.current_page} lastPage={deposits.last_page} />

@@ -104,6 +104,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     // Wallet / transactions
     Route::get('/wallet', [User\WalletController::class, 'index'])->name('wallet.index');
     Route::get('/transactions', [User\WalletController::class, 'transactions'])->name('transactions.index');
+    
+    // Transfers
+    Route::get('/transfer', [User\TransferController::class, 'create'])->name('transfer.create');
+    Route::post('/transfer', [User\TransferController::class, 'store'])->middleware('throttle:6,1')->name('transfer.store');
 
     // Referrals & commissions
     Route::get('/referrals', [User\ReferralController::class, 'index'])->name('referrals.index');
@@ -160,6 +164,7 @@ Route::prefix('admin')
         Route::get('/users/{user}', [Admin\UserController::class, 'show'])->name('users.show');
         Route::post('/users/{user}/block', [Admin\UserController::class, 'block'])->name('users.block');
         Route::post('/users/{user}/activate', [Admin\UserController::class, 'activate'])->name('users.activate');
+        Route::post('/users/{user}/toggle-agent', [Admin\UserController::class, 'toggleAgent'])->name('users.toggle-agent');
 
         Route::get('/deposits', [Admin\DepositController::class, 'index'])->name('deposits.index');
         Route::get('/deposits/{deposit}', [Admin\DepositController::class, 'show'])->name('deposits.show');

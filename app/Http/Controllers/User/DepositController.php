@@ -55,14 +55,13 @@ class DepositController extends Controller
 
     public function store(StoreDepositRequest $request): RedirectResponse
     {
-        [$deposit, $payment, $initiation] = $this->deposits->initiate(
+        $deposit = $this->deposits->initiateFromWallet(
             $request->user(),
-            Money::parse((string) $request->input('amount')),
+            $request->input('amount'),
         );
 
-        return redirect()
-            ->route('payments.show', $payment)
-            ->with('success', "Deposit {$deposit->reference} created. Follow the payment instructions.");
+        return back()
+            ->with('success', "Donation {$deposit->reference} successfully completed from your wallet balance.");
     }
 
     public function show(Deposit $deposit): Response

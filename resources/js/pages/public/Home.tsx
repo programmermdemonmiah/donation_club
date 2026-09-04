@@ -169,7 +169,7 @@ interface HomeProps {
 
 const STEPS = [
     { n: '01', title: 'Create Account', desc: 'Register in minutes. Use a sponsor\'s referral code to join their team automatically.' },
-    { n: '02', title: 'Make a Contribution', desc: 'Contribute $1–$10. Your deposit is recorded instantly on the immutable public ledger.' },
+    { n: '02', title: 'Make a Contribution', desc: 'Contribute $1–$10. Your donation is recorded instantly on the immutable public ledger.' },
     { n: '03', title: 'Build Your Network', desc: 'Share your unique referral link. Every member you refer becomes part of your team — 10 levels deep.' },
     { n: '04', title: 'Qualify & Support', desc: 'Meet activity thresholds to unlock community recognition, level upgrades, and ongoing community support.' },
 ];
@@ -301,7 +301,7 @@ export default function Home() {
                         <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4">
                             {[
                                 { label: 'Members', value: (stats?.members ?? 0).toLocaleString(), icon: '👥' },
-                                { label: 'Deposits', value: (stats?.deposits ?? 0).toLocaleString(), icon: '💎' },
+                                { label: 'Donations', value: (stats?.deposits ?? 0).toLocaleString(), icon: '💎' },
                                 { label: 'Paid Out', value: `$${(stats?.paid_out ?? 0).toFixed(0)}`, icon: '💰' },
                                 { label: 'Countries', value: `${stats?.countries ?? 0}+`, icon: '🌍' },
                             ].map((s) => (

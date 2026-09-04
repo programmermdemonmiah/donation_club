@@ -35,6 +35,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'status' => $user->status->value,
                 'is_admin' => $user->is_admin,
+                'is_agent' => $user->is_agent,
                 'email_verified' => $user->hasVerifiedEmail(),
                 'referral_code' => $user->referral_code,
                 'referred_by' => $user->referred_by,
@@ -59,6 +60,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'status' => $user->status->value,
                 'is_admin' => $user->is_admin,
+                'is_agent' => $user->is_agent,
                 'referral_code' => $user->referral_code,
                 'joined_at' => $user->created_at->toIso8601String(),
                 'email_verified' => $user->hasVerifiedEmail(),
@@ -118,5 +120,23 @@ class UserController extends Controller
         }
 
         return back()->with('success', 'User activated.');
+    }
+
+    public function toggleAgent(Request $request, User $user)
+    {
+        abort_if($user->isAdmin(), 403, 'Administrators cannot have their agent status toggled here.');
+
+        $newStatus = ! $user->isAgent();
+        $user->forceFill(['is_agent' => $newStatus])->save();
+
+        AuditLogService::logChanges(
+            $newStatus ? 'user.agent_granted' : 'user.agent_revoked', 
+            $user, 
+            ['is_agent' => ! $newStatus], 
+            ['is_agent' => $newStatus]
+        );
+
+        $msg = $newStatus ? 'User promoted to Agent.' : 'Agent status revoked.';
+        return back()->with('success', $msg);
     }
 }

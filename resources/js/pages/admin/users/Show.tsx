@@ -14,6 +14,7 @@ interface MemberDetail {
     email: string;
     status: string;
     is_admin: boolean;
+    is_agent: boolean;
     referral_code: string;
     joined_at: string;
     profile?: { phone?: string; city?: string; country?: string; address?: string } | null;
@@ -50,7 +51,7 @@ export default function AdminUserShow() {
     const member = page.props.member;
     const [blockOpen, setBlockOpen] = useState(false);
 
-    const act = (action: 'block' | 'activate') => {
+    const act = (action: 'block' | 'activate' | 'toggle-agent') => {
         router.post(route(`admin.users.${action}`, member.id), {}, { preserveScroll: true });
     };
 
@@ -66,12 +67,18 @@ export default function AdminUserShow() {
                 </div>
                 <div className="flex items-center gap-2">
                     <Badge value={member.status} />
+                    {member.is_agent && <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">Agent</span>}
                     {!member.is_admin && (
-                        member.status === 'active' ? (
-                            <Button variant="danger" onClick={() => setBlockOpen(true)}>Block user</Button>
-                        ) : (
-                            <Button onClick={() => act('activate')}>Activate user</Button>
-                        )
+                        <>
+                            <Button variant="outline" onClick={() => act('toggle-agent')}>
+                                {member.is_agent ? 'Revoke Agent' : 'Make Agent'}
+                            </Button>
+                            {member.status === 'active' ? (
+                                <Button variant="danger" onClick={() => setBlockOpen(true)}>Block</Button>
+                            ) : (
+                                <Button onClick={() => act('activate')}>Activate</Button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
@@ -143,12 +150,12 @@ export default function AdminUserShow() {
                                     router.post(route('admin.wallets.adjust', member.id), fd, { preserveScroll: true });
                                 }}
                             >
-                                <select name="direction" className="rounded-lg border-gray-300 py-2 pl-3 pr-8 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <select name="direction" className="rounded-lg border border-gray-300 py-2 pl-3 pr-8 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <option value="credit">Credit +</option>
                                     <option value="debit">Debit −</option>
                                 </select>
-                                <input name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required className="w-28 rounded-lg border-gray-300 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
-                                <input name="reason" placeholder="Reason (required)" required className="min-w-0 flex-1 rounded-lg border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                                <input name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required className="w-28 rounded-lg border border-gray-300 py-2 pl-3 pr-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                                <input name="reason" placeholder="Reason (required)" required className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
                                 <Button type="submit" size="sm" variant="outline">Apply</Button>
                             </form>
                         </CardBody>
