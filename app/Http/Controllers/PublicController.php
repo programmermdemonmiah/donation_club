@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Commission;
+use App\Models\CommissionRule;
 use App\Models\Deposit;
 use App\Models\DepositSequence;
 use App\Models\MemberReturn;
+use App\Models\ReturnRule;
 use App\Models\User;
 use App\Services\Settings\SettingsService;
 use Illuminate\Http\Request;
@@ -22,6 +24,11 @@ class PublicController extends Controller
 
     public function home(): Response
     {
+        $commissionRules = CommissionRule::query()
+            ->where('enabled', true)
+            ->orderBy('generation')
+            ->get(['generation', 'name', 'percentage', 'trigger_event', 'scope']);
+
         return Inertia::render('public/Home', [
             'depositRules' => [
                 'min' => $this->settings->minDeposit(),
@@ -44,6 +51,14 @@ class PublicController extends Controller
                     'amount' => (string) $d->amount,
                     'created_at' => $d->completed_at?->diffForHumans() ?? $d->created_at->diffForHumans(),
                 ]),
+            'commissionLevels' => $commissionRules->map(fn ($r) => [
+                'generation' => $r->generation,
+                'name' => $r->name,
+                'rate' => rtrim(rtrim((string) $r->percentage, '0'), '.').'%',
+                'trigger' => $r->trigger_event,
+                'is_direct' => $r->scope === 'direct',
+            ])->values(),
+            'returnRate' => (string) (ReturnRule::query()->value('return_percent') ?? '0'),
         ]);
     }
 

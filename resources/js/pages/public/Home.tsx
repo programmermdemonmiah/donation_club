@@ -119,10 +119,20 @@ function Ticker({ items }: { items: string[] }) {
 /* ═══════════════════════════════════════════════════════
    TYPES
 ═══════════════════════════════════════════════════════ */
+interface CommissionLevel {
+    generation: number;
+    name: string;
+    rate: string;
+    trigger: string;
+    is_direct: boolean;
+}
+
 interface HomeProps {
     stats?: { members: number; deposits: number; paid_out: number; countries: number };
     settings?: { min_deposit: string; max_deposit: string; commission_levels: number };
     latestDeposits?: Array<{ reference: string; amount: string; created_at: string }>;
+    commissionLevels?: CommissionLevel[];
+    returnRate?: string;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -190,7 +200,7 @@ const TRUST_ITEMS = [
 ═══════════════════════════════════════════════════════ */
 export default function Home() {
     const page = usePage<PageProps & HomeProps>();
-    const { stats, settings, latestDeposits = [], company } = page.props;
+    const { stats, settings, latestDeposits = [], company, commissionLevels = [], returnRate = '0' } = page.props;
 
     // Typewriter effect for hero subtitle
     const phrases = ['Build Your Team.', 'Share Donations.', 'Grow Together.', 'Join the Movement.'];
@@ -541,28 +551,38 @@ export default function Home() {
                                     <div className="border-b border-white/10 px-6 py-4">
                                         <p className="text-xs font-black uppercase tracking-[.18em] text-gray-400">Community Level Overview</p>
                                     </div>
-                                    <div className="divide-y divide-white/5 px-2">
-                                        {[
-                                            { gen: 'Generation 1', label: 'Direct Referral', rate: '10%', active: true },
-                                            { gen: 'Generation 2', label: 'Level 2 Team', rate: '5%', active: false },
-                                            { gen: 'Generation 3', label: 'Level 3 Team', rate: '3%', active: false },
-                                            { gen: 'Generation 4–5', label: 'Mid-Level Team', rate: '2%', active: false },
-                                            { gen: 'Generation 6–10', label: 'Deep Network', rate: '1%', active: false },
-                                        ].map((row) => (
-                                            <div key={row.gen}
-                                                className={`flex items-center justify-between px-4 py-4 ${row.active ? 'bg-blue-600/10' : ''}`}>
+                                    {/* Return rate banner */}
+                                    {Number(returnRate) > 0 && (
+                                        <div className="mx-4 mt-4 flex items-center justify-between rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3">
+                                            <div>
+                                                <p className="text-xs font-black text-emerald-400">Community Return Rate</p>
+                                                <p className="text-[11px] text-emerald-300/70">Donate & get back</p>
+                                            </div>
+                                            <span className="text-xl font-black text-emerald-400">{Number(returnRate)}%</span>
+                                        </div>
+                                    )}
+                                    <div className="mt-3 divide-y divide-white/5 px-2">
+                                        {commissionLevels.length > 0 ? commissionLevels.map((row) => (
+                                            <div key={row.generation}
+                                                className={`flex items-center justify-between px-4 py-3.5 ${row.is_direct ? 'bg-blue-600/10' : ''}`}>
                                                 <div>
-                                                    <p className={`text-sm font-black ${row.active ? 'text-blue-400' : 'text-gray-300'}`}>{row.gen}</p>
-                                                    <p className="text-xs text-blue-200">{row.label}</p>
+                                                    <p className={`text-sm font-black ${row.is_direct ? 'text-blue-400' : 'text-gray-300'}`}>
+                                                        Generation {row.generation} {row.is_direct ? '⭐' : ''}
+                                                    </p>
+                                                    <p className="text-xs text-blue-200/70">{row.name}</p>
                                                 </div>
-                                                <span className={`rounded-lg px-3 py-1 text-sm font-black ${row.active ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-400'}`}>
+                                                <span className={`rounded-lg px-3 py-1 text-sm font-black ${row.is_direct ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-400'}`}>
                                                     {row.rate}
                                                 </span>
                                             </div>
-                                        ))}
+                                        )) : (
+                                            <div className="px-4 py-8 text-center">
+                                                <p className="text-sm text-gray-500">Commission details not configured yet.</p>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="border-t border-white/10 bg-white/5 px-6 py-3">
-                                        <p className="text-[11px] text-blue-200/70">*Actual rates configured by club admin. For illustration only.</p>
+                                        <p className="text-[11px] text-blue-200/70">✓ Live rates — configured by the club administrator.</p>
                                     </div>
                                 </div>
                             </div>
