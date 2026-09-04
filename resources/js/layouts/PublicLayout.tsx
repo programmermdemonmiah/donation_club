@@ -198,11 +198,21 @@ export default function PublicLayout({ children, title = '' }: { children: React
                 <div className="mx-auto max-w-screen-xl px-4 py-14 sm:px-6 lg:px-8">
                     <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
                         <div className="lg:col-span-2">
-                            <Link href={route('home')} className="flex items-center gap-3">
-                                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-base font-black text-white shadow-[0_0_16px_rgba(37,99,235,0.3)]">
-                                    {company.name.charAt(0)}
-                                </span>
-                                <span className="text-lg font-black text-white">{company.name}</span>
+                            <Link href={route('home')} className="flex shrink-0 items-center">
+                                {company.logo ? (
+                                    <img
+                                        src={company.logo}
+                                        alt={company.name}
+                                        className="h-auto max-h-[62px] w-[250px] object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-base font-black text-white shadow-[0_0_16px_rgba(37,99,235,0.3)]">
+                                            {company.name.charAt(0)}
+                                        </span>
+                                        <span className="ml-3 text-lg font-black text-white">{company.name}</span>
+                                    </>
+                                )}
                             </Link>
                             <p className="mt-4 max-w-xs text-sm font-medium leading-relaxed text-blue-100/70">
                                 A transparent, member-governed platform for voluntary community contributions. Registered in England & Wales.
