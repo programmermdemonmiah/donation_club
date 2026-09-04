@@ -3,8 +3,8 @@ import Card, { CardBody, CardHeader } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/Modal';
-import { router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { router, usePage, useForm } from '@inertiajs/react';
+import { useState, FormEvent } from 'react';
 import type { PageProps } from '@/types';
 import { formatDateTime, formatMoney, formatSequence, statusColor } from '@/utils/format';
 
@@ -50,6 +50,20 @@ export default function AdminUserShow() {
     const page = usePage<PageProps & { member: MemberDetail; recentDeposits: DepositRow[]; recentTransactions: TxRow[] }>();
     const member = page.props.member;
     const [blockOpen, setBlockOpen] = useState(false);
+
+    const adjustForm = useForm({
+        direction: 'credit',
+        amount: '',
+        reason: '',
+    });
+
+    const submitAdjust = (e: FormEvent) => {
+        e.preventDefault();
+        adjustForm.post(route('admin.wallets.adjust', member.id), {
+            preserveScroll: true,
+            onSuccess: () => adjustForm.reset('amount', 'reason'),
+        });
+    };
 
     const act = (action: 'block' | 'activate' | 'toggle-agent') => {
         router.post(route(`admin.users.${action}`, member.id), {}, { preserveScroll: true });
@@ -162,21 +176,35 @@ export default function AdminUserShow() {
                                     <Badge value={t.status} />
                                 </div>
                             ))}
-                            <form
-                                className="mt-3 flex flex-wrap items-end gap-3"
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    const fd = new FormData(e.currentTarget);
-                                    router.post(route('admin.wallets.adjust', member.id), fd, { preserveScroll: true });
-                                }}
-                            >
-                                <select name="direction" className="rounded-lg border border-gray-300 py-2 pl-3 pr-8 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                    <option value="credit">Credit +</option>
-                                    <option value="debit">Debit −</option>
-                                </select>
-                                <input name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required className="w-28 rounded-lg border border-gray-300 py-2 pl-3 pr-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
-                                <input name="reason" placeholder="Reason (required)" required className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
-                                <Button type="submit" variant="outline">Apply</Button>
+                            <form className="mt-3 flex flex-wrap items-end gap-3" onSubmit={submitAdjust}>
+                                <div className="flex flex-wrap items-end gap-3 w-full">
+                                    <select 
+                                        value={adjustForm.data.direction}
+                                        onChange={e => adjustForm.setData('direction', e.target.value)}
+                                        className="rounded-lg border border-gray-300 py-2 pl-3 pr-8 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    >
+                                        <option value="credit">Credit +</option>
+                                        <option value="debit">Debit −</option>
+                                    </select>
+                                    <input 
+                                        type="number" step="0.01" min="0.01" placeholder="0.00" required 
+                                        value={adjustForm.data.amount}
+                                        onChange={e => adjustForm.setData('amount', e.target.value)}
+                                        className={`w-28 rounded-lg border py-2 pl-3 pr-2 text-sm shadow-sm focus:ring-blue-500 ${adjustForm.errors.amount ? 'border-red-500' : 'border-gray-300'}`} 
+                                    />
+                                    <input 
+                                        placeholder="Reason (required)" required 
+                                        value={adjustForm.data.reason}
+                                        onChange={e => adjustForm.setData('reason', e.target.value)}
+                                        className={`min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm shadow-sm focus:ring-blue-500 ${adjustForm.errors.reason ? 'border-red-500' : 'border-gray-300'}`} 
+                                    />
+                                    <Button type="submit" variant="outline" disabled={adjustForm.processing}>Apply</Button>
+                                </div>
+                                {(adjustForm.errors.amount || adjustForm.errors.reason || page.props.errors?.adjustment) && (
+                                    <div className="w-full text-xs text-red-600 mt-1">
+                                        {adjustForm.errors.amount || adjustForm.errors.reason || page.props.errors?.adjustment}
+                                    </div>
+                                )}
                             </form>
                         </CardBody>
                     </Card>

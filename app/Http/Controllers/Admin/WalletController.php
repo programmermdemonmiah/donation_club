@@ -68,7 +68,7 @@ class WalletController extends Controller
         $validated = $request->validate([
             'direction' => ['required', 'in:credit,debit'],
             'amount' => ['required', 'numeric', 'min:0.01'],
-            'reason' => ['required', 'string', 'min:5', 'max:500'],
+            'reason' => ['required', 'string', 'min:2', 'max:500'],
         ]);
 
         try {
