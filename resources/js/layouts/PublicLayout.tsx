@@ -92,7 +92,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                     {/* Brand - Logo B BIG before nav menus */}
                     <Link href={route('home')} className="flex shrink-0 items-center">
                         {company.logo ? (
-                            <img src={company.logo} alt={company.name} className="h-auto max-h-[72px] w-[280px] object-cover xl:w-[280px]" />
+                            <img src={company.logo} alt={company.name} className="h-auto max-h-[62px] w-[250px] object-cover xl:w-[250px]" />
                         ) : (
                             <div className="flex items-center gap-3 group">
                                 <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden group-hover:shadow-md transition-shadow">
