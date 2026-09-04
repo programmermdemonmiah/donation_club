@@ -55,36 +55,20 @@ export default function PublicLayout({ children, title = '' }: { children: React
                         </div>
                     </Link>
 
-                    {/* Right: Login | Register - as image */}
-                    <div className="flex shrink-0 items-center gap-1">
-                        {user ? (
-                            <Link
-                                href={user.is_admin ? '/admin' : route('dashboard')}
-                                className="rounded-[6px] border border-gray-800 bg-white px-2.5 py-[5px] text-[10px] font-bold leading-none text-gray-800 shadow-sm hover:bg-gray-50"
-                            >
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <div className="flex overflow-hidden rounded-[6px] border border-gray-800 bg-white shadow-sm">
-                                <Link href={route('login')} className="px-2 py-[5px] text-[10px] font-semibold leading-none text-gray-800 hover:bg-gray-50 sm:px-2.5 sm:text-[11px]">Login</Link>
-                                <span className="w-px bg-gray-800"></span>
-                                <Link href={route('register')} className="px-2 py-[5px] text-[10px] font-semibold leading-none text-gray-800 hover:bg-gray-50 sm:px-2.5 sm:text-[11px]">Register</Link>
-                            </div>
-                        )}
-                        <button
-                            onClick={() => setMobileOpen(!mobileOpen)}
-                            aria-label="Toggle menu"
-                            aria-expanded={mobileOpen}
-                            className="flex h-[30px] w-[30px] items-center justify-center rounded-md bg-[#0f4d2a] text-white shadow-sm transition-colors hover:bg-[#0a341c] sm:h-8 sm:w-8"
-                        >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                {mobileOpen
-                                    ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                                }
-                            </svg>
-                        </button>
-                    </div>
+                    {/* Right: Hamburger only — Login/Register are inside the dropdown */}
+                    <button
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                        aria-label="Toggle menu"
+                        aria-expanded={mobileOpen}
+                        className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-md bg-[#0f4d2a] text-white shadow-sm transition-colors hover:bg-[#0a341c] sm:h-9 sm:w-9"
+                    >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            {mobileOpen
+                                ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                            }
+                        </svg>
+                    </button>
                 </div>
 
                 {/* ===== Desktop Header - Logo BIG (full width) / Logo B before nav ===== */}
