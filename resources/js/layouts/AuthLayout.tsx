@@ -35,25 +35,24 @@ export default function AuthLayout({ title, subtitle, children }: Props) {
                 <div className="pointer-events-none absolute -bottom-20 -right-20 h-[26rem] w-[26rem] rounded-full bg-emerald-500/12 blur-[110px]" />
 
                 {/* Logo */}
-                <Link href="/" className="relative z-10 flex shrink-0 items-center gap-3 group">
-                    <div className="flex flex-col items-center">
-                        <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-[0_0_20px_rgba(37,99,235,0.4)] overflow-hidden group-hover:shadow-md transition-shadow">
-                            {company.logo ? (
-                                <img src={company.logo} alt={company.name} className="h-7 w-7 object-contain" />
-                            ) : (
+                <Link href="/" className="relative z-10 flex shrink-0 items-center">
+                    {company.logo ? (
+                        <img
+                            src={company.logo}
+                            alt={company.name}
+                            className="h-auto max-h-[62px] w-[250px] object-cover"
+                        />
+                    ) : (
+                        <div className="flex items-center gap-3 group">
+                            <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-[0_0_20px_rgba(37,99,235,0.4)] overflow-hidden transition-shadow">
                                 <span className="text-base">🤲</span>
-                            )}
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[19px] font-black leading-none tracking-[0.02em] text-white">DONATIONCLUB</span>
+                                <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-[19px] font-black leading-none tracking-[0.02em] text-white">DONATION<span className="text-white">CLUB</span></span>
-                        <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
-                        <div className="mt-[4px] flex w-full items-center justify-center gap-1.5">
-                            <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
-                            <span className="h-[6px] w-[6px] rotate-45 border border-[#c8a84e] bg-[#c8a84e]/10"></span>
-                            <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
-                        </div>
-                    </div>
+                    )}
                 </Link>
 
                 {/* Body */}
@@ -92,25 +91,24 @@ export default function AuthLayout({ title, subtitle, children }: Props) {
             {/* ── Right panel: White form ── */}
             <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16">
                 {/* Mobile logo */}
-                <Link href="/" className="mb-10 flex shrink-0 items-center gap-3 group lg:hidden">
-                    <div className="flex flex-col items-center">
-                        <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden group-hover:shadow-md transition-shadow">
-                            {company.logo ? (
-                                <img src={company.logo} alt={company.name} className="h-7 w-7 object-contain" />
-                            ) : (
+                <Link href="/" className="mb-10 flex shrink-0 items-center lg:hidden">
+                    {company.logo ? (
+                        <img
+                            src={company.logo}
+                            alt={company.name}
+                            className="h-auto max-h-[58px] w-[220px] object-cover"
+                        />
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden">
                                 <span className="text-base">🤲</span>
-                            )}
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[19px] font-black leading-none tracking-[0.02em] text-[#0f3d2b]">DONATIONCLUB</span>
+                                <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-[19px] font-black leading-none tracking-[0.02em] text-[#0f3d2b]">DONATION<span className="text-[#0f3d2b]">CLUB</span></span>
-                        <span className="mt-[1px] text-[7px] font-bold leading-none tracking-[0.2em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
-                        <div className="mt-[4px] flex w-full items-center justify-center gap-1.5">
-                            <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
-                            <span className="h-[6px] w-[6px] rotate-45 border border-[#c8a84e] bg-[#c8a84e]/10"></span>
-                            <span className="h-px w-[38px] bg-[#c8a84e]/60"></span>
-                        </div>
-                    </div>
+                    )}
                 </Link>
 
                 <div className="w-full max-w-md">
