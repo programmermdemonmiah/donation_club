@@ -6,7 +6,7 @@ import { ConfirmDialog } from '@/components/ui/Modal';
 import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type { PageProps } from '@/types';
-import { formatDateTime, formatMoney, formatSequence } from '@/utils/format';
+import { formatDateTime, formatMoney, formatSequence, statusColor } from '@/utils/format';
 
 interface MemberDetail {
     id: number;
@@ -57,6 +57,14 @@ export default function AdminUserShow() {
 
     return (
         <AdminLayout>
+            <div className="mb-4">
+                <a href={route('admin.users.index')} className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <svg className="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to users
+                </a>
+            </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h1 className="text-xl font-bold text-gray-900">{member.name}</h1>
@@ -66,8 +74,14 @@ export default function AdminUserShow() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Badge value={member.status} />
-                    {member.is_agent && <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">Agent</span>}
+                    <span className={`inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset capitalize ${statusColor(member.status)}`}>
+                        {member.status}
+                    </span>
+                    {member.is_agent && (
+                        <span className="inline-flex items-center justify-center rounded-lg bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 shadow-sm ring-1 ring-inset ring-purple-700/20">
+                            Agent
+                        </span>
+                    )}
                     {!member.is_admin && (
                         <>
                             <Button variant="outline" onClick={() => act('toggle-agent')}>
@@ -110,7 +124,9 @@ export default function AdminUserShow() {
                 <div className="space-y-6 lg:col-span-2">
                     <Card>
                         <CardHeader title="Recent deposits" subtitle={`${member.stats.direct_referrals} direct referrals`} action={
-                            <a href={route('admin.deposits.index')} className="text-xs font-medium text-blue-600">View all →</a>
+                            <a href={route('admin.deposits.index')} className="inline-flex items-center justify-center rounded-lg bg-blue-950 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                View all &rarr;
+                            </a>
                         } />
                         <CardBody className="space-y-2">
                             {page.props.recentDeposits.length === 0 && <p className="text-sm text-gray-500">No deposits.</p>}
@@ -129,7 +145,11 @@ export default function AdminUserShow() {
                         <CardHeader
                             title="Wallet adjustment"
                             subtitle="Manual credit/debit — fully audited with ledger entry"
-                            action={<a href={route('admin.wallets.transactions')} className="text-xs font-medium text-blue-600">Ledger →</a>}
+                            action={
+                                <a href={route('admin.wallets.transactions')} className="inline-flex items-center justify-center rounded-lg bg-blue-950 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    Ledger &rarr;
+                                </a>
+                            }
                         />
                         <CardBody className="space-y-2">
                             {page.props.recentTransactions.length === 0 && <p className="text-sm text-gray-500">No transactions.</p>}
@@ -156,7 +176,7 @@ export default function AdminUserShow() {
                                 </select>
                                 <input name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required className="w-28 rounded-lg border border-gray-300 py-2 pl-3 pr-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
                                 <input name="reason" placeholder="Reason (required)" required className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" />
-                                <Button type="submit" size="sm" variant="outline">Apply</Button>
+                                <Button type="submit" variant="outline">Apply</Button>
                             </form>
                         </CardBody>
                     </Card>
