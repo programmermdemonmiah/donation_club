@@ -43,8 +43,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                 <div className="relative mx-auto flex h-[62px] max-w-screen-xl items-center justify-between gap-1.5 px-2 sm:h-[64px] sm:gap-2 sm:px-3 lg:hidden">
                     {/* Left: Logo column - as image */}
                     <Link href={route('home')} className="flex shrink-0 flex-col items-center -mt-1">
-                        <span className="text-[6px] font-medium leading-none tracking-wide text-gray-400">Logo</span>
-                        <div className="relative mt-[1px] flex h-[36px] w-[36px] items-center justify-center rounded-full border-[1.5px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden sm:h-[40px] sm:w-[40px]">
+                        <div className="relative mt-[1px] flex h-auto w-[200px] shadow-sm overflow-hidden">
                             {company.logo ? (
                                 <img src={company.logo} alt={company.name} className="h-[24px] w-[24px] object-contain sm:h-[26px] sm:w-[26px]" />
                             ) : (
@@ -57,24 +56,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                 </>
                             )}
                         </div>
-                        <span className="mt-[1px] text-[5.5px] font-black leading-none tracking-[0.05em] text-[#0f4d2a]">DONATIONCLUB</span>
-                        <span className="text-[4px] font-bold leading-none tracking-[0.07em] text-[#b89a3e]">TOGETHER FOR A BETTER TOMORROW</span>
                     </Link>
-
-                    {/* Center: Title - as image */}
-                    <div className="flex min-w-0 flex-1 flex-col items-center justify-center px-1">
-                        <h1 className="whitespace-nowrap text-center text-[14px] font-black leading-none tracking-[0.01em] text-[#0f3d2b] sm:text-[16px]">
-                            DONATION<span className="text-[#0f3d2b]">CLUB</span>
-                        </h1>
-                        <p className="mt-[1px] whitespace-nowrap text-center text-[4.5px] font-bold leading-none tracking-[0.18em] text-[#b89a3e] sm:text-[5.5px]">
-                            TOGETHER FOR A BETTER TOMORROW
-                        </p>
-                        <div className="mt-[3px] flex w-full max-w-[120px] items-center justify-center gap-1 sm:max-w-[140px]">
-                            <span className="h-[1.5px] flex-1 bg-gradient-to-r from-transparent to-[#c8a84e]/80"></span>
-                            <span className="h-[4px] w-[4px] shrink-0 rotate-45 border border-[#c8a84e] bg-[#c8a84e]/15"></span>
-                            <span className="h-[1.5px] flex-1 bg-gradient-to-l from-transparent to-[#c8a84e]/80"></span>
-                        </div>
-                    </div>
 
                     {/* Right: Login | Register - as image */}
                     <div className="flex shrink-0 items-center gap-1">
