@@ -21,10 +21,10 @@ class RegistrationService
 
             if (! blank($data['referral_code'] ?? null)) {
                 try {
-                    $referrer = ReferralService::resolveReferrer($data['referral_code']);
-                } catch (\InvalidArgumentException) {
+                    $referrer = ReferralService::validateForRegistration($data['referral_code']);
+                } catch (\InvalidArgumentException $e) {
                     throw ValidationException::withMessages([
-                        'referral_code' => 'The referral code is invalid.',
+                        'referral_code' => $e->getMessage(),
                     ]);
                 }
             }

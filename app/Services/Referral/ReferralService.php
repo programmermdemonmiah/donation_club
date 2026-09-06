@@ -64,6 +64,16 @@ class ReferralService
             throw new InvalidArgumentException('This referral would create a circular relationship.');
         }
 
+        // Direct referral limit check
+        $settings = app(\App\Services\Settings\SettingsService::class);
+        $maxDirect = (int) $settings->get('referral.max_direct', 3);
+        if ($maxDirect > 0) {
+            $currentDirectCount = self::directReferrals($referrer)->count();
+            if ($currentDirectCount >= $maxDirect) {
+                throw new InvalidArgumentException('The referrer has reached the maximum allowed direct referrals ('.$maxDirect.').');
+            }
+        }
+
         $referrerRelationship = ReferralRelationship::query()->where('user_id', $referrer->id)->first();
 
         $ancestorPath = ($referrerRelationship?->ancestor_path ?? '/').$referrer->id.'/';
@@ -257,9 +267,21 @@ class ReferralService
         }
 
         try {
-            return self::resolveReferrer($code);
+            $referrer = self::resolveReferrer($code);
+            
+            // Check direct referral limit
+            $settings = app(\App\Services\Settings\SettingsService::class);
+            $maxDirect = (int) $settings->get('referral.max_direct', 3);
+            if ($maxDirect > 0) {
+                $currentDirectCount = self::directReferrals($referrer)->count();
+                if ($currentDirectCount >= $maxDirect) {
+                    throw new InvalidArgumentException('This referral code has already reached its maximum usage limit of '.$maxDirect.' people.');
+                }
+            }
+            
+            return $referrer;
         } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException('Invalid referral code.');
+            throw new InvalidArgumentException($e->getMessage());
         }
     }
 
