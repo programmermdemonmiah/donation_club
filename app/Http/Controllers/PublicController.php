@@ -43,6 +43,9 @@ class PublicController extends Controller
             'latestDeposits' => Deposit::query()
                 ->with('user:id,name')
                 ->completed()
+                ->whereDoesntHave('memberReturn', function ($query) {
+                    $query->where('status', 'completed');
+                })
                 ->latest('completed_at')
                 ->take(7)
                 ->get()
@@ -67,7 +70,12 @@ class PublicController extends Controller
         $sequences = DepositSequence::query()
             ->join('deposits', 'deposits.id', '=', 'deposit_sequences.deposit_id')
             ->join('users', 'users.id', '=', 'deposits.user_id')
+            ->leftJoin('returns', 'returns.deposit_id', '=', 'deposits.id')
             ->where('deposits.status', 'completed')
+            ->where(function ($query) {
+                $query->whereNull('returns.status')
+                      ->orWhere('returns.status', '!=', 'completed');
+            })
             ->orderByDesc('deposit_sequences.sequence_number')
             ->select('deposit_sequences.sequence_number', 'deposits.amount', 'deposits.completed_at', 'users.name as donor_name')
             ->paginate(20);
