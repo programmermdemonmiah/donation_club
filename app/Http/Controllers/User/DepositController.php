@@ -55,13 +55,17 @@ class DepositController extends Controller
 
     public function store(StoreDepositRequest $request): RedirectResponse
     {
-        $deposit = $this->deposits->initiateFromWallet(
-            $request->user(),
-            $request->input('amount'),
-        );
+        try {
+            $deposit = $this->deposits->initiateFromWallet(
+                $request->user(),
+                $request->input('amount'),
+            );
 
-        return back()
-            ->with('success', "Donation {$deposit->reference} successfully completed from your wallet balance.");
+            return back()
+                ->with('success', "Donation {$deposit->reference} successfully completed from your wallet balance.");
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function show(Deposit $deposit): Response
