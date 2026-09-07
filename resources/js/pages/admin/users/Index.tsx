@@ -10,6 +10,7 @@ import type { PageProps } from '@/types';
 interface UserRow {
     id: number;
     name: string;
+    username: string;
     email: string;
     status: string;
     is_admin: boolean;
@@ -62,6 +63,7 @@ export default function AdminUsers() {
                                 </a>
                             ),
                         },
+                        { header: 'Username', render: (u) => <span className="font-mono text-sm text-gray-700">@{u.username}</span> },
                         { header: 'Referral code', render: (u) => <span className="font-mono text-xs">{u.referral_code}</span> },
                         { header: 'Direct', render: (u) => u.direct_referrals },
                         {

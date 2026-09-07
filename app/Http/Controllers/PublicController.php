@@ -41,7 +41,7 @@ class PublicController extends Controller
                 'countries' => 12, // Placeholder or User::distinct('country')->count() if country exists
             ],
             'latestDeposits' => Deposit::query()
-                ->with('user:id,name')
+                ->with('user:id,username')
                 ->completed()
                 ->whereDoesntHave('memberReturn', function ($query) {
                     $query->where('status', 'completed');
@@ -53,6 +53,7 @@ class PublicController extends Controller
                     'reference' => $d->reference,
                     'amount' => (string) $d->amount,
                     'created_at' => $d->completed_at?->diffForHumans() ?? $d->created_at->diffForHumans(),
+                    'donor_name' => $d->user?->username ?? 'Unknown',
                 ]),
             'commissionLevels' => $commissionRules->map(fn ($r) => [
                 'generation' => $r->generation,
@@ -77,7 +78,7 @@ class PublicController extends Controller
                       ->orWhere('returns.status', '!=', 'completed');
             })
             ->orderByDesc('deposit_sequences.sequence_number')
-            ->select('deposit_sequences.sequence_number', 'deposits.amount', 'deposits.completed_at', 'users.name as donor_name')
+            ->select('deposit_sequences.sequence_number', 'deposits.amount', 'deposits.completed_at', 'users.username as donor_name')
             ->paginate(20);
 
         return Inertia::render('public/PublicDeposits', [

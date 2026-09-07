@@ -130,7 +130,7 @@ interface CommissionLevel {
 interface HomeProps {
     stats?: { members: number; deposits: number; paid_out: number; countries: number };
     settings?: { min_deposit: string; max_deposit: string; commission_levels: number };
-    latestDeposits?: Array<{ reference: string; amount: string; created_at: string }>;
+    latestDeposits?: Array<{ reference: string; amount: string; created_at: string; donor_name: string }>;
     commissionLevels?: CommissionLevel[];
     returnRate?: string;
 }
@@ -450,7 +450,7 @@ export default function Home() {
                                                         💰
                                                     </div>
                                                     <div>
-                                                        <p className="font-mono text-xs font-bold text-gray-300">{d.reference}</p>
+                                                        <p className="font-mono text-xs font-bold text-gray-300">@{d.donor_name}</p>
                                                         <p className="text-[11px] text-gray-600">{d.created_at}</p>
                                                     </div>
                                                 </div>
