@@ -46,6 +46,19 @@ foreach (['about', 'how-it-works', 'faq', 'contact', 'terms', 'privacy', 'risk-d
     Route::get('/'.$page, [PublicController::class, 'page'])->defaults('slug', $page)->name('pages.'.$page);
 }
 
+Route::get('/api/referral-lookup', function (\Illuminate\Http\Request $request) {
+    $code = strtoupper(trim($request->input('code', '')));
+    if (! $code) {
+        return response()->json(null);
+    }
+    $user = \App\Models\User::where('referral_code', $code)->first(['name', 'username']);
+    if (! $user) {
+        return response()->json(null);
+    }
+
+    return response()->json(['name' => $user->name, 'username' => $user->username]);
+})->name('api.referral-lookup');
+
 /*
 |--------------------------------------------------------------------------
 | Guest auth
