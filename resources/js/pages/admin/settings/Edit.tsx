@@ -9,7 +9,6 @@ import type { PageProps } from '@/types';
 interface CommissionRule {
     id: number;
     name: string;
-    scope: string;
     generation: number;
     percentage: string;
     trigger_event: string;
@@ -29,7 +28,8 @@ interface Settings {
     deposit_required_sequence_gap: number;
     deposit_max_per_account_cycle: number;
     commission_enabled: boolean;
-    commission_rules: CommissionRule[];
+    deposit_commission_rules: CommissionRule[];
+    return_commission_rules: CommissionRule[];
     return_enabled: boolean;
     return_percent: string;
     return_min_direct_referrals: number;
@@ -44,26 +44,105 @@ interface Settings {
     chat_widget_code: string;
 }
 
+function CommissionTable({
+    rules,
+    prefix,
+    onUpdate,
+    accentColor,
+}: {
+    rules: CommissionRule[];
+    prefix: string;
+    onUpdate: (id: number, patch: Partial<CommissionRule>) => void;
+    accentColor: 'blue' | 'emerald';
+}) {
+    const accent = accentColor === 'emerald'
+        ? 'text-emerald-700 bg-emerald-50'
+        : 'text-blue-700 bg-blue-50';
+
+    return (
+        <div className="overflow-x-auto rounded-xl border border-gray-100">
+            <table className="min-w-full divide-y divide-gray-100 text-sm">
+                <thead>
+                    <tr className="bg-gray-50 text-left text-xs font-bold uppercase tracking-wide text-gray-500">
+                        <th className="px-4 py-3">Generation</th>
+                        <th className="px-4 py-3">Percentage (%)</th>
+                        <th className="px-4 py-3 text-center">Enabled</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                    {rules.map((rule) => (
+                        <tr key={rule.id} className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-4 py-3 font-semibold text-gray-800">
+                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ${accent}`}>
+                                    Gen {rule.generation}
+                                </span>
+                                <span className="ml-2 text-xs text-gray-400">{rule.name}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                                <div className="relative w-28">
+                                    <input
+                                        type="number"
+                                        step="0.001"
+                                        min="0"
+                                        max="100"
+                                        value={rule.percentage}
+                                        onChange={(e) => onUpdate(rule.id, { percentage: e.target.value })}
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-1.5 pr-8 text-sm font-semibold text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+                                    />
+                                    <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">%</span>
+                                </div>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                                <label className="relative inline-flex cursor-pointer items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={rule.enabled}
+                                        onChange={(e) => onUpdate(rule.id, { enabled: e.target.checked })}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="h-5 w-9 rounded-full bg-gray-200 transition peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-300 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-all after:content-[''] peer-checked:after:translate-x-4"></div>
+                                </label>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+}
+
 export default function AdminSettings() {
     const page = usePage<PageProps & { settings: Settings; ranks: Array<{ id: number; name: string; level: number }> }>();
     const errors = (page.props.errors || {}) as Record<string, string>;
-    const [rules, setRules] = useState<CommissionRule[]>(page.props.settings.commission_rules);
+    const [depositRules, setDepositRules] = useState<CommissionRule[]>(page.props.settings.deposit_commission_rules ?? []);
+    const [returnRules, setReturnRules] = useState<CommissionRule[]>(page.props.settings.return_commission_rules ?? []);
     const s = page.props.settings;
 
-    const updateRule = (id: number, patch: Partial<CommissionRule>) => {
-        setRules(rules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+    const updateDepositRule = (id: number, patch: Partial<CommissionRule>) => {
+        setDepositRules(depositRules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+    };
+
+    const updateReturnRule = (id: number, patch: Partial<CommissionRule>) => {
+        setReturnRules(returnRules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
     };
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
         fd.append('_method', 'PUT');
-        rules.forEach((rule, index) => {
-            fd.append(`commission_rules[${index}][id]`, String(rule.id));
-            fd.append(`commission_rules[${index}][percentage]`, rule.percentage);
-            fd.append(`commission_rules[${index}][enabled]`, rule.enabled ? '1' : '0');
-            fd.append(`commission_rules[${index}][trigger_event]`, rule.trigger_event);
+
+        depositRules.forEach((rule, index) => {
+            fd.append(`deposit_commission_rules[${index}][id]`, String(rule.id));
+            fd.append(`deposit_commission_rules[${index}][percentage]`, rule.percentage);
+            fd.append(`deposit_commission_rules[${index}][enabled]`, rule.enabled ? '1' : '0');
         });
+
+        returnRules.forEach((rule, index) => {
+            fd.append(`return_commission_rules[${index}][id]`, String(rule.id));
+            fd.append(`return_commission_rules[${index}][percentage]`, rule.percentage);
+            fd.append(`return_commission_rules[${index}][enabled]`, rule.enabled ? '1' : '0');
+        });
+
         router.post(route('admin.settings.update'), fd, { preserveScroll: true });
     };
 
@@ -152,62 +231,45 @@ export default function AdminSettings() {
                 </Card>
 
                 <Card>
-                    <CardHeader title="Referral donations" subtitle="Master switch + per-generation percentages" />
-                    <CardBody className="space-y-4">
+                    <CardHeader title="Generation Commission" subtitle="Commission distributed to all upline generations when a member donates or receives a return" />
+                    <CardBody className="space-y-6">
                         <label className="flex items-center gap-3 rounded-lg bg-blue-50/60 p-3 ring-1 ring-inset ring-blue-600/10">
                             <input type="checkbox" name="commission_enabled" value="1" defaultChecked={s.commission_enabled} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
                             <span className="text-sm font-medium text-gray-800">Donation sharing enabled</span>
                         </label>
 
-                        <div className="overflow-x-auto rounded-lg border border-gray-100">
-                            <table className="min-w-full divide-y divide-gray-100 text-sm">
-                                <thead>
-                                    <tr className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                        <th className="px-3 py-2">Level</th>
-                                        <th className="px-3 py-2">Percentage (%)</th>
-                                        <th className="px-3 py-2">Trigger event</th>
-                                        <th className="px-3 py-2">Enabled</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {rules.map((rule) => (
-                                        <tr key={rule.id}>
-                                            <td className="px-3 py-2 font-medium capitalize text-gray-800">
-                                                {rule.scope === 'direct' ? 'Direct referral' : `Generation ${rule.generation}`}
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                <input
-                                                    type="number"
-                                                    step="0.001"
-                                                    min="0"
-                                                    max="100"
-                                                    value={rule.percentage}
-                                                    onChange={(e) => updateRule(rule.id, { percentage: e.target.value })}
-                                                    className="w-24 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500"
-                                                />
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                <select
-                                                    value={rule.trigger_event}
-                                                    onChange={(e) => updateRule(rule.id, { trigger_event: e.target.value })}
-                                                    className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm capitalize focus:border-blue-500 focus:ring-blue-500"
-                                                >
-                                                    <option value="deposit">On member deposit</option>
-                                                    <option value="return_payout">On member return</option>
-                                                </select>
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={rule.enabled}
-                                                    onChange={(e) => updateRule(rule.id, { enabled: e.target.checked })}
-                                                    className="h-4 w-4 rounded border-gray-300 text-blue-600"
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        {/* Deposit Commission Table */}
+                        <div>
+                            <div className="mb-3 flex items-center gap-2">
+                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white">1</span>
+                                <div>
+                                    <p className="text-sm font-bold text-gray-800">On Donation (Deposit)</p>
+                                    <p className="text-xs text-gray-500">When a member donates, their entire upline (Gen 1–10) receives commission immediately.</p>
+                                </div>
+                            </div>
+                            <CommissionTable
+                                rules={depositRules}
+                                prefix="deposit"
+                                onUpdate={updateDepositRule}
+                                accentColor="blue"
+                            />
+                        </div>
+
+                        {/* Return Commission Table */}
+                        <div>
+                            <div className="mb-3 flex items-center gap-2">
+                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-xs font-black text-white">2</span>
+                                <div>
+                                    <p className="text-sm font-bold text-gray-800">On Double Return (Return Payout)</p>
+                                    <p className="text-xs text-gray-500">When a member receives their double return payout, their upline (Gen 1–10) also receives commission.</p>
+                                </div>
+                            </div>
+                            <CommissionTable
+                                rules={returnRules}
+                                prefix="return"
+                                onUpdate={updateReturnRule}
+                                accentColor="emerald"
+                            />
                         </div>
                     </CardBody>
                 </Card>

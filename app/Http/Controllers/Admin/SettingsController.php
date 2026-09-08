@@ -11,6 +11,7 @@ use App\Services\Settings\SettingsService;
 use App\Support\Money;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -37,15 +38,30 @@ class SettingsController extends Controller
                 'deposit_max_per_account_cycle' => (int) ($this->settings->get('deposit.max_per_account_cycle') ?? 1),
                 // commissions (master switch + rules table)
                 'commission_enabled' => $this->settings->commissionsEnabled(),
-                'commission_rules' => CommissionRule::query()->orderBy('generation')->get()->map(fn ($r) => [
-                    'id' => $r->id,
-                    'name' => $r->name,
-                    'scope' => $r->scope,
-                    'generation' => $r->generation,
-                    'percentage' => (string) $r->percentage,
-                    'trigger_event' => $r->trigger_event,
-                    'enabled' => $r->enabled,
-                ]),
+                'deposit_commission_rules' => CommissionRule::query()
+                    ->where('trigger_event', 'deposit')
+                    ->orderBy('generation')
+                    ->get()
+                    ->map(fn ($r) => [
+                        'id' => $r->id,
+                        'name' => $r->name,
+                        'generation' => $r->generation,
+                        'percentage' => (string) $r->percentage,
+                        'trigger_event' => $r->trigger_event,
+                        'enabled' => $r->enabled,
+                    ]),
+                'return_commission_rules' => CommissionRule::query()
+                    ->where('trigger_event', 'return_payout')
+                    ->orderBy('generation')
+                    ->get()
+                    ->map(fn ($r) => [
+                        'id' => $r->id,
+                        'name' => $r->name,
+                        'generation' => $r->generation,
+                        'percentage' => (string) $r->percentage,
+                        'trigger_event' => $r->trigger_event,
+                        'enabled' => $r->enabled,
+                    ]),
                 // returns
                 'return_enabled' => (bool) (ReturnRule::query()->value('enabled')),
                 'return_percent' => (string) (ReturnRule::query()->value('return_percent') ?? ''),
@@ -86,11 +102,14 @@ class SettingsController extends Controller
             'deposit_max_per_account_cycle' => ['required', 'integer', 'min:1', 'max:100'],
             // commissions
             'commission_enabled' => ['boolean'],
-            'commission_rules' => ['array'],
-            'commission_rules.*.id' => ['required', 'integer', 'exists:commission_rules,id'],
-            'commission_rules.*.percentage' => ['required', 'numeric', 'min:0', 'max:100'],
-            'commission_rules.*.enabled' => ['boolean'],
-            'commission_rules.*.trigger_event' => ['required', 'in:deposit,return_payout'],
+            'deposit_commission_rules' => ['array'],
+            'deposit_commission_rules.*.id' => ['required', 'integer', 'exists:commission_rules,id'],
+            'deposit_commission_rules.*.percentage' => ['required', 'numeric', 'min:0', 'max:100'],
+            'deposit_commission_rules.*.enabled' => ['boolean'],
+            'return_commission_rules' => ['array'],
+            'return_commission_rules.*.id' => ['required', 'integer', 'exists:commission_rules,id'],
+            'return_commission_rules.*.percentage' => ['required', 'numeric', 'min:0', 'max:100'],
+            'return_commission_rules.*.enabled' => ['boolean'],
             // returns
             'return_enabled' => ['boolean'],
             'return_percent' => ['nullable', 'numeric', 'min:0', 'max:10000'],
@@ -162,11 +181,19 @@ class SettingsController extends Controller
                     $this->settings->set('company.favicon', '/assets/images/'.$filename, null, 'business');
                 }
 
-                foreach (($validated['commission_rules'] ?? []) as $ruleData) {
+                // Deposit commission rules
+                foreach (($validated['deposit_commission_rules'] ?? []) as $ruleData) {
                     CommissionRule::whereKey($ruleData['id'])->update([
                         'percentage' => number_format((float) $ruleData['percentage'], 3, '.', ''),
                         'enabled' => (bool) ($ruleData['enabled'] ?? false),
-                        'trigger_event' => $ruleData['trigger_event'],
+                    ]);
+                }
+
+                // Return commission rules
+                foreach (($validated['return_commission_rules'] ?? []) as $ruleData) {
+                    CommissionRule::whereKey($ruleData['id'])->update([
+                        'percentage' => number_format((float) $ruleData['percentage'], 3, '.', ''),
+                        'enabled' => (bool) ($ruleData['enabled'] ?? false),
                     ]);
                 }
 
@@ -185,10 +212,11 @@ class SettingsController extends Controller
 
             return back()->with('success', 'Settings updated.');
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Settings update failed: ' . $e->getMessage(), [
-                'exception' => $e
+            Log::error('Settings update failed: '.$e->getMessage(), [
+                'exception' => $e,
             ]);
-            return back()->withErrors(['logo' => 'Settings update failed: ' . $e->getMessage()]);
+
+            return back()->withErrors(['logo' => 'Settings update failed: '.$e->getMessage()]);
         }
     }
 }

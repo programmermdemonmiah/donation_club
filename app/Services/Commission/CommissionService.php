@@ -2,9 +2,9 @@
 
 namespace App\Services\Commission;
 
-use App\Enums\CommissionScope;
 use App\Enums\CommissionStatus;
 use App\Enums\CommissionTrigger;
+use App\Enums\WalletTransactionType;
 use App\Events\CommissionCredited;
 use App\Models\Commission;
 use App\Models\CommissionRule;
@@ -26,9 +26,7 @@ use Throwable;
  */
 class CommissionService
 {
-    public function __construct(private readonly SettingsService $settings)
-    {
-    }
+    public function __construct(private readonly SettingsService $settings) {}
 
     /**
      * Direct referral commission when a referred member's deposit completes.
@@ -39,44 +37,53 @@ class CommissionService
             return;
         }
 
-        $rule = CommissionRule::query()
+        $rules = CommissionRule::query()
             ->where('trigger_event', CommissionTrigger::Deposit->value)
-            ->where('scope', CommissionScope::Direct->value)
-            ->where('generation', 1)
             ->where('enabled', true)
-            ->first();
+            ->orderBy('generation')
+            ->get()
+            ->keyBy('generation');
 
-        if (! $rule) {
+        if ($rules->isEmpty()) {
             return;
         }
 
-        $beneficiary = $deposit->user->referrer;
+        $member = $deposit->user;
 
-        if (! $beneficiary || ! $this->isBeneficiaryEligible($beneficiary)) {
-            return;
-        }
+        DB::transaction(function () use ($deposit, $rules, $member) {
+            foreach (ReferralService::upline($member, ReferralService::MAX_GENERATIONS) as $entry) {
+                /** @var User $uplineUser */
+                $uplineUser = $entry['user'];
+                $generation = $entry['generation'];
 
-        DB::transaction(function () use ($deposit, $rule, $beneficiary) {
-            // Idempotency: one commission per source deposit per beneficiary.
-            $exists = Commission::query()
-                ->where('source_type', $deposit->getMorphClass())
-                ->where('source_id', $deposit->id)
-                ->where('user_id', $beneficiary->id)
-                ->lockForUpdate()
-                ->exists();
+                $rule = $rules->get($generation);
 
-            if ($exists) {
-                return;
+                if (! $rule || ! $this->isBeneficiaryEligible($uplineUser)) {
+                    continue;
+                }
+
+                // Idempotency: one commission per (source deposit, beneficiary, generation).
+                $exists = Commission::query()
+                    ->where('source_type', $deposit->getMorphClass())
+                    ->where('source_id', $deposit->id)
+                    ->where('user_id', $uplineUser->id)
+                    ->where('generation', $generation)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($exists) {
+                    continue;
+                }
+
+                self::createAndCredit(
+                    beneficiary: $uplineUser,
+                    sourceUser: $member,
+                    rule: $rule,
+                    baseAmount: Money::parse((string) $deposit->amount),
+                    source: $deposit,
+                    description: "Generation {$generation} deposit commission",
+                );
             }
-
-            self::createAndCredit(
-                beneficiary: $beneficiary,
-                sourceUser: $deposit->user,
-                rule: $rule,
-                baseAmount: Money::parse((string) $deposit->amount),
-                source: $deposit,
-                description: 'Direct referral commission',
-            );
         });
     }
 
@@ -159,7 +166,7 @@ class CommissionService
                         WalletService::debit(
                             $commission->user_id,
                             (string) $commission->amount,
-                            \App\Enums\WalletTransactionType::Adjustment,
+                            WalletTransactionType::Adjustment,
                             $commission,
                             "Reversal of commission {$commission->reference}",
                         );
@@ -212,7 +219,7 @@ class CommissionService
         WalletService::credit(
             $beneficiary,
             $amount,
-            \App\Enums\WalletTransactionType::Commission,
+            WalletTransactionType::Commission,
             $commission,
             "{$description} ({$sourceUser->name})",
         );
@@ -224,6 +231,6 @@ class CommissionService
 
     private function isBeneficiaryEligible(User $user): bool
     {
-        return $user->isActive() && $user->hasVerifiedEmail();
+        return $user->isActive();
     }
 }
