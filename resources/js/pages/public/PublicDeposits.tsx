@@ -1,7 +1,8 @@
 import PublicLayout from '@/layouts/PublicLayout';
 import Pagination from '@/components/ui/Pagination';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { formatDate } from '@/utils/format';
+import { useState, useCallback } from 'react';
 
 interface DepositRow {
     sequence_number: number;
@@ -13,8 +14,32 @@ interface DepositRow {
 }
 
 export default function PublicDeposits() {
-    const page = usePage<{ deposits: { data: DepositRow[]; current_page: number; last_page: number } }>();
+    const page = usePage<{
+        deposits: { data: DepositRow[]; current_page: number; last_page: number };
+        filters: { search?: string };
+    }>();
     const { data, current_page, last_page } = page.props.deposits;
+    const [search, setSearch] = useState(page.props.filters?.search ?? '');
+
+    const handleSearch = useCallback(
+        (value: string) => {
+            router.get(
+                route('public.deposits'),
+                { search: value || undefined },
+                { preserveState: true, replace: true },
+            );
+        },
+        [],
+    );
+
+    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') handleSearch(search);
+    };
+
+    const onClear = () => {
+        setSearch('');
+        handleSearch('');
+    };
 
     return (
         <PublicLayout>
@@ -37,12 +62,54 @@ export default function PublicDeposits() {
                     <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-relaxed text-blue-100/70">
                         Every confirmed donation — donor name, amount and permanent sequence number — displayed in list order for full transparency.
                     </p>
+
+
                 </div>
             </section>
 
             {/* Ledger Table */}
             <section className="bg-white py-16 sm:py-20">
                 <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+
+                    {/* Search Box */}
+                    <div className="mb-5 flex items-center gap-3">
+                        <div className="relative flex-1">
+                            <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+                                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                                </svg>
+                            </span>
+                            <input
+                                id="ledger-search"
+                                type="text"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={onKeyDown}
+                                placeholder="Search by username…"
+                                className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-gray-800 shadow-sm placeholder-gray-400 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+                            />
+                            {search && (
+                                <button
+                                    type="button"
+                                    onClick={onClear}
+                                    className="absolute inset-y-0 right-3 flex items-center text-gray-400 transition hover:text-gray-600"
+                                    aria-label="Clear search"
+                                >
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => handleSearch(search)}
+                            className="shrink-0 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-500 px-6 py-3 text-sm font-black text-white shadow-md transition hover:from-blue-500 hover:to-emerald-400 active:scale-95"
+                        >
+                            Search
+                        </button>
+                    </div>
+
                     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-200/50">
                         {/* Table Header */}
                         <div className="hidden grid-cols-[90px_1fr_140px_140px_110px] items-center border-b border-gray-100 bg-gradient-to-r from-blue-50 to-emerald-50/40 px-6 py-4 sm:grid">
@@ -66,8 +133,17 @@ export default function PublicDeposits() {
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <p className="mt-4 text-base font-bold text-gray-700">No completed donations yet.</p>
-                                    <p className="mt-1 text-sm font-medium text-gray-400">The public donor list will appear here once members donate.</p>
+                                    <p className="mt-4 text-base font-bold text-gray-700">
+                                        {search ? `No results found for "@${search}"` : 'No completed donations yet.'}
+                                    </p>
+                                    <p className="mt-1 text-sm font-medium text-gray-400">
+                                        {search ? 'Try a different username.' : 'The public donor list will appear here once members donate.'}
+                                    </p>
+                                    {search && (
+                                        <button onClick={onClear} className="mt-4 rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100">
+                                            Clear search
+                                        </button>
+                                    )}
                                 </div>
                             )}
                             {data.map((deposit) => (
@@ -82,18 +158,18 @@ export default function PublicDeposits() {
                                         <span className="text-xs font-medium text-gray-400 sm:hidden">Donor</span>
                                     </div>
 
-                                    {/* Donor - which person */}
+                                    {/* Donor */}
                                     <div className="flex items-center gap-3">
                                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-xs font-black text-white shadow-sm ring-1 ring-white">
                                             {deposit.donor_initial}
                                         </span>
                                         <div className="min-w-0">
-                                            <p className="truncate text-sm font-bold text-gray-900">{deposit.donor_name}</p>
+                                            <p className="truncate text-sm font-bold text-gray-900">@{deposit.donor_name}</p>
                                             <p className="hidden text-xs font-medium text-gray-400 sm:block">Donor</p>
                                         </div>
                                     </div>
 
-                                    {/* Amount - which amount */}
+                                    {/* Amount */}
                                     <div className="flex items-center justify-between sm:block">
                                         <span className="text-xs font-semibold text-gray-400 sm:hidden">Donation Amount</span>
                                         <span className="text-base font-black tabular-nums text-emerald-600">

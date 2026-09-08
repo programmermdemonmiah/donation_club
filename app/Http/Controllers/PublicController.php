@@ -68,6 +68,8 @@ class PublicController extends Controller
 
     public function deposits(Request $request): Response
     {
+        $search = $request->input('search');
+
         $sequences = DepositSequence::query()
             ->join('deposits', 'deposits.id', '=', 'deposit_sequences.deposit_id')
             ->join('users', 'users.id', '=', 'deposits.user_id')
@@ -77,9 +79,11 @@ class PublicController extends Controller
                 $query->whereNull('returns.status')
                       ->orWhere('returns.status', '!=', 'completed');
             })
+            ->when($search, fn ($q) => $q->where('users.username', 'like', '%'.$search.'%'))
             ->orderByDesc('deposit_sequences.sequence_number')
             ->select('deposit_sequences.sequence_number', 'deposits.amount', 'deposits.completed_at', 'users.username as donor_name')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return Inertia::render('public/PublicDeposits', [
             'deposits' => $sequences->through(fn ($row) => [
@@ -90,6 +94,7 @@ class PublicController extends Controller
                 'donor_name' => (string) $row->donor_name,
                 'donor_initial' => strtoupper(mb_substr((string) $row->donor_name, 0, 1)),
             ]),
+            'filters' => ['search' => $search],
         ]);
     }
 
