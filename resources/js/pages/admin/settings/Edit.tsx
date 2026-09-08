@@ -27,6 +27,7 @@ interface Settings {
     deposit_max_amount: string;
     deposit_required_sequence_gap: number;
     deposit_max_per_account_cycle: number;
+    rank_salary_enabled: boolean;
     commission_enabled: boolean;
     deposit_commission_rules: CommissionRule[];
     return_commission_rules: CommissionRule[];
@@ -227,6 +228,16 @@ export default function AdminSettings() {
                             After an account completes its per-cycle limit, it becomes eligible again only once this many additional
                             club-wide deposits (sequence positions) have passed.
                         </p>
+                    </CardBody>
+                </Card>
+
+                <Card>
+                    <CardHeader title="Rank rules" subtitle="Control automated rank payouts" />
+                    <CardBody className="space-y-4">
+                        <label className="flex items-center gap-3 rounded-lg bg-blue-50/60 p-3 ring-1 ring-inset ring-blue-600/10">
+                            <input type="checkbox" name="rank_salary_enabled" value="1" defaultChecked={s.rank_salary_enabled} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                            <span className="text-sm font-medium text-gray-800">Monthly rank salary enabled</span>
+                        </label>
                     </CardBody>
                 </Card>
 

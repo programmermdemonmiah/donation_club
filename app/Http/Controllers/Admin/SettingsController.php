@@ -36,6 +36,8 @@ class SettingsController extends Controller
                 'deposit_max_amount' => $this->settings->maxDeposit(),
                 'deposit_required_sequence_gap' => $this->settings->requiredSequenceGap(),
                 'deposit_max_per_account_cycle' => (int) ($this->settings->get('deposit.max_per_account_cycle') ?? 1),
+                // ranks
+                'rank_salary_enabled' => (bool) $this->settings->get('rank.salary_enabled', true),
                 // commissions (master switch + rules table)
                 'commission_enabled' => $this->settings->commissionsEnabled(),
                 'deposit_commission_rules' => CommissionRule::query()
@@ -100,6 +102,8 @@ class SettingsController extends Controller
             'deposit_max_amount' => ['required', 'numeric', 'min:0.01', 'max:100000', 'gte:deposit_min_amount'],
             'deposit_required_sequence_gap' => ['required', 'integer', 'min:0', 'max:10000'],
             'deposit_max_per_account_cycle' => ['required', 'integer', 'min:1', 'max:100'],
+            // ranks
+            'rank_salary_enabled' => ['boolean'],
             // commissions
             'commission_enabled' => ['boolean'],
             'deposit_commission_rules' => ['array'],
@@ -142,6 +146,7 @@ class SettingsController extends Controller
                     'deposit.max_amount' => Money::parse((string) $validated['deposit_max_amount']),
                     'deposit.required_sequence_gap' => (int) $validated['deposit_required_sequence_gap'],
                     'deposit.max_per_account_cycle' => (int) $validated['deposit_max_per_account_cycle'],
+                    'rank.salary_enabled' => (bool) ($validated['rank_salary_enabled'] ?? false),
                     'commission.enabled' => (bool) ($validated['commission_enabled'] ?? false),
                     'withdrawal.enabled' => (bool) ($validated['withdrawal_enabled'] ?? false),
                     'withdrawal.min_amount' => Money::parse((string) $validated['withdrawal_min_amount']),

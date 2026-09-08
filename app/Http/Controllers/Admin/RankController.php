@@ -28,6 +28,7 @@ class RankController extends Controller
                     'color' => $rank->color,
                     'active' => $rank->active,
                     'incentive_amount' => (string) $rank->incentive_amount,
+                    'monthly_salary' => (string) $rank->monthly_salary,
                     'requirements_count' => $rank->requirements_count,
                     'holders' => DB::table('user_ranks')->where('rank_id', $rank->id)->where('status', 'active')->count(),
                 ]),
@@ -46,6 +47,7 @@ class RankController extends Controller
                 'description' => $rank->description,
                 'active' => $rank->active,
                 'incentive_amount' => (string) $rank->incentive_amount,
+                'monthly_salary' => (string) $rank->monthly_salary,
                 'requirements' => $rank->requirements()->get()->map(fn ($req) => [
                     'key' => $req->key,
                     'value' => (string) $req->value,
@@ -62,6 +64,7 @@ class RankController extends Controller
             'color' => ['required', 'string', 'max:20'],
             'active' => ['boolean'],
             'incentive_amount' => ['required', 'numeric', 'min:0', 'max:9999999999'],
+            'monthly_salary' => ['required', 'numeric', 'min:0', 'max:9999999999'],
             'description' => ['nullable', 'string', 'max:1000'],
             'requirements' => ['array'],
             'requirements.*.key' => ['required', 'string', 'in:'.implode(',', RankRequirement::KEYS)],
@@ -69,13 +72,14 @@ class RankController extends Controller
         ]);
 
         DB::transaction(function () use ($rank, $data) {
-            $old = $rank->only(['name', 'color', 'active', 'description', 'incentive_amount']);
+            $old = $rank->only(['name', 'color', 'active', 'description', 'incentive_amount', 'monthly_salary']);
 
             $rank->update([
                 'name' => $data['name'],
                 'color' => $data['color'],
                 'active' => (bool) ($data['active'] ?? true),
                 'incentive_amount' => number_format((float) $data['incentive_amount'], 2, '.', ''),
+                'monthly_salary' => number_format((float) $data['monthly_salary'], 2, '.', ''),
                 'description' => $data['description'] ?? null,
             ]);
 
