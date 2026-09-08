@@ -11,6 +11,7 @@ enum WalletTransactionType: string
     case Commission = 'commission';           // referral commission credited
     case ReturnPayout = 'return_payout';      // return/reward payout credited
     case FundDisbursement = 'fund_disbursement'; // support fund credited
+    case RankIncentive = 'rank_incentive';    // rank incentive payout credited
     case WithdrawalHold = 'withdrawal_hold';  // amount locked for a pending withdrawal
     case Withdrawal = 'withdrawal';           // withdrawal finalized
     case WithdrawalRelease = 'withdrawal_release'; // locked amount released back
@@ -24,6 +25,7 @@ enum WalletTransactionType: string
             self::Commission => 'Commission',
             self::ReturnPayout => 'Return Payout',
             self::FundDisbursement => 'Fund Disbursement',
+            self::RankIncentive => 'Rank Incentive',
             self::WithdrawalHold => 'Withdrawal Hold',
             self::Withdrawal => 'Withdrawal',
             self::WithdrawalRelease => 'Withdrawal Release',
@@ -41,6 +43,7 @@ enum WalletTransactionType: string
             self::Commission,
             self::ReturnPayout,
             self::FundDisbursement,
+            self::RankIncentive,
             self::Adjustment,
             self::Refund,
         ], true);

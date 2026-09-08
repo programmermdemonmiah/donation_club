@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rank;
+use App\Models\RankRequirement;
 use App\Services\Audit\AuditLogService;
 use App\Services\Rank\RankService;
 use Illuminate\Http\Request;
@@ -13,9 +14,7 @@ use Inertia\Response;
 
 class RankController extends Controller
 {
-    public function __construct(private readonly RankService $ranks)
-    {
-    }
+    public function __construct(private readonly RankService $ranks) {}
 
     public function index(): Response
     {
@@ -28,6 +27,7 @@ class RankController extends Controller
                     'level' => $rank->level,
                     'color' => $rank->color,
                     'active' => $rank->active,
+                    'incentive_amount' => (string) $rank->incentive_amount,
                     'requirements_count' => $rank->requirements_count,
                     'holders' => DB::table('user_ranks')->where('rank_id', $rank->id)->where('status', 'active')->count(),
                 ]),
@@ -45,6 +45,7 @@ class RankController extends Controller
                 'color' => $rank->color,
                 'description' => $rank->description,
                 'active' => $rank->active,
+                'incentive_amount' => (string) $rank->incentive_amount,
                 'requirements' => $rank->requirements()->get()->map(fn ($req) => [
                     'key' => $req->key,
                     'value' => (string) $req->value,
@@ -60,19 +61,21 @@ class RankController extends Controller
             'name' => ['required', 'string', 'max:60'],
             'color' => ['required', 'string', 'max:20'],
             'active' => ['boolean'],
+            'incentive_amount' => ['required', 'numeric', 'min:0', 'max:9999999999'],
             'description' => ['nullable', 'string', 'max:1000'],
             'requirements' => ['array'],
-            'requirements.*.key' => ['required', 'string', 'in:'.implode(',', \App\Models\RankRequirement::KEYS)],
+            'requirements.*.key' => ['required', 'string', 'in:'.implode(',', RankRequirement::KEYS)],
             'requirements.*.value' => ['required', 'numeric', 'min:0', 'max:9999999999'],
         ]);
 
-        DB::transaction(function () use ($rank, $data, $request) {
-            $old = $rank->only(['name', 'color', 'active', 'description']);
+        DB::transaction(function () use ($rank, $data) {
+            $old = $rank->only(['name', 'color', 'active', 'description', 'incentive_amount']);
 
             $rank->update([
                 'name' => $data['name'],
                 'color' => $data['color'],
                 'active' => (bool) ($data['active'] ?? true),
+                'incentive_amount' => number_format((float) $data['incentive_amount'], 2, '.', ''),
                 'description' => $data['description'] ?? null,
             ]);
 

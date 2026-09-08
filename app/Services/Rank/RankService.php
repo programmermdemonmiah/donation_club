@@ -7,7 +7,6 @@ use App\Events\RankAchieved;
 use App\Models\Rank;
 use App\Models\RankHistory;
 use App\Models\RankRequirement;
-use App\Models\ReturnRule;
 use App\Models\User;
 use App\Models\UserRank;
 use App\Services\Audit\AuditLogService;
@@ -21,9 +20,7 @@ use Illuminate\Support\Facades\DB;
  */
 class RankService
 {
-    public function __construct(private readonly SettingsService $settings)
-    {
-    }
+    public function __construct(private readonly SettingsService $settings) {}
 
     /**
      * Live metrics for a user used by rank evaluation and dashboards.
@@ -38,6 +35,9 @@ class RankService
             'team_volume' => ReferralService::teamVolume($user),
             'qualified_members' => count(ReferralService::qualifiedMemberIds($user, $qualifiedMin)),
             'own_total_deposit' => (string) $user->deposits()->completed()->sum('amount'),
+            'gen1_volume' => ReferralService::generationVolume($user, 1),
+            'gen2_volume' => ReferralService::generationVolume($user, 2),
+            'gen3_volume' => ReferralService::generationVolume($user, 3),
         ];
     }
 
@@ -76,6 +76,9 @@ class RankService
                 RankRequirement::TEAM_VOLUME => $metrics['team_volume'],
                 RankRequirement::QUALIFIED_MEMBERS => $metrics['qualified_members'],
                 RankRequirement::MIN_DEPOSIT => $metrics['own_total_deposit'],
+                RankRequirement::GEN1_VOLUME => $metrics['gen1_volume'] ?? '0',
+                RankRequirement::GEN2_VOLUME => $metrics['gen2_volume'] ?? '0',
+                RankRequirement::GEN3_VOLUME => $metrics['gen3_volume'] ?? '0',
                 default => 0,
             };
 

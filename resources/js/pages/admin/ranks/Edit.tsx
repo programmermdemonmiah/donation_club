@@ -18,6 +18,7 @@ interface RankForm {
     color: string;
     description?: string | null;
     active: boolean;
+    incentive_amount: string;
     requirements: Requirement[];
 }
 
@@ -42,6 +43,7 @@ export default function AdminRankEdit() {
         fd.append('color', (document.getElementById('rank-color') as HTMLInputElement).value);
         fd.append('description', (document.getElementById('rank-description') as HTMLTextAreaElement)?.value ?? '');
         fd.append('active', (document.getElementById('rank-active') as HTMLInputElement).checked ? '1' : '0');
+        fd.append('incentive_amount', (document.getElementById('rank-incentive') as HTMLInputElement).value);
         fd.append('_method', 'PUT');
 
         requirements.forEach((req) => {
@@ -64,6 +66,7 @@ export default function AdminRankEdit() {
                     <CardBody className="grid gap-4 sm:grid-cols-2">
                         <Input id="rank-name" label="Name" defaultValue={page.props.rank.name} required />
                         <Input id="rank-color" label="Color" type="color" defaultValue={page.props.rank.color} className="h-10" />
+                        <Input id="rank-incentive" label="Incentive Amount ($)" type="number" step="0.01" min="0" defaultValue={page.props.rank.incentive_amount} required className="sm:col-span-2" />
                         <div className="sm:col-span-2">
                             <label htmlFor="rank-description" className="mb-1.5 block text-sm font-medium text-gray-700">Description</label>
                             <textarea

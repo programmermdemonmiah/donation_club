@@ -2,8 +2,11 @@
 
 namespace App\Listeners;
 
+use App\Enums\WalletTransactionType;
 use App\Events\RankAchieved;
 use App\Notifications\RankUpdated;
+use App\Services\Wallet\WalletService;
+use App\Support\Money;
 
 class OnRankAchieved
 {
@@ -11,8 +14,22 @@ class OnRankAchieved
 
     public function handle(RankAchieved $event): void
     {
-        $event->user->notify(new RankUpdated([
-            'message' => "Congratulations! You achieved the {$event->rank->name} rank.",
+        $user = $event->user;
+        $rank = $event->rank;
+
+        // Credit incentive amount if greater than 0
+        if (Money::gt((string) $rank->incentive_amount, '0.00')) {
+            WalletService::credit(
+                $user,
+                (string) $rank->incentive_amount,
+                WalletTransactionType::RankIncentive,
+                $rank,
+                "Incentive for achieving {$rank->name} rank"
+            );
+        }
+
+        $user->notify(new RankUpdated([
+            'message' => "Congratulations! You achieved the {$rank->name} rank.",
             'url' => route('rank.index'),
         ]));
     }

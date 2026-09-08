@@ -11,6 +11,7 @@ interface RankRow {
     level: number;
     color: string;
     active: boolean;
+    incentive_amount: string;
     requirements_count: number;
     holders: number;
 }
@@ -36,6 +37,7 @@ export default function AdminRanks() {
                             ),
                         },
                         { header: 'Level', render: (r) => r.level },
+                        { header: 'Incentive', render: (r) => `$${Number(r.incentive_amount).toLocaleString()}` },
                         { header: 'Requirements', render: (r) => r.requirements_count },
                         { header: 'Members at rank', render: (r) => r.holders },
                         {

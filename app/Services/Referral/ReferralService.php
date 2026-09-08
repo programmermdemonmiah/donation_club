@@ -4,6 +4,7 @@ namespace App\Services\Referral;
 
 use App\Models\ReferralRelationship;
 use App\Models\User;
+use App\Services\Settings\SettingsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -65,7 +66,7 @@ class ReferralService
         }
 
         // Direct referral limit check
-        $settings = app(\App\Services\Settings\SettingsService::class);
+        $settings = app(SettingsService::class);
         $maxDirect = (int) $settings->get('referral.max_direct', 3);
         if ($maxDirect > 0) {
             $currentDirectCount = self::directReferrals($referrer)->count();
@@ -214,6 +215,27 @@ class ReferralService
     }
 
     /**
+     * Sum of completed deposit amounts for members at exactly $generation levels below $user.
+     */
+    public static function generationVolume(User $user, int $generation): string
+    {
+        $members = self::generationMembers($user, $generation);
+
+        if ($members->isEmpty()) {
+            return '0.00';
+        }
+
+        $ids = $members->pluck('id')->all();
+
+        $total = DB::table('deposits')
+            ->whereIn('user_id', $ids)
+            ->where('status', 'completed')
+            ->sum('amount');
+
+        return (string) $total;
+    }
+
+    /**
      * Downline members whose completed deposits meet a minimum threshold.
      */
     public static function qualifiedMemberIds(User $user, string $minTotalDeposit): array
@@ -268,9 +290,9 @@ class ReferralService
 
         try {
             $referrer = self::resolveReferrer($code);
-            
+
             // Check direct referral limit
-            $settings = app(\App\Services\Settings\SettingsService::class);
+            $settings = app(SettingsService::class);
             $maxDirect = (int) $settings->get('referral.max_direct', 3);
             if ($maxDirect > 0) {
                 $currentDirectCount = self::directReferrals($referrer)->count();
@@ -278,7 +300,7 @@ class ReferralService
                     throw new InvalidArgumentException('This referral code has already reached its maximum usage limit of '.$maxDirect.' people.');
                 }
             }
-            
+
             return $referrer;
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage());
