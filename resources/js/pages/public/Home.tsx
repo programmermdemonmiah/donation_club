@@ -117,6 +117,35 @@ function Ticker({ items }: { items: string[] }) {
 }
 
 /* ═══════════════════════════════════════════════════════
+   HERO SLIDER
+═══════════════════════════════════════════════════════ */
+function HeroSlider({ images }: { images: string[] }) {
+    const [idx, setIdx] = useState(0);
+    useEffect(() => {
+        if (!images || images.length <= 1) return;
+        const t = setInterval(() => setIdx((i) => (i + 1) % images.length), 5000);
+        return () => clearInterval(t);
+    }, [images]);
+
+    if (!images || images.length === 0) return null;
+
+    return (
+        <div className="absolute inset-0 z-0">
+            {images.map((img, i) => (
+                <div
+                    key={i}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === idx ? 'opacity-100' : 'opacity-0'}`}
+                >
+                    <img src={img} alt="Hero Background" className="h-full w-full object-cover" />
+                </div>
+            ))}
+            {/* Dark overlay for readability */}
+            <div className="absolute inset-0 bg-blue-950/80 backdrop-blur-[2px]" />
+        </div>
+    );
+}
+
+/* ═══════════════════════════════════════════════════════
    TYPES
 ═══════════════════════════════════════════════════════ */
 interface CommissionLevel {
@@ -133,6 +162,7 @@ interface HomeProps {
     latestDeposits?: Array<{ reference: string; amount: string; created_at: string; donor_name: string }>;
     commissionLevels?: CommissionLevel[];
     returnRate?: string;
+    hero?: { title: string; description: string; images: string[] };
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -200,28 +230,7 @@ const TRUST_ITEMS = [
 ═══════════════════════════════════════════════════════ */
 export default function Home() {
     const page = usePage<PageProps & HomeProps>();
-    const { stats, settings, latestDeposits = [], company, commissionLevels = [], returnRate = '0' } = page.props;
-
-    // Typewriter effect for hero subtitle
-    const phrases = ['Build Your Team.', 'Share Donations.', 'Grow Together.', 'Join the Movement.'];
-    const [phraseIdx, setPhraseIdx] = useState(0);
-    const [typed, setTyped] = useState('');
-    const [deleting, setDeleting] = useState(false);
-    useEffect(() => {
-        const target = phrases[phraseIdx];
-        let timeout: ReturnType<typeof setTimeout>;
-        if (!deleting && typed.length < target.length) {
-            timeout = setTimeout(() => setTyped(target.slice(0, typed.length + 1)), 80);
-        } else if (!deleting && typed.length === target.length) {
-            timeout = setTimeout(() => setDeleting(true), 2200);
-        } else if (deleting && typed.length > 0) {
-            timeout = setTimeout(() => setTyped(typed.slice(0, -1)), 40);
-        } else if (deleting && typed.length === 0) {
-            setDeleting(false);
-            setPhraseIdx((i) => (i + 1) % phrases.length);
-        }
-        return () => clearTimeout(timeout);
-    }, [typed, deleting, phraseIdx]);
+    const { stats, settings, latestDeposits = [], company, commissionLevels = [], returnRate = '0', hero } = page.props;
 
     return (
         <PublicLayout>
@@ -229,86 +238,36 @@ export default function Home() {
             {/* ══════════════════════════════════════════
                 HERO — full viewport, split layout
             ══════════════════════════════════════════ */}
-            <section className="relative flex min-h-screen overflow-hidden bg-blue-950">
+            <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-blue-950">
+                {/* Dynamic Hero Slider */}
+                {hero?.images && hero.images.length > 0 && <HeroSlider images={hero.images} />}
+
                 {/* Particle canvas */}
-                <NetworkCanvas className="opacity-60" />
+                <NetworkCanvas className="absolute inset-0 z-0 opacity-60 pointer-events-none" />
 
                 {/* Left atmospheric glow - blue */}
-                <div className="pointer-events-none absolute -left-40 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-blue-600/10 blur-[130px]" />
+                <div className="pointer-events-none absolute -left-40 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-blue-600/10 blur-[130px] z-0" />
                 {/* Right glow - green */}
-                <div className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-emerald-500/10 blur-[100px]" />
+                <div className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-emerald-500/10 blur-[100px] z-0" />
                 {/* Top center glow - blue */}
-                <div className="pointer-events-none absolute left-1/2 top-0 h-60 w-[800px] -translate-x-1/2 bg-blue-600/8 blur-[80px]" />
+                <div className="pointer-events-none absolute left-1/2 top-0 h-60 w-[800px] -translate-x-1/2 bg-blue-600/8 blur-[80px] z-0" />
 
                 {/* Content */}
-                <div className="relative mx-auto flex w-full max-w-screen-xl flex-col items-center justify-center px-4 py-32 sm:px-6 lg:px-8">
-                    <div className="mx-auto max-w-5xl text-center">
-
-                        {/* Badge */}
-                        <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-blue-600/20 bg-blue-600/8 px-5 py-2 backdrop-blur-sm">
-                            <span className="relative flex h-2 w-2">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
-                                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
-                            </span>
-                            <span className="text-[11px] font-black uppercase tracking-[.22em] text-blue-400/90">
-                                {company.name} · Live Network · Est. 2024
-                            </span>
-                        </div>
+                <div className="relative z-10 mx-auto flex w-full max-w-screen-xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
+                    <div className="mx-auto flex max-w-4xl flex-col items-center justify-center text-center">
 
                         {/* Main headline */}
-                        <h1 className="text-[clamp(3rem,7.5vw,6rem)] font-black leading-[1.02] tracking-[-0.02em] text-white">
-                            Donate Together.{' '}
-                            <br className="hidden sm:block" />
-                            <span className="relative inline-block">
-                                <span className="bg-gradient-to-r from-blue-400 via-blue-600 to-emerald-400 bg-clip-text text-transparent">
-                                    Grow Together.
-                                </span>
-                                {/* Underline glow */}
-                                <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-blue-600/0 via-blue-600 to-blue-600/0" />
-                            </span>
+                        <h1 className="bg-gradient-to-br from-white via-white to-blue-200 bg-clip-text text-5xl font-black leading-tight tracking-tight text-transparent drop-shadow-xl sm:text-6xl md:text-7xl">
+                            {hero?.title || 'Donate Together. Grow Together.'}
                         </h1>
 
-                        {/* Typewriter line */}
-                        <div className="mt-6 flex items-center justify-center gap-2 text-xl font-semibold text-gray-400 sm:text-2xl">
-                            <span className="text-blue-400">{typed}</span>
-                            <span className="inline-block h-7 w-[2px] animate-[blink_.85s_step-end_infinite] rounded-full bg-blue-600 align-middle" />
-                            <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
-                        </div>
-
                         {/* Description */}
-                        <p className="mx-auto mt-7 max-w-2xl text-base font-medium leading-relaxed text-gray-500 sm:text-lg">
-                            A transparent, member-governed community contribution platform registered in England & Wales.
-                            Make voluntary donations, build your community network, and support one another.
+                        <p className="mx-auto mt-3 md:mt-4 max-w-3xl text-sm sm:text-base md:text-lg font-medium leading-relaxed text-gray-200 drop-shadow-md">
+                            {hero?.description || 'A transparent, member-governed community contribution platform registered in England & Wales. Make voluntary donations, build your community network, and support one another.'}
                         </p>
 
-                        {/* CTA row */}
-                        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                            <Link href={route('register')}
-                                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 px-10 py-4 text-base font-black text-white shadow-[0_0_50px_rgba(37,99,235,.45)] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_70px_rgba(16,185,129,.35)]">
-                                <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-white/30 transition-transform duration-700 group-hover:translate-x-full" />
-                                <span className="relative flex items-center gap-2.5">
-                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                                    Start Donating Today
-                                </span>
-                            </Link>
-                            <Link href={route('pages.how-it-works')}
-                                className="group flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-base font-bold text-gray-300 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white">
-                                How It Works
-                                <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                            </Link>
-                        </div>
-
-                        {/* Trust micro-row */}
-                        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-                            {[`Registered · ${company.registration}`, company.address, 'Public Ledger', 'KYC Compliant'].map((t, i) => (
-                                <span key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-200">
-                                    <span className="h-1 w-1 rounded-full bg-blue-400/50" />{t}
-                                </span>
-                            ))}
-                        </div>
-
                         {/* Glassmorphism stat pills */}
-                        <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
                             {[
                                 { label: 'Members', value: (stats?.members ?? 0).toLocaleString(), icon: '👥' },
                                 { label: 'Donations', value: (stats?.deposits ?? 0).toLocaleString(), icon: '💎' },

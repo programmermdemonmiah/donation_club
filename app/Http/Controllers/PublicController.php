@@ -63,6 +63,11 @@ class PublicController extends Controller
                 'is_direct' => $r->scope === 'direct',
             ])->values(),
             'returnRate' => (string) (ReturnRule::query()->value('return_percent') ?? '0'),
+            'hero' => [
+                'title' => $this->settings->get('hero.title', 'Donate Together. Grow Together.'),
+                'description' => $this->settings->get('hero.description', 'A transparent, member-governed community contribution platform registered in England & Wales. Make voluntary donations, build your community network, and support one another.'),
+                'images' => json_decode($this->settings->get('hero.images', '[]'), true) ?? [],
+            ],
         ]);
     }
 

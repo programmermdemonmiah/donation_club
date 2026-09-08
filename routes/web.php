@@ -9,7 +9,7 @@ use App\Http\Controllers\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/nai/kono/migration', function () {
+Route::get('/system-migrate', function () {
     try {
         Artisan::call('migrate');
 // :fresh', [
@@ -225,6 +225,11 @@ Route::prefix('admin')
 
         Route::get('/settings', [Admin\SettingsController::class, 'edit'])->name('settings.edit');
         Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
+
+        Route::get('/hero', [Admin\HeroController::class, 'edit'])->name('hero.edit');
+        Route::put('/hero', [Admin\HeroController::class, 'update'])->name('hero.update');
+        Route::post('/hero/images', [Admin\HeroController::class, 'uploadImage'])->name('hero.images.store');
+        Route::delete('/hero/images', [Admin\HeroController::class, 'deleteImage'])->name('hero.images.destroy');
 
         Route::get('/pins', [Admin\PinController::class, 'index'])->name('pins.index');
         Route::post('/pins', [Admin\PinController::class, 'store'])->name('pins.store');
