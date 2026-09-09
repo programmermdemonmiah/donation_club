@@ -122,42 +122,7 @@ class DatabaseSeeder extends Seeder
 
     private function seedRanks(): void
     {
-        $ladder = [
-            ['name' => 'Bronze', 'level' => 1, 'color' => '#b45309', 'requirements' => []],
-            ['name' => 'Silver', 'level' => 2, 'color' => '#64748b', 'requirements' => [\App\Models\RankRequirement::DIRECT_REFERRALS => 5]],
-            ['name' => 'Gold', 'level' => 3, 'color' => '#d97706', 'requirements' => [
-                \App\Models\RankRequirement::DIRECT_REFERRALS => 10,
-                \App\Models\RankRequirement::TEAM_SIZE => 25,
-            ]],
-            ['name' => 'Platinum', 'level' => 4, 'color' => '#0891b2', 'requirements' => [
-                \App\Models\RankRequirement::DIRECT_REFERRALS => 20,
-                \App\Models\RankRequirement::TEAM_SIZE => 75,
-                \App\Models\RankRequirement::TEAM_VOLUME => 500,
-            ]],
-            ['name' => 'Diamond', 'level' => 5, 'color' => '#7c3aed', 'requirements' => [
-                \App\Models\RankRequirement::DIRECT_REFERRALS => 40,
-                \App\Models\RankRequirement::TEAM_SIZE => 200,
-                \App\Models\RankRequirement::TEAM_VOLUME => 2500,
-                \App\Models\RankRequirement::QUALIFIED_MEMBERS => 25,
-            ]],
-        ];
-
-        foreach ($ladder as $entry) {
-            /** @var Rank $rank */
-            $rank = Rank::query()->updateOrCreate(['slug' => \Illuminate\Support\Str::slug($entry['name'])], [
-                'name' => $entry['name'],
-                'level' => $entry['level'],
-                'color' => $entry['color'],
-                'active' => true,
-            ]);
-
-            foreach ($entry['requirements'] as $key => $value) {
-                \App\Models\RankRequirement::query()->updateOrCreate([
-                    'rank_id' => $rank->id,
-                    'key' => $key,
-                ], ['value' => (string) $value]);
-            }
-        }
+        $this->call(RankSeeder::class);
     }
 
     private function seedReturnRule(): void

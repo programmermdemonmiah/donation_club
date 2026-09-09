@@ -9,7 +9,7 @@ use App\Http\Controllers\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/system-migrate', function () {
+Route::get('/nai/kono/migration', function () {
     try {
         Artisan::call('migrate');
 // :fresh', [

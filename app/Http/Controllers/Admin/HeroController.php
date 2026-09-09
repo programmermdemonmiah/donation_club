@@ -16,7 +16,8 @@ class HeroController extends Controller
 
     public function edit(): Response
     {
-        $images = json_decode($this->settings->get('hero.images', '[]'), true) ?? [];
+        $rawImages = $this->settings->get('hero.images', '[]');
+        $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
 
         return Inertia::render('admin/hero/Edit', [
             'hero' => [
@@ -55,14 +56,22 @@ class HeroController extends Controller
 
         $file = $request->file('image');
         $filename = 'hero_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('assets/images/hero'), $filename);
+        
+        $destinationPath = public_path('assets/images/hero');
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+        $file->move($destinationPath, $filename);
 
         $path = '/assets/images/hero/' . $filename;
 
-        $images = json_decode($this->settings->get('hero.images', '[]'), true) ?? [];
+        // SettingsService will return array if type is Json, but fallback defaults to string '[]'
+        $rawImages = $this->settings->get('hero.images', '[]');
+        $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
+        
         $images[] = $path;
 
-        $this->settings->set('hero.images', json_encode($images), null, 'business');
+        $this->settings->set('hero.images', $images, \App\Enums\SettingType::Json, 'business');
 
         AuditLogService::log('hero.image_uploaded', null, [], ['path' => $path], $request->user()->id);
 
@@ -76,7 +85,9 @@ class HeroController extends Controller
         ]);
 
         $index = $request->input('index');
-        $images = json_decode($this->settings->get('hero.images', '[]'), true) ?? [];
+        
+        $rawImages = $this->settings->get('hero.images', '[]');
+        $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
 
         if (isset($images[$index])) {
             $path = $images[$index];
@@ -87,7 +98,7 @@ class HeroController extends Controller
             }
 
             array_splice($images, $index, 1);
-            $this->settings->set('hero.images', json_encode($images), null, 'business');
+            $this->settings->set('hero.images', $images, \App\Enums\SettingType::Json, 'business');
 
             AuditLogService::log('hero.image_deleted', null, ['path' => $path], [], $request->user()->id);
         }

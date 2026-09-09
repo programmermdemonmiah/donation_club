@@ -29,6 +29,9 @@ class PublicController extends Controller
             ->orderBy('generation')
             ->get(['generation', 'name', 'percentage', 'trigger_event', 'scope']);
 
+        $rawImages = $this->settings->get('hero.images', '[]');
+        $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
+
         return Inertia::render('public/Home', [
             'depositRules' => [
                 'min' => $this->settings->minDeposit(),
@@ -66,7 +69,7 @@ class PublicController extends Controller
             'hero' => [
                 'title' => $this->settings->get('hero.title', 'Donate Together. Grow Together.'),
                 'description' => $this->settings->get('hero.description', 'A transparent, member-governed community contribution platform registered in England & Wales. Make voluntary donations, build your community network, and support one another.'),
-                'images' => json_decode($this->settings->get('hero.images', '[]'), true) ?? [],
+                'images' => $images,
             ],
         ]);
     }
