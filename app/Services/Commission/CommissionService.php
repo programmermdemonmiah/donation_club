@@ -193,12 +193,13 @@ class CommissionService
         string $baseAmount,
         object $source,
         string $description,
-    ): Commission {
+    ): ?Commission {
         $rate = (string) $rule->percentage;
         $amount = Money::percentOf($baseAmount, $rate);
 
         if (Money::lte($amount, '0')) {
-            throw new \RuntimeException('Computed commission must be positive.');
+            // Commission rounds to zero for this rule/amount combination — skip silently.
+            return null;
         }
 
         $commission = Commission::create([
