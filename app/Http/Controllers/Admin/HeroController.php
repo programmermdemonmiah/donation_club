@@ -52,19 +52,22 @@ class HeroController extends Controller
     {
         try {
             $request->validate([
-                'image' => ['required', 'image', 'max:5120'], // Max 5MB
+                'image' => ['required', 'file', 'max:5120'], // Use 'file' to bypass finfo requirement
             ]);
 
             $file = $request->file('image');
-            $filename = 'hero_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $extension = strtolower($file->getClientOriginalExtension());
             
-            $destinationPath = public_path('assets/images/hero');
-            if (!file_exists($destinationPath)) {
-                @mkdir($destinationPath, 0755, true);
+            if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])) {
+                return back()->with('error', 'Upload failed: Only JPG, PNG, and WebP images are allowed.');
             }
+
+            $filename = 'hero_' . time() . '_' . uniqid() . '.' . $extension;
+            
+            $destinationPath = public_path('assets/images');
             $file->move($destinationPath, $filename);
 
-            $path = '/assets/images/hero/' . $filename;
+            $path = '/assets/images/' . $filename;
 
             // SettingsService will return array if type is Json, but fallback defaults to string '[]'
             $rawImages = $this->settings->get('hero.images', '[]');
