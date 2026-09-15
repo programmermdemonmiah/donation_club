@@ -98,7 +98,7 @@ class PublicController extends Controller
                 'sequence_number' => $row->sequence_number,
                 'formatted' => sprintf('#%011d', $row->sequence_number),
                 'amount' => (string) $row->amount,
-                'completed_at' => optional($row->completed_at)?->toIso8601String(),
+                'completed_at' => $row->completed_at ? \Carbon\Carbon::parse($row->completed_at)->toIso8601String() : null,
                 'donor_name' => (string) $row->donor_name,
                 'donor_initial' => strtoupper(mb_substr((string) $row->donor_name, 0, 1)),
             ]),
