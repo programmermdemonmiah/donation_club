@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 import Table from '@/components/ui/Table';
 import Badge from '@/components/ui/Badge';
@@ -9,9 +10,9 @@ import { formatDateTime, formatMoney } from '@/utils/format';
 
 interface ReturnRow {
     id: number;
-    reference: string;
-    user?: { id: number; name: string; email: string } | null;
+    sequence: string;
     deposit_reference?: string;
+    user?: { id: number; name: string; email: string };
     base_amount: string;
     rate: string;
     payout_amount: string;
@@ -19,12 +20,15 @@ interface ReturnRow {
     created_at: string;
 }
 
-export default function AdminReturns() {
+export default function ReturnsIndex() {
     const page = usePage<PageProps & { returns: { data: ReturnRow[]; current_page: number; last_page: number }; filters: { status?: string }; moduleEnabled: boolean }>();
+    const [status, setStatus] = useState(page.props.filters?.status ?? '');
 
-    const setStatus = (status: string) => {
-        router.get(route('admin.returns.index'), status ? { status } : {}, { preserveState: true });
-    };
+    useEffect(() => {
+        if (status !== (page.props.filters?.status ?? '')) {
+            router.get(route('admin.returns.index'), { status: status || undefined }, { preserveState: true });
+        }
+    }, [status]);
 
     return (
         <AdminLayout>
@@ -38,7 +42,7 @@ export default function AdminReturns() {
             </div>
 
             <div className="mt-4 w-44">
-                <Select value={page.props.filters?.status ?? ''} onChange={(e) => setStatus(e.target.value)}>
+                <Select value={status} onChange={(e) => setStatus(e.target.value)}>
                     <option value="">All statuses</option>
                     {['pending', 'eligible', 'approved', 'processing', 'completed', 'cancelled', 'reversed'].map((s) => (
                         <option key={s} value={s}>{s}</option>
@@ -49,7 +53,7 @@ export default function AdminReturns() {
             <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <Table<ReturnRow>
                     columns={[
-                        { header: 'Reference', render: (r) => <span className="font-mono text-xs">{r.reference}</span> },
+                        { header: 'Sequence', render: (r) => <span className="font-mono text-xs text-blue-600">{r.sequence}</span> },
                         {
                             header: 'Member',
                             render: (r) =>
