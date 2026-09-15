@@ -3,12 +3,12 @@ import { Input, Textarea } from '@/components/ui/Input';
 import { useForm, usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 
-function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function Section({ title, subtitle, children }: { title: string; subtitle?: React.ReactNode; children: React.ReactNode }) {
     return (
         <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm shadow-gray-200/50">
             <div className="border-b border-gray-50 bg-gray-50/60 px-6 py-4">
                 <h2 className="text-sm font-black text-gray-900">{title}</h2>
-                {subtitle && <p className="mt-0.5 text-xs font-medium text-gray-400">{subtitle}</p>}
+                {subtitle && <div className="mt-0.5 text-xs font-medium text-gray-400">{subtitle}</div>}
             </div>
             <div className="p-6">{children}</div>
         </div>
@@ -25,7 +25,7 @@ function FormInput({ label, ...props }: { label: string } & React.InputHTMLAttri
 }
 
 export default function Profile() {
-    const page = usePage<PageProps & { auth: { user: { name: string; email: string; referral_code?: string } }; profile: Record<string, unknown> }>();
+    const page = usePage<PageProps & { auth: { user: { name: string; username: string; email: string; referral_code?: string; referrer?: { name: string; username: string } | null } }; profile: Record<string, unknown> }>();
     const user = page.props.auth.user;
 
     const profile = useForm({
@@ -48,7 +48,20 @@ export default function Profile() {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-2">
-                <Section title="Profile Information" subtitle={`Referral code: ${user.referral_code ?? '—'}`}>
+                <Section title="Profile Information" subtitle={
+                    <div className="mt-2 flex flex-col gap-1.5 text-gray-500">
+                        {user.referrer ? (
+                            <div className="flex flex-col gap-1">
+                                <span className="font-bold text-gray-700">Referred by:</span>
+                                <span className="ml-2">Full Name: <strong className="text-gray-900">{user.referrer.name}</strong></span>
+                                <span className="ml-2">Username: <strong className="text-gray-900">{user.referrer.username}</strong></span>
+                            </div>
+                        ) : (
+                            <span className="font-bold text-gray-700">Direct registration</span>
+                        )}
+                        <span className="mt-1 border-t border-gray-100 pt-2">Referral code: <strong className="text-gray-900">{user.referral_code ?? '—'}</strong></span>
+                    </div>
+                }>
                     <form onSubmit={(e) => { e.preventDefault(); profile.put(route('profile.update')); }} className="space-y-4">
                         <FormInput label="Full Name" value={profile.data.name} onChange={(e) => profile.setData('name', e.target.value)} required />
                         <FormInput label="Email (read-only)" value={user.email} disabled />

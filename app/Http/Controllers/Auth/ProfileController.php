@@ -15,15 +15,17 @@ class ProfileController extends Controller
 {
     public function edit(): Response
     {
-        $user = request()->user()->loadMissing('profile');
+        $user = request()->user()->loadMissing(['profile', 'referrer:id,name,username']);
 
         return Inertia::render('profile/Edit', [
             'auth' => [
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'username' => $user->username,
                     'email' => $user->email,
                     'referral_code' => $user->referral_code,
+                    'referrer' => $user->referrer ? $user->referrer->only(['id', 'name', 'username']) : null,
                 ],
             ],
             'profile' => $user->profile,
