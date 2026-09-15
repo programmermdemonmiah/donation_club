@@ -50,11 +50,11 @@ class HeroController extends Controller
 
     public function uploadImage(Request $request)
     {
-        $request->validate([
-            'image' => ['required', 'image', 'max:5120'], // Max 5MB
-        ]);
-
         try {
+            $request->validate([
+                'image' => ['required', 'image', 'max:5120'], // Max 5MB
+            ]);
+
             $file = $request->file('image');
             $filename = 'hero_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             
@@ -77,6 +77,8 @@ class HeroController extends Controller
             AuditLogService::log('hero.image_uploaded', null, [], ['path' => $path], $request->user()->id);
 
             return back()->with('success', 'Image uploaded successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e; // Let Laravel handle standard validation errors
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Hero Image Upload Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return back()->with('error', 'Upload failed: ' . $e->getMessage());
