@@ -39,6 +39,12 @@ class DashboardController extends Controller
                 ->where('user_id', $user->id)
                 ->where('status', \App\Enums\CommissionStatus::Completed->value)
                 ->sum('amount'),
+            'total_transfer' => (string) WalletTransaction::query()
+                ->where('user_id', $user->id)
+                ->where('type', \App\Enums\WalletTransactionType::Adjustment->value)
+                ->where('direction', 'debit')
+                ->where('description', 'like', 'Transfer to %')
+                ->sum('amount'),
             'total_withdrawn' => (string) DB::table('withdrawals')
                 ->where('user_id', $user->id)
                 ->where('status', 'completed')
