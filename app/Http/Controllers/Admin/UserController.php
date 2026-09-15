@@ -58,6 +58,7 @@ class UserController extends Controller
             'member' => [
                 'id' => $user->id,
                 'name' => $user->name,
+                'username' => $user->username,
                 'email' => $user->email,
                 'status' => $user->status->value,
                 'is_admin' => $user->is_admin,

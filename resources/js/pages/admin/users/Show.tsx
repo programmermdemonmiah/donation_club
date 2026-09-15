@@ -11,6 +11,7 @@ import { formatDateTime, formatMoney, formatSequence, statusColor } from '@/util
 interface MemberDetail {
     id: number;
     name: string;
+    username: string;
     email: string;
     status: string;
     is_admin: boolean;
@@ -81,7 +82,7 @@ export default function AdminUserShow() {
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-xl font-bold text-gray-900">{member.name}</h1>
+                    <h1 className="text-xl font-bold text-gray-900">@{member.username}</h1>
                     <p className="text-sm text-gray-500">
                         {member.email} · <span className="font-mono">{member.referral_code}</span> · joined{' '}
                         {new Date(member.joined_at).toLocaleDateString()}
