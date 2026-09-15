@@ -112,12 +112,12 @@ export default function PublicDeposits() {
 
                     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-200/50">
                         {/* Table Header */}
-                        <div className="hidden grid-cols-[120px_1fr_140px_140px_110px] items-center border-b border-gray-100 bg-gradient-to-r from-blue-50 to-emerald-50/40 px-6 py-4 sm:grid">
+                        <div className="hidden grid-cols-5 items-center border-b border-gray-100 bg-gradient-to-r from-blue-50 to-emerald-50/40 px-6 py-4 sm:grid gap-4">
                             <span className="text-xs font-black uppercase tracking-widest text-blue-600">Sequence</span>
-                            <span className="text-xs font-black uppercase tracking-widest text-emerald-700">Donor</span>
-                            <span className="text-xs font-black uppercase tracking-widest text-gray-600">Donation</span>
-                            <span className="text-xs font-black uppercase tracking-widest text-gray-500">Date</span>
-                            <span className="text-right text-xs font-black uppercase tracking-widest text-gray-500">Status</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-emerald-700 text-center">Donor</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-gray-600 text-center">Donation</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-gray-500 text-center">Date</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-gray-500 text-center">Status</span>
                         </div>
                         <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-blue-50 to-emerald-50/40 px-6 py-4 sm:hidden">
                             <span className="text-xs font-black uppercase tracking-widest text-blue-600">Donations List</span>
@@ -149,7 +149,7 @@ export default function PublicDeposits() {
                             {data.map((deposit) => (
                                 <div
                                     key={deposit.sequence_number}
-                                    className="grid grid-cols-1 gap-3 px-6 py-4 transition-colors hover:bg-blue-50/30 sm:grid-cols-[120px_1fr_140px_140px_110px] sm:items-center sm:gap-0"
+                                    className="grid grid-cols-1 gap-3 px-6 py-4 transition-colors hover:bg-blue-50/30 sm:grid-cols-5 sm:items-center sm:gap-4"
                                 >
                                     {/* Sequence */}
                                     <div className="flex items-center gap-3 sm:gap-0">
@@ -159,7 +159,7 @@ export default function PublicDeposits() {
                                     </div>
 
                                     {/* Donor */}
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 sm:justify-center">
                                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-xs font-black text-white shadow-sm ring-1 ring-white">
                                             {deposit.donor_initial}
                                         </span>
@@ -170,7 +170,7 @@ export default function PublicDeposits() {
                                     </div>
 
                                     {/* Amount */}
-                                    <div className="flex items-center justify-between sm:block">
+                                    <div className="flex items-center justify-between sm:block sm:text-center">
                                         <span className="text-xs font-semibold text-gray-400 sm:hidden">Donation Amount</span>
                                         <span className="text-base font-black tabular-nums text-emerald-600">
                                             ${Number(deposit.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -178,13 +178,13 @@ export default function PublicDeposits() {
                                     </div>
 
                                     {/* Date */}
-                                    <div className="flex items-center justify-between sm:block">
+                                    <div className="flex items-center justify-between sm:block sm:text-center">
                                         <span className="text-xs font-semibold text-gray-400 sm:hidden">Date</span>
                                         <span className="text-sm font-medium text-gray-600">{formatDate(deposit.completed_at)}</span>
                                     </div>
 
                                     {/* Status */}
-                                    <div className="flex justify-between sm:justify-end">
+                                    <div className="flex justify-between sm:justify-center">
                                         <span className="text-xs font-semibold text-gray-400 sm:hidden">Status</span>
                                         <span className="inline-flex h-fit items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200/60">
                                             ● Donated
