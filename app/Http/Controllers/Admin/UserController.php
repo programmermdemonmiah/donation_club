@@ -18,8 +18,10 @@ class UserController extends Controller
             ->when($request->input('search'), function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('referral_code', 'like', "%{$search}%");
+                        ->orWhere('referral_code', 'like', "%{$search}%")
+                        ->orWhereHas('profile', fn($p) => $p->where('phone', 'like', "%{$search}%"));
                 });
             })
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->input('status')))

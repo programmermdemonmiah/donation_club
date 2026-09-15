@@ -3,6 +3,7 @@ import Table from '@/components/ui/Table';
 import Badge from '@/components/ui/Badge';
 import Pagination from '@/components/ui/Pagination';
 import { Input, Select } from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
 import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type { PageProps } from '@/types';
@@ -28,6 +29,12 @@ export default function AdminUsers() {
     const applyFilter = (status: string) => {
         router.get(route('admin.users.index'), { search, status: status || undefined }, { preserveState: true });
     };
+    const clearFilter = () => {
+        setSearch('');
+        router.get(route('admin.users.index'));
+    };
+
+    const hasFilter = search !== '' || (page.props.filters?.status ?? '') !== '';
 
     return (
         <AdminLayout>
@@ -36,12 +43,15 @@ export default function AdminUsers() {
             <div className="mt-4 flex flex-wrap items-end gap-3">
                 <div className="w-64">
                     <Input
-                        placeholder="Search name / email / code…"
+                        placeholder="Search name, username, email, phone, code…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && applyFilter('')}
+                        onKeyDown={(e) => e.key === 'Enter' && applyFilter(page.props.filters?.status ?? '')}
                     />
                 </div>
+                <Button onClick={() => applyFilter(page.props.filters?.status ?? '')}>
+                    Search
+                </Button>
                 <div className="w-40">
                     <Select value={page.props.filters?.status ?? ''} onChange={(e) => applyFilter(e.target.value)}>
                         <option value="">All statuses</option>
@@ -49,6 +59,11 @@ export default function AdminUsers() {
                         <option value="blocked">Blocked</option>
                     </Select>
                 </div>
+                {hasFilter && (
+                    <Button variant="outline" onClick={clearFilter}>
+                        Clear
+                    </Button>
+                )}
             </div>
 
             <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
