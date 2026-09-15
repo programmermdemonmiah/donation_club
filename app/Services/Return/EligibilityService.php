@@ -85,8 +85,8 @@ class EligibilityService
 
             if ((int) $lastSequence < $details['sequence_requirement']) {
                 $failed['sequence'] = [
-                    'required' => sprintf('#%06d', $details['sequence_requirement']),
-                    'actual' => sprintf('#%06d', (int) $lastSequence),
+                    'required' => sprintf('#%011d', $details['sequence_requirement']),
+                    'actual' => sprintf('#%011d', (int) $lastSequence),
                 ];
             }
         }

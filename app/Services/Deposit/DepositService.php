@@ -116,7 +116,7 @@ class DepositService
 
             AuditLogService::log('deposit.completed_from_wallet', $deposit, [], [
                 'status' => DepositStatus::Completed->value,
-                'sequence' => sprintf('#%06d', $sequenceNumber),
+                'sequence' => sprintf('#%011d', $sequenceNumber),
                 'amount' => Money::parse((string) $deposit->amount),
             ]);
 
@@ -167,7 +167,7 @@ class DepositService
 
             AuditLogService::log('deposit.completed', $deposit, ['status' => DepositStatus::Pending->value], [
                 'status' => DepositStatus::Completed->value,
-                'sequence' => sprintf('#%06d', $sequenceNumber),
+                'sequence' => sprintf('#%011d', $sequenceNumber),
                 'amount' => Money::parse((string) $deposit->amount),
             ]);
 

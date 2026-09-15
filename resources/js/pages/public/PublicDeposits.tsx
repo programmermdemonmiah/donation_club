@@ -112,7 +112,7 @@ export default function PublicDeposits() {
 
                     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-200/50">
                         {/* Table Header */}
-                        <div className="hidden grid-cols-[90px_1fr_140px_140px_110px] items-center border-b border-gray-100 bg-gradient-to-r from-blue-50 to-emerald-50/40 px-6 py-4 sm:grid">
+                        <div className="hidden grid-cols-[120px_1fr_140px_140px_110px] items-center border-b border-gray-100 bg-gradient-to-r from-blue-50 to-emerald-50/40 px-6 py-4 sm:grid">
                             <span className="text-xs font-black uppercase tracking-widest text-blue-600">Sequence</span>
                             <span className="text-xs font-black uppercase tracking-widest text-emerald-700">Donor</span>
                             <span className="text-xs font-black uppercase tracking-widest text-gray-600">Donation</span>
@@ -149,7 +149,7 @@ export default function PublicDeposits() {
                             {data.map((deposit) => (
                                 <div
                                     key={deposit.sequence_number}
-                                    className="grid grid-cols-1 gap-3 px-6 py-4 transition-colors hover:bg-blue-50/30 sm:grid-cols-[90px_1fr_140px_140px_110px] sm:items-center sm:gap-0"
+                                    className="grid grid-cols-1 gap-3 px-6 py-4 transition-colors hover:bg-blue-50/30 sm:grid-cols-[120px_1fr_140px_140px_110px] sm:items-center sm:gap-0"
                                 >
                                     {/* Sequence */}
                                     <div className="flex items-center gap-3 sm:gap-0">

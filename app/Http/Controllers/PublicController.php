@@ -96,7 +96,7 @@ class PublicController extends Controller
         return Inertia::render('public/PublicDeposits', [
             'deposits' => $sequences->through(fn ($row) => [
                 'sequence_number' => $row->sequence_number,
-                'formatted' => sprintf('#%06d', $row->sequence_number),
+                'formatted' => sprintf('#%011d', $row->sequence_number),
                 'amount' => (string) $row->amount,
                 'completed_at' => optional($row->completed_at)?->toIso8601String(),
                 'donor_name' => (string) $row->donor_name,

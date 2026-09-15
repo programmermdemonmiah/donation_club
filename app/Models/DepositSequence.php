@@ -29,6 +29,6 @@ class DepositSequence extends Model
 
     public function formatted(): string
     {
-        return sprintf('#%06d', $this->sequence_number);
+        return sprintf('#%011d', $this->sequence_number);
     }
 }

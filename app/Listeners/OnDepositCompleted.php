@@ -32,7 +32,7 @@ class OnDepositCompleted
         // 3) Member notification
         $event->deposit->user->notify(new DepositSuccessful([
             'message' => sprintf(
-                'Your deposit of %s was confirmed. Sequence number: #%06d.',
+                'Your deposit of %s was confirmed. Sequence number: #%011d.',
                 $event->deposit->amount,
                 $event->deposit->sequence->sequence_number ?? 0,
             ),
