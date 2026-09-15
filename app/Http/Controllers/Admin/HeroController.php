@@ -54,28 +54,33 @@ class HeroController extends Controller
             'image' => ['required', 'image', 'max:5120'], // Max 5MB
         ]);
 
-        $file = $request->file('image');
-        $filename = 'hero_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        
-        $destinationPath = public_path('assets/images/hero');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
+        try {
+            $file = $request->file('image');
+            $filename = 'hero_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            $destinationPath = public_path('assets/images/hero');
+            if (!file_exists($destinationPath)) {
+                @mkdir($destinationPath, 0755, true);
+            }
+            $file->move($destinationPath, $filename);
+
+            $path = '/assets/images/hero/' . $filename;
+
+            // SettingsService will return array if type is Json, but fallback defaults to string '[]'
+            $rawImages = $this->settings->get('hero.images', '[]');
+            $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
+            
+            $images[] = $path;
+
+            $this->settings->set('hero.images', $images, \App\Enums\SettingType::Json, 'business');
+
+            AuditLogService::log('hero.image_uploaded', null, [], ['path' => $path], $request->user()->id);
+
+            return back()->with('success', 'Image uploaded successfully.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Hero Image Upload Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Upload failed: ' . $e->getMessage());
         }
-        $file->move($destinationPath, $filename);
-
-        $path = '/assets/images/hero/' . $filename;
-
-        // SettingsService will return array if type is Json, but fallback defaults to string '[]'
-        $rawImages = $this->settings->get('hero.images', '[]');
-        $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
-        
-        $images[] = $path;
-
-        $this->settings->set('hero.images', $images, \App\Enums\SettingType::Json, 'business');
-
-        AuditLogService::log('hero.image_uploaded', null, [], ['path' => $path], $request->user()->id);
-
-        return back()->with('success', 'Image uploaded successfully.');
     }
 
     public function deleteImage(Request $request)
@@ -84,25 +89,30 @@ class HeroController extends Controller
             'index' => ['required', 'integer', 'min:0'],
         ]);
 
-        $index = $request->input('index');
-        
-        $rawImages = $this->settings->get('hero.images', '[]');
-        $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
+        try {
+            $index = $request->input('index');
+            
+            $rawImages = $this->settings->get('hero.images', '[]');
+            $images = is_string($rawImages) ? (json_decode($rawImages, true) ?? []) : (is_array($rawImages) ? $rawImages : []);
 
-        if (isset($images[$index])) {
-            $path = $images[$index];
-            $fullPath = public_path(ltrim($path, '/'));
+            if (isset($images[$index])) {
+                $path = $images[$index];
+                $fullPath = public_path(ltrim($path, '/'));
 
-            if (file_exists($fullPath)) {
-                @unlink($fullPath);
+                if (file_exists($fullPath)) {
+                    @unlink($fullPath);
+                }
+
+                array_splice($images, $index, 1);
+                $this->settings->set('hero.images', $images, \App\Enums\SettingType::Json, 'business');
+
+                AuditLogService::log('hero.image_deleted', null, ['path' => $path], [], $request->user()->id);
             }
 
-            array_splice($images, $index, 1);
-            $this->settings->set('hero.images', $images, \App\Enums\SettingType::Json, 'business');
-
-            AuditLogService::log('hero.image_deleted', null, ['path' => $path], [], $request->user()->id);
+            return back()->with('success', 'Image deleted successfully.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Hero Image Delete Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Delete failed: ' . $e->getMessage());
         }
-
-        return back()->with('success', 'Image deleted successfully.');
     }
 }
