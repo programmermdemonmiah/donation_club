@@ -9,7 +9,8 @@ import type { PageProps } from '@/types';
 interface HeroProps {
     title: string;
     description: string;
-    images: string[];
+    media: Array<{ url: string; type: string }>;
+    limits?: { photo_mb: number; video_mb: number };
 }
 
 export default function HeroEdit() {
@@ -33,7 +34,7 @@ export default function HeroEdit() {
 
         setUploading(true);
         const fd = new FormData();
-        fd.append('image', file);
+        fd.append('media', file);
 
         router.post(route('admin.hero.images.store'), fd, {
             preserveScroll: true,
@@ -45,7 +46,7 @@ export default function HeroEdit() {
     };
 
     const deleteImage = (index: number) => {
-        if (!confirm('Are you sure you want to delete this hero image?')) return;
+        if (!confirm('Remove this from the gallery?')) return;
         
         router.delete(route('admin.hero.images.destroy'), {
             data: { index },
@@ -59,7 +60,7 @@ export default function HeroEdit() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Homepage Hero Section</h1>
                     <p className="mt-1 text-sm text-gray-500">
-                        Manage the main title, description, and background images of your public homepage.
+                        Manage the homepage title and description. Photos and videos uploaded here appear on the public Gallery page.
                     </p>
                 </div>
             </div>
@@ -97,7 +98,7 @@ export default function HeroEdit() {
 
                 {/* Images Gallery */}
                 <Card>
-                    <CardHeader title="Background Images" subtitle="Upload high-quality images for the hero slider" />
+                    <CardHeader title="Gallery" subtitle="Photos and videos shown when someone opens Gallery in the site header. These are not used as the homepage background." />
                     <CardBody>
                         {/* Uploader */}
                         <div className="mb-6 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-6 text-center">
@@ -105,7 +106,7 @@ export default function HeroEdit() {
                                 type="file" 
                                 ref={fileInputRef}
                                 onChange={handleFileUpload}
-                                accept="image/*"
+                                accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.jpg,.jpeg,.png,.webp,.mp4,.webm,.mov"
                                 className="hidden"
                                 id="hero-image-upload"
                                 disabled={uploading}
@@ -114,24 +115,33 @@ export default function HeroEdit() {
                                 htmlFor="hero-image-upload"
                                 className={`cursor-pointer inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                                {uploading ? 'Uploading...' : 'Browse Image...'}
+                                {uploading ? 'Uploading...' : 'Upload photo or video'}
                             </label>
-                            <p className="mt-2 text-xs text-gray-500">Supported: JPG, PNG, WebP (Max 5MB). Recommended size: 1920x1080px.</p>
-                            {errors.image && <p className="mt-2 text-xs font-semibold text-red-600">{errors.image}</p>}
+                            <p className="mt-2 text-xs text-gray-500">
+                                Photos: JPG, PNG, WebP (max {hero.limits?.photo_mb ?? 10}MB). Videos: MP4, WebM, MOV (max {hero.limits?.video_mb ?? 10}MB).
+                            </p>
+                            {errors.media && <p className="mt-2 text-xs font-semibold text-red-600">{errors.media}</p>}
                         </div>
 
                         {/* Gallery */}
-                        {hero.images.length > 0 ? (
+                        {hero.media.length > 0 ? (
                             <div className="grid grid-cols-2 gap-4">
-                                {hero.images.map((img, idx) => (
-                                    <div key={idx} className="group relative aspect-video overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-                                        <img src={img} alt={`Hero ${idx + 1}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                {hero.media.map((item, idx) => (
+                                    <div key={`${item.url}-${idx}`} className="group relative aspect-video overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                                        {item.type === 'video' ? (
+                                            <video src={item.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                                        ) : (
+                                            <img src={item.url} alt={`Gallery item ${idx + 1}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        )}
+                                        <span className="absolute left-2 top-2 rounded-md bg-gray-900/75 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                                            {item.type === 'video' ? 'Video' : 'Photo'}
+                                        </span>
                                         <div className="absolute inset-0 flex items-center justify-center bg-gray-900/40 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
                                             <button 
                                                 onClick={() => deleteImage(idx)}
                                                 className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-red-500"
                                             >
-                                                Delete Image
+                                                Remove
                                             </button>
                                         </div>
                                     </div>
@@ -139,7 +149,7 @@ export default function HeroEdit() {
                             </div>
                         ) : (
                             <div className="flex h-32 items-center justify-center rounded-xl border border-gray-100 bg-gray-50">
-                                <p className="text-sm text-gray-400">No images uploaded yet.</p>
+                                <p className="text-sm text-gray-400">No photos or videos yet.</p>
                             </div>
                         )}
                     </CardBody>

@@ -10,6 +10,8 @@ use App\Models\MemberReturn;
 use App\Models\ReturnRule;
 use App\Models\User;
 use App\Services\Settings\SettingsService;
+use App\Support\GalleryMedia;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -74,6 +76,13 @@ class PublicController extends Controller
         ]);
     }
 
+    public function gallery(): Response
+    {
+        return Inertia::render('public/Gallery', [
+            'media' => GalleryMedia::fromStored($this->settings->get('hero.images', '[]')),
+        ]);
+    }
+
     public function deposits(Request $request): Response
     {
         $search = $request->input('search');
@@ -85,7 +94,7 @@ class PublicController extends Controller
             ->where('deposits.status', 'completed')
             ->where(function ($query) {
                 $query->whereNull('returns.status')
-                      ->orWhere('returns.status', '!=', 'completed');
+                    ->orWhere('returns.status', '!=', 'completed');
             })
             ->when($search, fn ($q) => $q->where('users.username', 'like', '%'.$search.'%'))
             ->orderByDesc('deposit_sequences.sequence_number')
@@ -98,7 +107,7 @@ class PublicController extends Controller
                 'sequence_number' => $row->sequence_number,
                 'formatted' => sprintf('#%011d', $row->sequence_number),
                 'amount' => (string) $row->amount,
-                'completed_at' => $row->completed_at ? \Carbon\Carbon::parse($row->completed_at)->toIso8601String() : null,
+                'completed_at' => $row->completed_at ? Carbon::parse($row->completed_at)->toIso8601String() : null,
                 'donor_name' => (string) $row->donor_name,
                 'donor_initial' => strtoupper(mb_substr((string) $row->donor_name, 0, 1)),
             ]),

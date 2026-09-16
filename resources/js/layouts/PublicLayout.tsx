@@ -19,6 +19,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
     const nav = [
         { href: route('public.deposits'), label: 'Donors', name: 'public.deposits' },
         { href: route('pages.about'), label: 'About', name: 'pages.about' },
+        { href: route('pages.gallery'), label: 'Gallery', name: 'pages.gallery' },
         { href: route('pages.how-it-works'), label: 'How It Works', name: 'pages.how-it-works' },
         { href: route('pages.faq'), label: 'FAQ', name: 'pages.faq' },
         { href: route('pages.risk-disclosure'), label: 'Risk Disclosure', name: 'pages.risk-disclosure' },
@@ -103,7 +104,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                 <Link
                                     key={item.label}
                                     href={item.href}
-                                    className={`relative rounded-lg px-4 py-2.5 text-sm font-bold transition-all duration-200 ${
+                                    className={`relative whitespace-nowrap rounded-lg px-2.5 py-2.5 text-sm font-bold transition-all duration-200 xl:px-4 ${
                                         active
                                             ? 'bg-[#0f4d2a] text-white shadow-sm'
                                             : 'text-gray-600 hover:bg-[#0f4d2a]/5 hover:text-[#0f4d2a]'
@@ -233,6 +234,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                                     { href: route('public.deposits'), label: 'Public Ledger' },
                                     { href: route('pages.how-it-works'), label: 'How It Works' },
                                     { href: route('pages.about'), label: 'About Us' },
+                                    { href: route('pages.gallery'), label: 'Gallery' },
                                     { href: route('pages.faq'), label: 'FAQs' },
                                     { href: route('pages.contact'), label: 'Contact' },
                                 ].map((item) => (

@@ -43,6 +43,7 @@ Route::get('/storage-link', function () {
 */
 Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/ledger', [PublicController::class, 'deposits'])->name('public.deposits');
+Route::get('/gallery', [PublicController::class, 'gallery'])->name('pages.gallery');
 
 foreach (['about', 'how-it-works', 'faq', 'contact', 'terms', 'privacy', 'risk-disclosure'] as $page) {
     Route::get('/'.$page, [PublicController::class, 'page'])->defaults('slug', $page)->name('pages.'.$page);
