@@ -56,21 +56,38 @@ class RankService
         $ranks = Rank::query()->where('active', true)->with('requirements')->orderBy('level')->get();
 
         $target = null;
+        $baselines = [];
 
         foreach ($ranks as $rank) {
-            if ($this->satisfies($rank, $metrics)) {
-                $target = $rank; // keep the highest satisfied
+            if ($this->satisfies($rank, $metrics, $baselines)) {
+                $target = $rank;
+            }
+
+            foreach ($rank->requirements as $requirement) {
+                $baselines[$requirement->key] = Money::add(
+                    $baselines[$requirement->key] ?? '0.00',
+                    (string) $requirement->value,
+                );
             }
         }
 
         return $target;
     }
 
-    private function satisfies(Rank $rank, array $metrics): bool
+    /**
+     * @param  array<string, string>  $baselines
+     */
+    private function satisfies(Rank $rank, array $metrics, array $baselines): bool
     {
         foreach ($rank->requirements as $requirement) {
             /** @var RankRequirement $requirement */
-            if (! Money::gte(self::metricAmount($requirement->key, $metrics), (string) $requirement->value)) {
+            $progress = self::cycleProgress(
+                self::metricAmount($requirement->key, $metrics),
+                (string) $requirement->value,
+                $baselines[$requirement->key] ?? '0.00',
+            );
+
+            if (! $progress['met']) {
                 return false;
             }
         }
@@ -101,9 +118,9 @@ class RankService
     /**
      * Progress inside one rank cycle.
      *
-     * The previous rank's threshold is the baseline, so the next rank starts at 0.
-     * Amount already above that baseline is carried into this rank. A rank is met
-     * only when the lifetime total reaches this rank's own threshold.
+     * The required amount is exactly the value saved in admin. The previous ranks'
+     * targets are only the starting line, so this rank always fills from 0 up to
+     * that saved amount.
      *
      * @return array{actual: string, required: string, met: bool}
      */
@@ -117,29 +134,26 @@ class RankService
             $baseline = '0.00';
         }
 
-        if (! Money::gt($requirement, $baseline)) {
-            return [
-                'actual' => $lifetime,
-                'required' => $requirement,
-                'met' => Money::gte($lifetime, $requirement),
-            ];
+        if (Money::lt($requirement, '0')) {
+            $requirement = '0.00';
         }
 
-        $cycleRequired = Money::sub($requirement, $baseline);
         $cycleActual = Money::sub($lifetime, $baseline);
 
         if (Money::lt($cycleActual, '0')) {
             $cycleActual = '0.00';
         }
 
-        if (Money::gt($cycleActual, $cycleRequired)) {
-            $cycleActual = $cycleRequired;
+        $met = Money::gte($cycleActual, $requirement);
+
+        if (Money::gt($cycleActual, $requirement)) {
+            $cycleActual = $requirement;
         }
 
         return [
             'actual' => $cycleActual,
-            'required' => $cycleRequired,
-            'met' => Money::gte($lifetime, $requirement),
+            'required' => $requirement,
+            'met' => $met,
         ];
     }
 

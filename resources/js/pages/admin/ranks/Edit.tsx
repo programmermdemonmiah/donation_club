@@ -48,10 +48,12 @@ export default function AdminRankEdit() {
         fd.append('monthly_salary', (document.getElementById('rank-salary') as HTMLInputElement).value);
         fd.append('_method', 'PUT');
 
+        let requirementIndex = 0;
         requirements.forEach((req) => {
             if (req.key && req.value !== '') {
-                fd.append('requirements[][key]', req.key);
-                fd.append('requirements[][value]', req.value);
+                fd.append(`requirements[${requirementIndex}][key]`, req.key);
+                fd.append(`requirements[${requirementIndex}][value]`, req.value);
+                requirementIndex += 1;
             }
         });
 

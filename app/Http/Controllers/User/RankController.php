@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Rank;
 use App\Services\Rank\RankService;
+use App\Support\Money;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,7 +32,10 @@ class RankController extends Controller
             });
 
             foreach ($rank->requirements as $requirement) {
-                $baselines[$requirement->key] = (string) $requirement->value;
+                $baselines[$requirement->key] = Money::add(
+                    $baselines[$requirement->key] ?? '0.00',
+                    (string) $requirement->value,
+                );
             }
 
             $ladder[] = [

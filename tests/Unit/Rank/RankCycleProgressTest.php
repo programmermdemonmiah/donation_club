@@ -15,7 +15,7 @@ class RankCycleProgressTest extends TestCase
         $this->assertSame('100.00', $bronze['actual']);
         $this->assertTrue($bronze['met']);
         $this->assertSame('50.00', $silver['actual']);
-        $this->assertSame('400.00', $silver['required']);
+        $this->assertSame('500.00', $silver['required']);
         $this->assertFalse($silver['met']);
     }
 
@@ -27,16 +27,20 @@ class RankCycleProgressTest extends TestCase
         $this->assertSame('50.00', $bronze['actual']);
         $this->assertFalse($bronze['met']);
         $this->assertSame('0.00', $silver['actual']);
+        $this->assertSame('500.00', $silver['required']);
         $this->assertFalse($silver['met']);
     }
 
     public function test_next_rank_is_reached_only_when_the_lifetime_total_hits_its_threshold(): void
     {
-        $almost = RankService::cycleProgress('499.00', '500.00', '100.00');
-        $reached = RankService::cycleProgress('500.00', '500.00', '100.00');
+        $almost = RankService::cycleProgress('599.00', '500.00', '100.00');
+        $reached = RankService::cycleProgress('600.00', '500.00', '100.00');
 
+        $this->assertSame('499.00', $almost['actual']);
+        $this->assertSame('500.00', $almost['required']);
         $this->assertFalse($almost['met']);
-        $this->assertSame('400.00', $reached['actual']);
+        $this->assertSame('500.00', $reached['actual']);
+        $this->assertSame('500.00', $reached['required']);
         $this->assertTrue($reached['met']);
     }
 }
