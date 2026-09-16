@@ -5,6 +5,7 @@ namespace App\Services\Referral;
 use App\Models\ReferralRelationship;
 use App\Models\User;
 use App\Services\Settings\SettingsService;
+use App\Support\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -212,6 +213,42 @@ class ReferralService
             ->sum('amount');
 
         return (string) $total;
+    }
+
+    /**
+     * Completed donation total of one direct-referral hand and that hand's whole team.
+     *
+     * Hand 1 is the earliest direct referral, hand 2 the next, and hand 3 the one after that.
+     * The total is that member's own completed deposits plus every completed deposit
+     * in their downline, at any depth. Other hands are never included.
+     */
+    public static function handVolume(User $user, int $hand): string
+    {
+        if ($hand < 1) {
+            return '0.00';
+        }
+
+        $referral = self::directReferrals($user)
+            ->orderBy('id')
+            ->skip($hand - 1)
+            ->first();
+
+        if (! $referral) {
+            return '0.00';
+        }
+
+        $ids = self::downlineQuery($referral)
+            ->pluck('user_id')
+            ->push($referral->id)
+            ->unique()
+            ->values();
+
+        $total = DB::table('deposits')
+            ->whereIn('user_id', $ids)
+            ->where('status', 'completed')
+            ->sum('amount');
+
+        return Money::parse($total ?? '0');
     }
 
     /**

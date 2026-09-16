@@ -35,9 +35,9 @@ class RankService
             'team_volume' => ReferralService::teamVolume($user),
             'qualified_members' => count(ReferralService::qualifiedMemberIds($user, $qualifiedMin)),
             'own_total_deposit' => (string) $user->deposits()->completed()->sum('amount'),
-            'gen1_volume' => ReferralService::generationVolume($user, 1),
-            'gen2_volume' => ReferralService::generationVolume($user, 2),
-            'gen3_volume' => ReferralService::generationVolume($user, 3),
+            'gen1_volume' => ReferralService::handVolume($user, 1),
+            'gen2_volume' => ReferralService::handVolume($user, 2),
+            'gen3_volume' => ReferralService::handVolume($user, 3),
         ];
     }
 
@@ -70,24 +70,98 @@ class RankService
     {
         foreach ($rank->requirements as $requirement) {
             /** @var RankRequirement $requirement */
-            $actual = match ($requirement->key) {
-                RankRequirement::DIRECT_REFERRALS => $metrics['direct_referrals'],
-                RankRequirement::TEAM_SIZE => $metrics['team_size'],
-                RankRequirement::TEAM_VOLUME => $metrics['team_volume'],
-                RankRequirement::QUALIFIED_MEMBERS => $metrics['qualified_members'],
-                RankRequirement::MIN_DEPOSIT => $metrics['own_total_deposit'],
-                RankRequirement::GEN1_VOLUME => $metrics['gen1_volume'] ?? '0',
-                RankRequirement::GEN2_VOLUME => $metrics['gen2_volume'] ?? '0',
-                RankRequirement::GEN3_VOLUME => $metrics['gen3_volume'] ?? '0',
-                default => 0,
-            };
-
-            if (! Money::gte((string) $actual, (string) $requirement->value)) {
+            if (! Money::gte(self::metricAmount($requirement->key, $metrics), (string) $requirement->value)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Lifetime amount used for a requirement. Rank awards still use this total.
+     */
+    public static function metricAmount(string $key, array $metrics): string
+    {
+        $actual = match ($key) {
+            RankRequirement::DIRECT_REFERRALS => $metrics['direct_referrals'] ?? 0,
+            RankRequirement::TEAM_SIZE => $metrics['team_size'] ?? 0,
+            RankRequirement::TEAM_VOLUME => $metrics['team_volume'] ?? 0,
+            RankRequirement::QUALIFIED_MEMBERS => $metrics['qualified_members'] ?? 0,
+            RankRequirement::MIN_DEPOSIT => $metrics['own_total_deposit'] ?? 0,
+            RankRequirement::GEN1_VOLUME => $metrics['gen1_volume'] ?? 0,
+            RankRequirement::GEN2_VOLUME => $metrics['gen2_volume'] ?? 0,
+            RankRequirement::GEN3_VOLUME => $metrics['gen3_volume'] ?? 0,
+            default => 0,
+        };
+
+        return Money::parse((string) $actual);
+    }
+
+    /**
+     * Progress inside one rank cycle.
+     *
+     * The previous rank's threshold is the baseline, so the next rank starts at 0.
+     * Amount already above that baseline is carried into this rank. A rank is met
+     * only when the lifetime total reaches this rank's own threshold.
+     *
+     * @return array{actual: string, required: string, met: bool}
+     */
+    public static function cycleProgress(string $lifetime, string $requirement, string $baseline): array
+    {
+        $lifetime = Money::parse($lifetime);
+        $requirement = Money::parse($requirement);
+        $baseline = Money::parse($baseline);
+
+        if (Money::lt($baseline, '0')) {
+            $baseline = '0.00';
+        }
+
+        if (! Money::gt($requirement, $baseline)) {
+            return [
+                'actual' => $lifetime,
+                'required' => $requirement,
+                'met' => Money::gte($lifetime, $requirement),
+            ];
+        }
+
+        $cycleRequired = Money::sub($requirement, $baseline);
+        $cycleActual = Money::sub($lifetime, $baseline);
+
+        if (Money::lt($cycleActual, '0')) {
+            $cycleActual = '0.00';
+        }
+
+        if (Money::gt($cycleActual, $cycleRequired)) {
+            $cycleActual = $cycleRequired;
+        }
+
+        return [
+            'actual' => $cycleActual,
+            'required' => $cycleRequired,
+            'met' => Money::gte($lifetime, $requirement),
+        ];
+    }
+
+    /**
+     * @param  array<string, string|int|float>  $metrics
+     * @return array{key: string, label: string, value: string, actual: string, met: bool}
+     */
+    public function presentRequirement(RankRequirement $requirement, array $metrics, string $baseline): array
+    {
+        $progress = self::cycleProgress(
+            self::metricAmount($requirement->key, $metrics),
+            (string) $requirement->value,
+            $baseline,
+        );
+
+        return [
+            'key' => $requirement->key,
+            'label' => $requirement->keyLabel(),
+            'value' => $progress['required'],
+            'actual' => $progress['actual'],
+            'met' => $progress['met'],
+        ];
     }
 
     /**

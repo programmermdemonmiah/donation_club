@@ -20,6 +20,9 @@ export default function Rank() {
             <div className="mb-8">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Achievement</p>
                 <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">Rank Progress</h1>
+                <p className="mt-2 max-w-2xl text-sm font-medium text-gray-500">
+                    A rank opens only when all three hands are full. Anything above a filled hand counts toward the next rank, starting from zero.
+                </p>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-4">

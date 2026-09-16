@@ -11,9 +11,7 @@ use Inertia\Response;
 
 class RankController extends Controller
 {
-    public function __construct(private readonly RankService $ranks)
-    {
-    }
+    public function __construct(private readonly RankService $ranks) {}
 
     public function index(): Response
     {
@@ -22,45 +20,29 @@ class RankController extends Controller
         $metrics = $this->ranks->metrics($user);
         $current = $this->ranks->currentRank($user);
 
-        $ladder = Rank::query()
-            ->where('active', true)
-            ->with('requirements')
-            ->orderBy('level')
-            ->get()
-            ->map(fn (Rank $rank) => [
+        $baselines = [];
+        $ladder = [];
+
+        foreach (Rank::query()->where('active', true)->with('requirements')->orderBy('level')->get() as $rank) {
+            $requirements = $rank->requirements->map(function ($requirement) use ($metrics, $baselines) {
+                $baseline = $baselines[$requirement->key] ?? '0.00';
+
+                return $this->ranks->presentRequirement($requirement, $metrics, $baseline);
+            });
+
+            foreach ($rank->requirements as $requirement) {
+                $baselines[$requirement->key] = (string) $requirement->value;
+            }
+
+            $ladder[] = [
                 'id' => $rank->id,
                 'name' => $rank->name,
                 'level' => $rank->level,
                 'color' => $rank->color,
                 'is_current' => $current?->id === $rank->id,
-                'requirements' => $rank->requirements->map(fn ($req) => [
-                    'key' => $req->key,
-                    'label' => $req->keyLabel(),
-                    'value' => (string) $req->value,
-                    'actual' => (string) match ($req->key) {
-                        \App\Models\RankRequirement::DIRECT_REFERRALS => $metrics['direct_referrals'],
-                        \App\Models\RankRequirement::TEAM_SIZE => $metrics['team_size'],
-                        \App\Models\RankRequirement::TEAM_VOLUME => $metrics['team_volume'],
-                        \App\Models\RankRequirement::QUALIFIED_MEMBERS => $metrics['qualified_members'],
-                        \App\Models\RankRequirement::MIN_DEPOSIT => $metrics['own_total_deposit'],
-                        \App\Models\RankRequirement::GEN1_VOLUME => $metrics['gen1_volume'],
-                        \App\Models\RankRequirement::GEN2_VOLUME => $metrics['gen2_volume'],
-                        \App\Models\RankRequirement::GEN3_VOLUME => $metrics['gen3_volume'],
-                        default => 0,
-                    },
-                    'met' => bccomp((string) match ($req->key) {
-                        \App\Models\RankRequirement::DIRECT_REFERRALS => $metrics['direct_referrals'],
-                        \App\Models\RankRequirement::TEAM_SIZE => $metrics['team_size'],
-                        \App\Models\RankRequirement::TEAM_VOLUME => $metrics['team_volume'],
-                        \App\Models\RankRequirement::QUALIFIED_MEMBERS => $metrics['qualified_members'],
-                        \App\Models\RankRequirement::MIN_DEPOSIT => $metrics['own_total_deposit'],
-                        \App\Models\RankRequirement::GEN1_VOLUME => $metrics['gen1_volume'],
-                        \App\Models\RankRequirement::GEN2_VOLUME => $metrics['gen2_volume'],
-                        \App\Models\RankRequirement::GEN3_VOLUME => $metrics['gen3_volume'],
-                        default => 0,
-                    }, (string) $req->value, 2) >= 0,
-                ]),
-            ]);
+                'requirements' => $requirements,
+            ];
+        }
 
         return Inertia::render('rank/Index', [
             'currentRank' => $current ? ['name' => $current->name, 'color' => $current->color] : null,
