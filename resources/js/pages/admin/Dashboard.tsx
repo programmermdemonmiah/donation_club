@@ -9,6 +9,7 @@ import type { PageProps } from '@/types';
 interface Stats {
     users: { total: number; active: number; blocked: number };
     deposits: { total_amount: string; count: number; today_amount: string; pending_payments: number };
+    transfers: { total: string; users: number };
     returns: { total_payout: string; count: number; pending: number };
     commissions: { total: string; pending: number };
     withdrawals: { total: string; count: number; pending: number };
@@ -53,6 +54,7 @@ export default function AdminDashboard() {
             {/* Money */}
             <h2 className="mt-8 text-xs font-semibold uppercase tracking-wider text-gray-400">Financial</h2>
             <dl className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <StatCard label="Total Dollar Transfer" value={formatMoney(s.transfers.total)} sub={`${s.transfers.users} users completed`} />
                 <StatCard label="Total Deposits" value={formatMoney(s.deposits.total_amount)} sub={`${s.deposits.count} completed`} />
                 <StatCard label="Today's Deposits" value={formatMoney(s.deposits.today_amount)} accent="text-blue-600" />
                 <StatCard label="Pending Payments" value={s.deposits.pending_payments} accent="text-blue-600" />

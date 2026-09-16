@@ -2,24 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\WalletDirection;
+use App\Enums\WalletTransactionStatus;
+use App\Enums\WalletTransactionType;
 use App\Http\Controllers\Controller;
 use App\Models\Commission;
 use App\Models\Deposit;
-use App\Models\Fund;
 use App\Models\FundRequest;
 use App\Models\MemberReturn;
+use App\Models\Payment;
 use App\Models\User;
+use App\Models\WalletTransaction;
 use App\Models\Withdrawal;
 use App\Services\Settings\SettingsService;
+use App\Support\Money;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __construct(private readonly SettingsService $settings)
-    {
-    }
+    public function __construct(private readonly SettingsService $settings) {}
 
     public function index(): Response
     {
@@ -35,11 +38,21 @@ class DashboardController extends Controller
             ->first();
 
         $todayDeposits = (string) Deposit::query()->completed()->whereDate('completed_at', today())->sum('amount');
-        $pendingPayments = \App\Models\Payment::query()->whereIn('status', ['pending', 'processing'])->count();
+        $pendingPayments = Payment::query()->whereIn('status', ['pending', 'processing'])->count();
+
+        $transferAgg = WalletTransaction::query()
+            ->where('type', WalletTransactionType::Adjustment->value)
+            ->where('direction', WalletDirection::Credit->value)
+            ->where('status', WalletTransactionStatus::Completed->value)
+            ->where('description', 'like', 'Admin adjustment:%')
+            ->whereIn('user_id', User::query()->where('is_admin', false)->select('id'))
+            ->selectRaw('COALESCE(SUM(amount), 0) as total')
+            ->selectRaw('COUNT(DISTINCT user_id) as users')
+            ->first();
 
         $returnsAgg = MemberReturn::query()
             ->selectRaw("COALESCE(SUM(CASE WHEN status = 'completed' THEN payout_amount END),0) as total_completed")
-            ->selectRaw("COUNT(*) as total_count")
+            ->selectRaw('COUNT(*) as total_count')
             ->selectRaw("SUM(CASE WHEN status IN ('pending','eligible','approved','processing') THEN 1 ELSE 0 END) as pending_count")
             ->first();
 
@@ -50,7 +63,7 @@ class DashboardController extends Controller
 
         $withdrawalAgg = Withdrawal::query()
             ->selectRaw("COALESCE(SUM(CASE WHEN status = 'completed' THEN amount END),0) as total")
-            ->selectRaw("COUNT(*) as total_count")
+            ->selectRaw('COUNT(*) as total_count')
             ->selectRaw("SUM(CASE WHEN status IN ('pending','approved','processing') THEN 1 ELSE 0 END) as pending_count")
             ->first();
 
@@ -74,6 +87,10 @@ class DashboardController extends Controller
                     'count' => (int) ($depositAgg->count ?? 0),
                     'today_amount' => $todayDeposits,
                     'pending_payments' => $pendingPayments,
+                ],
+                'transfers' => [
+                    'total' => Money::parse($transferAgg->total ?? '0'),
+                    'users' => (int) ($transferAgg->users ?? 0),
                 ],
                 'returns' => [
                     'total_payout' => (string) ($returnsAgg->total_completed ?? '0'),
