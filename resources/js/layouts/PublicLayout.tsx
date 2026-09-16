@@ -28,6 +28,15 @@ export default function PublicLayout({ children, title = '' }: { children: React
 
     const pageTitle = title ? `${title} — ${company.name}` : company.name;
 
+    const renderLogo = (maxHeight: number, maxWidth: number) => (
+        <img
+            src={company.logo}
+            alt={company.name}
+            className="block h-auto w-auto object-contain"
+            style={{ maxHeight, maxWidth }}
+        />
+    );
+
     return (
         <div className="flex min-h-screen flex-col bg-white">
             <Head>
@@ -41,12 +50,12 @@ export default function PublicLayout({ children, title = '' }: { children: React
             <header className={`sticky top-0 z-50 w-full bg-white ${scrolled ? 'shadow-lg shadow-gray-100/70 border-b border-gray-100' : 'border-b border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)]'}`}>
 
                 {/* ===== Mobile Header - Logo BIG (full width cover) ===== */}
-                <div className="relative mx-auto flex h-[72px] max-w-screen-xl items-center justify-between gap-2 px-2 sm:h-[76px] sm:gap-3 sm:px-3 lg:hidden">
+                <div className="relative mx-auto flex h-[108px] max-w-screen-xl items-center justify-between gap-2 px-3 sm:h-[116px] sm:px-4 lg:hidden">
                     {/* Left: Logo - BIG full header width cover */}
                     <Link href={route('home')} className="flex flex-1 min-w-0 items-center">
-                        <div className="flex w-full max-w-[380px] items-center overflow-hidden sm:max-w-[320px]">
+                        <div className="flex items-center">
                             {company.logo ? (
-                                <img src={company.logo} alt={company.name} className="h-auto max-h-[54px] w-full object-cover sm:max-h-[58px]" />
+                                renderLogo(92, 280)
                             ) : (
                                 <div className="flex items-center gap-2">
                                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#c8a84e]/40 bg-[#0f4d2a] text-[13px] leading-none">👐</div>
@@ -73,11 +82,11 @@ export default function PublicLayout({ children, title = '' }: { children: React
                 </div>
 
                 {/* ===== Desktop Header - Logo BIG (full width) / Logo B before nav ===== */}
-                <div className="relative mx-auto hidden h-[88px] max-w-screen-xl items-center justify-between gap-4 px-6 lg:flex xl:px-8">
+                <div className="relative mx-auto hidden h-[148px] max-w-screen-xl items-center justify-between gap-4 px-6 lg:flex xl:px-8">
                     {/* Brand - Logo B BIG before nav menus */}
                     <Link href={route('home')} className="flex shrink-0 items-center">
                         {company.logo ? (
-                            <img src={company.logo} alt={company.name} className="h-auto max-h-[62px] w-[250px] object-cover xl:w-[250px]" />
+                            renderLogo(128, 460)
                         ) : (
                             <div className="flex items-center gap-3 group">
                                 <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full border-[2px] border-[#c8a84e] bg-[#0f4d2a] shadow-sm overflow-hidden group-hover:shadow-md transition-shadow">
@@ -201,11 +210,7 @@ export default function PublicLayout({ children, title = '' }: { children: React
                         <div className="lg:col-span-2">
                             <Link href={route('home')} className="flex shrink-0 items-center">
                                 {company.logo ? (
-                                    <img
-                                        src={company.logo}
-                                        alt={company.name}
-                                        className="h-auto max-h-[62px] w-[250px] object-cover"
-                                    />
+                                    renderLogo(96, 420)
                                 ) : (
                                     <>
                                         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-base font-black text-white shadow-[0_0_16px_rgba(37,99,235,0.3)]">
