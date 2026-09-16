@@ -117,35 +117,6 @@ function Ticker({ items }: { items: string[] }) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   HERO SLIDER
-═══════════════════════════════════════════════════════ */
-function HeroSlider({ images }: { images: string[] }) {
-    const [idx, setIdx] = useState(0);
-    useEffect(() => {
-        if (!images || images.length <= 1) return;
-        const t = setInterval(() => setIdx((i) => (i + 1) % images.length), 5000);
-        return () => clearInterval(t);
-    }, [images]);
-
-    if (!images || images.length === 0) return null;
-
-    return (
-        <div className="absolute inset-0 z-0">
-            {images.map((img, i) => (
-                <div
-                    key={i}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === idx ? 'opacity-100' : 'opacity-0'}`}
-                >
-                    <img src={img} alt="Hero Background" className="h-full w-full object-cover" />
-                </div>
-            ))}
-            {/* Dark overlay for readability */}
-            <div className="absolute inset-0 bg-blue-950/80 backdrop-blur-[2px]" />
-        </div>
-    );
-}
-
-/* ═══════════════════════════════════════════════════════
    TYPES
 ═══════════════════════════════════════════════════════ */
 interface CommissionLevel {
@@ -239,9 +210,6 @@ export default function Home() {
                 HERO — full viewport, split layout
             ══════════════════════════════════════════ */}
             <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-blue-950">
-                {/* Dynamic Hero Slider */}
-                {hero?.images && hero.images.length > 0 && <HeroSlider images={hero.images} />}
-
                 {/* Particle canvas */}
                 <NetworkCanvas className="absolute inset-0 z-0 opacity-60 pointer-events-none" />
 
