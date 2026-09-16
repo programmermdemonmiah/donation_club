@@ -12,7 +12,7 @@ interface ReturnRow {
     id: number;
     sequence: string;
     deposit_reference?: string;
-    user?: { id: number; name: string; email: string };
+    user?: { id: number; name: string; username: string; email: string };
     base_amount: string;
     rate: string;
     payout_amount: string;
@@ -55,12 +55,19 @@ export default function ReturnsIndex() {
                     columns={[
                         { header: 'Sequence', render: (r) => <span className="font-mono text-xs text-blue-600">{r.sequence}</span> },
                         {
-                            header: 'Member',
+                            header: 'Member Username',
                             render: (r) =>
                                 r.user ? (
-                                    <a href={route('admin.users.show', r.user.id)} className="text-sm text-blue-600 hover:text-blue-500">
-                                        {r.user.name}
+                                    <a href={route('admin.users.show', r.user.id)} className="text-sm font-semibold text-blue-600 hover:text-blue-500">
+                                        @{r.user.username}
                                     </a>
+                                ) : '—',
+                        },
+                        {
+                            header: 'Member Full Name',
+                            render: (r) =>
+                                r.user ? (
+                                    <span className="text-sm text-gray-900">{r.user.name}</span>
                                 ) : '—',
                         },
                         { header: 'Deposit', render: (r) => r.deposit_reference ?? '—' },

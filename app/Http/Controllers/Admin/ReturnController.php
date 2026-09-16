@@ -20,14 +20,14 @@ class ReturnController extends Controller
     public function index(Request $request): Response
     {
         $returns = MemberReturn::query()
-            ->with(['user:id,name,email', 'deposit:id,reference', 'deposit.sequence'])
+            ->with(['user:id,name,username,email', 'deposit:id,reference', 'deposit.sequence'])
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->input('status')))
             ->latest()
             ->paginate(15)
             ->through(fn (MemberReturn $r) => [
                 'id' => $r->id,
                 'sequence' => $r->deposit?->sequence?->formatted() ?? '—',
-                'user' => $r->user?->only(['id', 'name', 'email']),
+                'user' => $r->user?->only(['id', 'name', 'username', 'email']),
                 'deposit_reference' => $r->deposit?->reference,
                 'base_amount' => $r->base_amount,
                 'rate' => $r->rate,
