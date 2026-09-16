@@ -8,6 +8,7 @@ use App\Services\Audit\AuditLogService;
 use App\Services\Settings\SettingsService;
 use App\Support\GalleryMedia;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -91,7 +92,7 @@ class HeroController extends Controller
                 return back()->with('error', "Upload failed: {$label} must be {$limit} or smaller.");
             }
 
-            if (! GalleryMedia::mimeAllowed($type, (string) $file->getMimeType())) {
+            if (! GalleryMedia::mimeAllowed($type, self::detectedMime($file))) {
                 return back()->with('error', 'Upload failed: The file contents do not match an allowed photo or video.');
             }
 
@@ -161,6 +162,23 @@ class HeroController extends Controller
             Log::error('Hero Image Delete Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return back()->with('error', 'Delete failed: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Live hosting often has php_fileinfo disabled. Do not call the MIME guesser then;
+     * the extension allow-list already rejected unknown files.
+     */
+    private static function detectedMime(UploadedFile $file): string
+    {
+        if (! extension_loaded('fileinfo') && ! function_exists('finfo_open')) {
+            return '';
+        }
+
+        try {
+            return (string) $file->getMimeType();
+        } catch (\Throwable) {
+            return '';
         }
     }
 }
