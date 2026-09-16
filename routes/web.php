@@ -6,18 +6,20 @@ use App\Http\Controllers\KycController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/nai/kono/migration', function () {
     try {
         Artisan::call('migrate');
-// :fresh', [
-//             '--seed' => true,
-//             '--force' => true,
-//         ]
+
+        // :fresh', [
+        //             '--seed' => true,
+        //             '--force' => true,
+        //         ]
         return 'Migration run successfully<br><pre>'.e(Artisan::output()).'</pre>';
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return response('Migration failed: '.$e->getMessage().'<br><pre>'.e(Artisan::output()).'</pre>', 500);
     }
 })->name('nai.kono.migration');
@@ -46,12 +48,16 @@ foreach (['about', 'how-it-works', 'faq', 'contact', 'terms', 'privacy', 'risk-d
     Route::get('/'.$page, [PublicController::class, 'page'])->defaults('slug', $page)->name('pages.'.$page);
 }
 
-Route::get('/api/referral-lookup', function (\Illuminate\Http\Request $request) {
+Route::get('/api/username-availability', [Auth\RegisteredUserController::class, 'usernameAvailability'])
+    ->middleware('throttle:60,1')
+    ->name('api.username-availability');
+
+Route::get('/api/referral-lookup', function (Request $request) {
     $code = strtoupper(trim($request->input('code', '')));
     if (! $code) {
         return response()->json(null);
     }
-    $user = \App\Models\User::where('referral_code', $code)->first(['name', 'username']);
+    $user = App\Models\User::where('referral_code', $code)->first(['name', 'username']);
     if (! $user) {
         return response()->json(null);
     }
@@ -117,7 +123,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     // Wallet / transactions
     Route::get('/wallet', [User\WalletController::class, 'index'])->name('wallet.index');
     Route::get('/transactions', [User\WalletController::class, 'transactions'])->name('transactions.index');
-    
+
     // Transfers
     Route::get('/transfer', [User\TransferController::class, 'create'])->name('transfer.create');
     Route::post('/transfer', [User\TransferController::class, 'store'])->middleware('throttle:6,1')->name('transfer.store');

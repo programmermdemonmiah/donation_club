@@ -24,7 +24,10 @@ export default function Register() {
 
     const [referrer, setReferrer] = useState<ReferrerInfo | null>(null);
     const [referrerStatus, setReferrerStatus] = useState<'idle' | 'loading' | 'found' | 'not_found'>('idle');
+    const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle');
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const usernameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const usernameAbortRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
         const code = form.data.referral_code.trim();
@@ -60,6 +63,55 @@ export default function Register() {
             if (debounceRef.current) clearTimeout(debounceRef.current);
         };
     }, [form.data.referral_code]);
+
+    useEffect(() => {
+        const username = form.data.username.trim();
+
+        if (!username) {
+            setUsernameStatus('idle');
+            return;
+        }
+
+        setUsernameStatus('checking');
+
+        if (usernameTimerRef.current) {
+            clearTimeout(usernameTimerRef.current);
+        }
+
+        usernameTimerRef.current = setTimeout(async () => {
+            usernameAbortRef.current?.abort();
+            const controller = new AbortController();
+            usernameAbortRef.current = controller;
+
+            try {
+                const res = await fetch(`/api/username-availability?username=${encodeURIComponent(username)}`, {
+                    headers: { Accept: 'application/json' },
+                    signal: controller.signal,
+                });
+                const data = await res.json();
+
+                if (data.status === 'available') {
+                    setUsernameStatus('available');
+                } else if (data.status === 'taken') {
+                    setUsernameStatus('taken');
+                } else {
+                    setUsernameStatus('invalid');
+                }
+            } catch (error) {
+                if (error instanceof DOMException && error.name === 'AbortError') {
+                    return;
+                }
+
+                setUsernameStatus('invalid');
+            }
+        }, 300);
+
+        return () => {
+            if (usernameTimerRef.current) {
+                clearTimeout(usernameTimerRef.current);
+            }
+        };
+    }, [form.data.username]);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -112,6 +164,23 @@ export default function Register() {
                             )}
                         </div>
 
+                        {key === 'username' && usernameStatus !== 'idle' && (
+                            <div className="min-h-[1.25rem]" aria-live="polite">
+                                {usernameStatus === 'checking' && (
+                                    <p className="text-xs font-semibold text-gray-400">Checking username…</p>
+                                )}
+                                {usernameStatus === 'available' && (
+                                    <p className="text-xs font-semibold text-emerald-600">Available user name</p>
+                                )}
+                                {usernameStatus === 'taken' && (
+                                    <p className="text-xs font-semibold text-red-600">Not available user name</p>
+                                )}
+                                {usernameStatus === 'invalid' && (
+                                    <p className="text-xs font-semibold text-red-600">Use letters, numbers, dashes, or underscores.</p>
+                                )}
+                            </div>
+                        )}
+
                         {/* Referrer preview below referral_code field */}
                         {key === 'referral_code' && (
                             <div className="min-h-[2rem]">
@@ -160,7 +229,7 @@ export default function Register() {
 
                 <button
                     type="submit"
-                    disabled={form.processing}
+                    disabled={form.processing || usernameStatus === 'taken'}
                     className="group relative w-full overflow-hidden rounded-xl bg-blue-600 py-3.5 text-sm font-black tracking-wider text-white shadow-[0_0_30px_rgba(37,99,235,0.3)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_50px_rgba(37,99,235,0.5)] disabled:opacity-60"
                 >
                     <span className="absolute inset-0 -translate-x-full skew-x-[-15deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full"></span>
