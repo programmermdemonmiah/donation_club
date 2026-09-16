@@ -52,7 +52,7 @@ function StatCard({ label, value, sub, icon, accent = 'blue' }: {
 export default function Dashboard() {
     const page = usePage<PageProps & { stats: Stats; recentTransactions: Tx[]; depositRules: { min: string; max: string } }>();
     const { stats, recentTransactions, depositRules } = page.props;
-    const firstName = page.props.auth.user?.name.split(' ')[0];
+    const userName = page.props.auth.user?.username;
 
     return (
         <AppLayout>
@@ -60,7 +60,7 @@ export default function Dashboard() {
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">Welcome back</p>
-                    <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">{firstName}'s Dashboard</h1>
+                    <h1 className="mt-1.5 text-3xl font-black tracking-tight text-gray-900">{userName}'s Dashboard</h1>
                     <p className="mt-1 text-sm font-medium text-gray-500">Here's your complete club overview.</p>
                 </div>
                 <Link

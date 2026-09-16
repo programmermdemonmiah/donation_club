@@ -1,6 +1,7 @@
 export interface AuthUser {
     id: number;
     name: string;
+    username: string;
     email: string;
     is_admin: boolean;
     referral_code?: string;
