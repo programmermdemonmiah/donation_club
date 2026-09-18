@@ -61,6 +61,12 @@ class DashboardController extends Controller
             ->selectRaw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count")
             ->first();
 
+        $profitAgg = MemberReturn::query()
+            ->where('status', 'completed')
+            ->selectRaw('COALESCE(SUM(payout_amount - base_amount), 0) as total')
+            ->selectRaw('COUNT(DISTINCT user_id) as users')
+            ->first();
+
         $withdrawalAgg = Withdrawal::query()
             ->selectRaw("COALESCE(SUM(CASE WHEN status = 'completed' THEN amount END),0) as total")
             ->selectRaw('COUNT(*) as total_count')
@@ -100,6 +106,10 @@ class DashboardController extends Controller
                 'commissions' => [
                     'total' => (string) ($commissionAgg->total ?? '0'),
                     'pending' => (int) ($commissionAgg->pending_count ?? 0),
+                ],
+                'profit' => [
+                    'total' => Money::parse($profitAgg->total ?? '0'),
+                    'users' => (int) ($profitAgg->users ?? 0),
                 ],
                 'withdrawals' => [
                     'total' => (string) ($withdrawalAgg->total ?? '0'),
