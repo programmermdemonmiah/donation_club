@@ -7,6 +7,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -27,5 +29,27 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            if ($response->getStatusCode() < 500) {
+                return $response;
+            }
+
+            $message = 'Something went wrong. Please try again.';
+
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json(['message' => $message], 500);
+            }
+
+            if ($request->header('X-Inertia')) {
+                if ($request->isMethod('GET')) {
+                    return redirect()->route('home')->with('error', $message);
+                }
+
+                return back()->with('error', $message);
+            }
+
+            return redirect()->route('home')->with('error', $message);
+        });
     })
     ->create();

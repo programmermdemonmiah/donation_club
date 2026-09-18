@@ -32,13 +32,28 @@ class ReferralService
     }
 
     /**
+     * Find a referrer by referral code or username.
+     */
+    public static function findReferrer(string $code): ?User
+    {
+        $code = trim($code);
+
+        if ($code === '') {
+            return null;
+        }
+
+        return User::query()
+            ->where('referral_code', mb_strtoupper($code))
+            ->orWhereRaw('LOWER(username) = ?', [mb_strtolower($code)])
+            ->first();
+    }
+
+    /**
      * Resolve a referral code to an active referrer or fail.
      */
     public static function resolveReferrer(string $code): User
     {
-        $referrer = User::query()
-            ->where('referral_code', mb_strtoupper(trim($code)))
-            ->first();
+        $referrer = self::findReferrer($code);
 
         if (! $referrer) {
             throw new InvalidArgumentException('The referral code is invalid.');
@@ -67,8 +82,7 @@ class ReferralService
         }
 
         // Direct referral limit check
-        $settings = app(SettingsService::class);
-        $maxDirect = (int) $settings->get('referral.max_direct', 3);
+        $maxDirect = self::maxDirectReferrals();
         if ($maxDirect > 0) {
             $currentDirectCount = self::directReferrals($referrer)->count();
             if ($currentDirectCount >= $maxDirect) {
@@ -328,9 +342,12 @@ class ReferralService
         try {
             $referrer = self::resolveReferrer($code);
 
+            if (! $referrer->isActive()) {
+                throw new InvalidArgumentException('The referrer account is not eligible.');
+            }
+
             // Check direct referral limit
-            $settings = app(SettingsService::class);
-            $maxDirect = (int) $settings->get('referral.max_direct', 3);
+            $maxDirect = self::maxDirectReferrals();
             if ($maxDirect > 0) {
                 $currentDirectCount = self::directReferrals($referrer)->count();
                 if ($currentDirectCount >= $maxDirect) {
@@ -350,5 +367,18 @@ class ReferralService
     public static function moveSubtreeRoot(User $user, User $newReferrer): void
     {
         throw new RuntimeException('Subtree moves are intentionally disabled to preserve ledger/tree integrity.');
+    }
+
+    private static function maxDirectReferrals(): int
+    {
+        $raw = app(SettingsService::class)->get('referral.max_direct', 3);
+
+        if (is_array($raw) || is_object($raw) || is_bool($raw)) {
+            return 3;
+        }
+
+        $maxDirect = (int) $raw;
+
+        return $maxDirect < 0 ? 0 : $maxDirect;
     }
 }

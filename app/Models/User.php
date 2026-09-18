@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\UserRankStatus;
 use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -46,7 +47,6 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_agent' => 'boolean',
-            'status' => UserStatus::class,
         ];
     }
 
@@ -156,5 +156,28 @@ class User extends Authenticatable
     public function is2faEnabled(): bool
     {
         return (bool) $this->google2fa_enabled;
+    }
+
+    /**
+     * Live rows can contain unexpected status strings. Never crash while reading them.
+     */
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value): UserStatus {
+                if ($value instanceof UserStatus) {
+                    return $value;
+                }
+
+                return UserStatus::tryFrom(strtolower(trim((string) $value))) ?? UserStatus::Active;
+            },
+            set: function (mixed $value): string {
+                if ($value instanceof UserStatus) {
+                    return $value->value;
+                }
+
+                return UserStatus::tryFrom(strtolower(trim((string) $value)))?->value ?? UserStatus::Active->value;
+            },
+        );
     }
 }

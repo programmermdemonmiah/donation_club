@@ -6,6 +6,7 @@ use App\Http\Controllers\KycController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\User;
+use App\Services\Referral\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -54,11 +55,8 @@ Route::get('/api/username-availability', [Auth\RegisteredUserController::class, 
     ->name('api.username-availability');
 
 Route::get('/api/referral-lookup', function (Request $request) {
-    $code = strtoupper(trim($request->input('code', '')));
-    if (! $code) {
-        return response()->json(null);
-    }
-    $user = App\Models\User::where('referral_code', $code)->first(['name', 'username']);
+    $user = ReferralService::findReferrer((string) $request->input('code', ''));
+
     if (! $user) {
         return response()->json(null);
     }

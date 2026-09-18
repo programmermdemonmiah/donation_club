@@ -24,6 +24,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'status' => UserStatus::Active,
+            'username' => fake()->unique()->regexify('[a-z0-9]{10}'),
             'referral_code' => ReferralService::generateReferralCode(),
             'referred_by' => null,
             'remember_token' => Str::random(10),
