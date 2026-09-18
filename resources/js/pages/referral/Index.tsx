@@ -7,7 +7,7 @@ import { usePage } from '@inertiajs/react';
 import { formatMoney } from '@/utils/format';
 import type { PageProps } from '@/types';
 
-interface ReferralRow { id: number; name: string; joined_at: string; rank?: string; status: string; }
+interface ReferralRow { id: number; username: string; joined_at: string; rank: { name: string; color: string } | null; status: string; }
 interface HandLeader { hand: number; username: string | null; }
 interface HandProgress { key: string; label: string; value: string; actual: string; met: boolean; }
 interface HandRankRow { id: number; name: string; color: string; hands: Array<HandProgress | null>; }
@@ -138,16 +138,24 @@ export default function Referrals() {
                     <h2 className="text-sm font-black text-gray-900">Direct Referrals</h2>
                 </div>
                 <Table<ReferralRow>
+                    tableClassName="table-fixed"
                     columns={[
-                        { header: 'Name', render: (r) => (
+                        { header: 'Username', className: 'w-[16%] text-left', render: (r) => (
                             <div className="flex items-center gap-3">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-xs font-black text-blue-700">{r.name.charAt(0).toUpperCase()}</span>
-                                <span className="font-semibold text-gray-900">{r.name}</span>
+                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-xs font-black text-blue-700">{r.username.charAt(0).toUpperCase()}</span>
+                                <span className="font-semibold text-gray-900">@{r.username}</span>
                             </div>
                         )},
-                        { header: 'Rank', render: (r) => <span className="font-semibold text-gray-600">{r.rank ?? '—'}</span> },
-                        { header: 'Status', render: (r) => <Badge value={r.status} /> },
-                        { header: 'Joined', render: (r) => <span className="text-xs text-gray-400">{r.joined_at}</span> },
+                        { header: 'Rank', className: 'w-[22%] text-center', render: (r) => r.rank ? (
+                            <span className="inline-flex items-center gap-2 font-semibold text-gray-900">
+                                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: r.rank.color }} />
+                                {r.rank.name}
+                            </span>
+                        ) : (
+                            <span className="text-xs font-medium text-gray-400">No rank achieved yet</span>
+                        )},
+                        { header: 'Status', className: 'w-[31%] text-center', render: (r) => <Badge value={r.status} /> },
+                        { header: 'Joined', className: 'w-[31%] text-center', render: (r) => <span className="text-xs text-gray-400">{r.joined_at}</span> },
                     ]}
                     rows={page.props.directReferrals.data}
                     rowKey={(r) => r.id}

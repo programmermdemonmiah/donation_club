@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Referral;
 
+use App\Enums\UserRankStatus;
 use App\Models\Deposit;
 use App\Models\Rank;
 use App\Models\RankRequirement;
 use App\Models\User;
+use App\Models\UserRank;
 use App\Services\Referral\ReferralService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -33,6 +35,31 @@ class ReferralHandsTableTest extends TestCase
                 ->has('referralCode')
                 ->has('directReferrals.data', 4)
                 ->missing('tree')
+            );
+    }
+
+    public function test_direct_referrals_table_shows_username_and_achieved_rank(): void
+    {
+        $member = $this->createUser(['username' => 'sponsor3']);
+        $this->attachDirectReferral($member, 'nomanone');
+        $ranked = $this->attachDirectReferral($member, 'nomantwo');
+        $bronze = Rank::query()->where('slug', 'bronze')->firstOrFail();
+
+        UserRank::query()->create([
+            'user_id' => $ranked->id,
+            'rank_id' => $bronze->id,
+            'status' => UserRankStatus::Active,
+            'achieved_at' => now(),
+        ]);
+
+        $this->actingAs($member)
+            ->get('/referrals')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('directReferrals.data.0.username', 'nomantwo')
+                ->where('directReferrals.data.0.rank.name', 'Bronze')
+                ->where('directReferrals.data.1.username', 'nomanone')
+                ->where('directReferrals.data.1.rank', null)
             );
     }
 

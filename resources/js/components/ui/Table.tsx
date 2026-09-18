@@ -11,9 +11,10 @@ interface Props<T> {
     rows: T[];
     rowKey: (row: T) => string | number;
     emptyMessage?: string;
+    tableClassName?: string;
 }
 
-export default function Table<T>({ columns, rows, rowKey, emptyMessage = 'No records found.' }: Props<T>) {
+export default function Table<T>({ columns, rows, rowKey, emptyMessage = 'No records found.', tableClassName }: Props<T>) {
     if (rows.length === 0) {
         return (
             <div className="px-5 py-12 text-center">
@@ -24,7 +25,7 @@ export default function Table<T>({ columns, rows, rowKey, emptyMessage = 'No rec
 
     return (
         <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className={cn('min-w-full divide-y divide-gray-200', tableClassName)}>
                 <thead>
                     <tr>
                         {columns.map((col, i) => (

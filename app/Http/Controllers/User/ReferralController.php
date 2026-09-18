@@ -25,16 +25,23 @@ class ReferralController extends Controller
             'hands' => ReferralService::handLeaders($user),
             'handRanks' => $this->ranks->handCycleRows($user),
             'directReferrals' => $user->directReferrals()
-                ->with('activeRank:id,name')
+                ->with('activeRank')
                 ->latest()
                 ->paginate(15)
-                ->through(fn ($r) => [
-                    'id' => $r->id,
-                    'name' => $r->name,
-                    'joined_at' => $r->created_at->toDateString(),
-                    'rank' => $r->activeRank->first()?->name,
-                    'status' => $r->status->value,
-                ]),
+                ->through(function ($referral) {
+                    $rank = $referral->activeRank->first();
+
+                    return [
+                        'id' => $referral->id,
+                        'username' => $referral->username,
+                        'joined_at' => $referral->created_at->toDateString(),
+                        'rank' => $rank ? [
+                            'name' => $rank->name,
+                            'color' => $rank->color,
+                        ] : null,
+                        'status' => $referral->status->value,
+                    ];
+                }),
         ]);
     }
 }
