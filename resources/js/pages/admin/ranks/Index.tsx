@@ -2,6 +2,7 @@ import AdminLayout from '@/layouts/AdminLayout';
 import Table from '@/components/ui/Table';
 import Button from '@/components/ui/Button';
 import { usePage } from '@inertiajs/react';
+import { formatMoney } from '@/utils/format';
 import type { PageProps } from '@/types';
 
 interface RankRow {
@@ -15,6 +16,8 @@ interface RankRow {
     monthly_salary: string;
     requirements_count: number;
     holders: number;
+    lifetime_achievers: number;
+    incentive_paid: string;
 }
 
 export default function AdminRanks() {
@@ -37,11 +40,13 @@ export default function AdminRanks() {
                                 </span>
                             ),
                         },
-                        { header: 'Level', render: (r) => r.level },
-                        { header: 'Incentive', render: (r) => `$${Number(r.incentive_amount).toLocaleString()}` },
-                        { header: 'Monthly Salary', render: (r) => Number(r.monthly_salary) > 0 ? `$${Number(r.monthly_salary).toLocaleString()}/mo` : '-' },
-                        { header: 'Requirements', render: (r) => r.requirements_count },
-                        { header: 'Members at rank', render: (r) => r.holders },
+                        { header: 'Level', className: 'text-center', render: (r) => r.level },
+                        { header: 'Incentive', className: 'text-center', render: (r) => `$${Number(r.incentive_amount).toLocaleString()}` },
+                        { header: 'Monthly Salary', className: 'text-center', render: (r) => Number(r.monthly_salary) > 0 ? `$${Number(r.monthly_salary).toLocaleString()}/mo` : '-' },
+                        { header: 'Requirements', className: 'text-center', render: (r) => r.requirements_count },
+                        { header: 'Members at rank', className: 'text-center', render: (r) => r.holders },
+                        { header: 'Lifetime achievers', className: 'text-center', render: (r) => r.lifetime_achievers },
+                        { header: 'Incentive paid', className: 'text-center', render: (r) => formatMoney(r.incentive_paid) },
                         {
                             header: 'State',
                             render: (r) =>

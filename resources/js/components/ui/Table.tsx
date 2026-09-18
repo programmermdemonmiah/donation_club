@@ -28,7 +28,7 @@ export default function Table<T>({ columns, rows, rowKey, emptyMessage = 'No rec
                 <thead>
                     <tr>
                         {columns.map((col, i) => (
-                            <th key={i} scope="col" className={cn('px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500', col.className)}>
+                            <th key={i} scope="col" className={cn('px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500', col.className ?? 'text-left')}>
                                 {col.header}
                             </th>
                         ))}
