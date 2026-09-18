@@ -68,6 +68,14 @@ class DashboardController extends Controller
             ->selectRaw('COUNT(DISTINCT user_id) as users')
             ->first();
 
+        $rankIncentiveAgg = WalletTransaction::query()
+            ->where('type', WalletTransactionType::RankIncentive->value)
+            ->where('direction', WalletDirection::Credit->value)
+            ->where('status', WalletTransactionStatus::Completed->value)
+            ->selectRaw('COALESCE(SUM(amount), 0) as total')
+            ->selectRaw('COUNT(DISTINCT user_id) as users')
+            ->first();
+
         $withdrawalAgg = Withdrawal::query()
             ->selectRaw("COALESCE(SUM(CASE WHEN status = 'completed' THEN amount END),0) as total")
             ->selectRaw('COUNT(*) as total_count')
@@ -112,6 +120,10 @@ class DashboardController extends Controller
                 'profit' => [
                     'total' => Money::parse($profitAgg->total ?? '0'),
                     'users' => (int) ($profitAgg->users ?? 0),
+                ],
+                'rank_incentives' => [
+                    'total' => Money::parse($rankIncentiveAgg->total ?? '0'),
+                    'users' => (int) ($rankIncentiveAgg->users ?? 0),
                 ],
                 'withdrawals' => [
                     'total' => (string) ($withdrawalAgg->total ?? '0'),

@@ -13,6 +13,7 @@ interface Stats {
     returns: { total_payout: string; count: number; pending: number };
     commissions: { total: string; users: number; pending: number };
     profit: { total: string; users: number };
+    rank_incentives: { total: string; users: number };
     withdrawals: { total: string; count: number; pending: number };
     referrals: { relationships: number };
     ranks: { distributed: number };
@@ -62,6 +63,7 @@ export default function AdminDashboard() {
                 <StatCard label="Support Provided" value={formatMoney(s.returns.total_payout)} sub={`${s.returns.pending} pending`} />
                 <StatCard label="Total Generation Cost" value={formatMoney(s.commissions.total)} sub={`${s.commissions.users} users completed`} />
                 <StatCard label="Total Profit Cost" value={formatMoney(s.profit.total)} sub={`${s.profit.users} users completed`} />
+                <StatCard label="Total Rank Incentive" value={formatMoney(s.rank_incentives.total)} sub={`${s.rank_incentives.users} users completed`} />
                 <StatCard label="Withdrawals Paid" value={formatMoney(s.withdrawals.total)} sub={`${s.withdrawals.count} completed`} />
                 <StatCard label="Pending Withdrawals" value={s.withdrawals.pending} accent="text-blue-600" />
                 <StatCard label="Funds Disbursed" value={formatMoney(s.funds.disbursed)} sub={`${s.funds.requests} requests`} />
