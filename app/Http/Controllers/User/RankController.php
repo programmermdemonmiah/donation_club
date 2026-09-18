@@ -46,6 +46,7 @@ class RankController extends Controller
                 'name' => $rank->name,
                 'level' => $rank->level,
                 'color' => $rank->color,
+                'incentive_amount' => Money::parse((string) $rank->incentive_amount),
                 'is_current' => $current?->id === $rank->id,
                 'requirements' => $requirements,
             ];

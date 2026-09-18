@@ -4,7 +4,7 @@ import type { PageProps } from '@/types';
 import { formatDate, formatMoney } from '@/utils/format';
 
 interface RequirementRow { key: string; label: string; value: string; actual: string; met: boolean; }
-interface RankEntry { id: number; name: string; level: number; color: string; is_current: boolean; requirements: RequirementRow[]; }
+interface RankEntry { id: number; name: string; level: number; color: string; incentive_amount: string; is_current: boolean; requirements: RequirementRow[]; }
 interface HistoryRow { old: string | null; new: string | null; reason?: string; at: string; }
 
 export default function Rank() {
@@ -90,6 +90,10 @@ export default function Rank() {
                                     </li>
                                 ))}
                             </ul>
+                            <div className="mt-4 flex items-center justify-between border-t border-gray-50 pt-3">
+                                <span className="text-xs font-semibold text-gray-500">Incentive</span>
+                                <span className="text-sm font-black text-gray-900">{formatMoney(rank.incentive_amount)}</span>
+                            </div>
                         </div>
                     ))}
                 </div>
