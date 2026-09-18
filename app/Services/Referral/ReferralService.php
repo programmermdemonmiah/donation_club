@@ -266,6 +266,30 @@ class ReferralService
     }
 
     /**
+     * The first N direct referrals, earliest first — the same order as handVolume().
+     *
+     * @return list<array{hand: int, username: string|null}>
+     */
+    public static function handLeaders(User $user, int $count = 3): array
+    {
+        $referrals = self::directReferrals($user)
+            ->orderBy('id')
+            ->limit($count)
+            ->get(['id', 'username']);
+
+        $hands = [];
+
+        for ($hand = 1; $hand <= $count; $hand++) {
+            $hands[] = [
+                'hand' => $hand,
+                'username' => $referrals->get($hand - 1)?->username,
+            ];
+        }
+
+        return $hands;
+    }
+
+    /**
      * Sum of completed deposit amounts for members at exactly $generation levels below $user.
      */
     public static function generationVolume(User $user, int $generation): string

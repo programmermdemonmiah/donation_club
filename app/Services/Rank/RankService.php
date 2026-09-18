@@ -180,6 +180,51 @@ class RankService
     }
 
     /**
+     * 1st/2nd/3rd hand cycle progress for every active rank — the same numbers
+     * the member rank cards show for hand volume.
+     *
+     * @return list<array{id: int, name: string, color: string, hands: list<array{key: string, label: string, value: string, actual: string, met: bool}|null>}>
+     */
+    public function handCycleRows(User $user): array
+    {
+        $metrics = $this->metrics($user);
+        $handKeys = [
+            RankRequirement::GEN1_VOLUME,
+            RankRequirement::GEN2_VOLUME,
+            RankRequirement::GEN3_VOLUME,
+        ];
+        $baselines = [];
+        $rows = [];
+
+        foreach (Rank::query()->where('active', true)->with('requirements')->orderBy('level')->get() as $rank) {
+            $hands = [];
+
+            foreach ($handKeys as $key) {
+                $requirement = $rank->requirements->firstWhere('key', $key);
+                $hands[] = $requirement
+                    ? $this->presentRequirement($requirement, $metrics, $baselines[$key] ?? '0.00')
+                    : null;
+            }
+
+            foreach ($rank->requirements as $requirement) {
+                $baselines[$requirement->key] = Money::add(
+                    $baselines[$requirement->key] ?? '0.00',
+                    (string) $requirement->value,
+                );
+            }
+
+            $rows[] = [
+                'id' => $rank->id,
+                'name' => $rank->name,
+                'color' => $rank->color,
+                'hands' => $hands,
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
      * Promote every filled rank above the current one, in order, so each
      * rank's one-time incentive can be paid. Returns true when any promotion happened.
      */

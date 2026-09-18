@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Commission;
+use App\Services\Rank\RankService;
 use App\Services\Referral\ReferralService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -11,6 +11,8 @@ use Inertia\Response;
 
 class ReferralController extends Controller
 {
+    public function __construct(private readonly RankService $ranks) {}
+
     public function index(): Response
     {
         $user = Auth::user();
@@ -20,6 +22,8 @@ class ReferralController extends Controller
             'referralLink' => url('/register?ref='.$user->referral_code),
             'directCount' => ReferralService::directReferralCount($user),
             'teamSize' => ReferralService::teamSize($user),
+            'hands' => ReferralService::handLeaders($user),
+            'handRanks' => $this->ranks->handCycleRows($user),
             'directReferrals' => $user->directReferrals()
                 ->with('activeRank:id,name')
                 ->latest()
@@ -31,7 +35,6 @@ class ReferralController extends Controller
                     'rank' => $r->activeRank->first()?->name,
                     'status' => $r->status->value,
                 ]),
-            'tree' => ReferralService::buildTree($user, 3),
         ]);
     }
 }

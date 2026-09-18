@@ -4,42 +4,23 @@ import Badge from '@/components/ui/Badge';
 import Pagination from '@/components/ui/Pagination';
 import { useState } from 'react';
 import { usePage } from '@inertiajs/react';
+import { formatMoney } from '@/utils/format';
 import type { PageProps } from '@/types';
 
 interface ReferralRow { id: number; name: string; joined_at: string; rank?: string; status: string; }
-interface TreeNode { id: number; name: string; joined_at: string; children: TreeNode[]; }
+interface HandLeader { hand: number; username: string | null; }
+interface HandProgress { key: string; label: string; value: string; actual: string; met: boolean; }
+interface HandRankRow { id: number; name: string; color: string; hands: Array<HandProgress | null>; }
 
-function Tree({ nodes, depth }: { nodes: TreeNode[]; depth: number }) {
-    if (!nodes.length) return null;
-    return (
-        <ul className={depth === 0 ? 'space-y-1' : 'ml-5 mt-1 space-y-1 border-l-2 border-gray-100 pl-4'}>
-            {nodes.map((node) => (
-                <li key={node.id}>
-                    <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-gray-50">
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black text-blue-700">
-                            {node.name.charAt(0).toUpperCase()}
-                        </span>
-                        <span className="text-sm font-semibold text-gray-800">{node.name}</span>
-                        <span className="text-xs font-medium text-gray-400">since {node.joined_at}</span>
-                        {node.children.length > 0 && (
-                            <span className="ml-auto rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-black text-blue-600">
-                                +{node.children.length}
-                            </span>
-                        )}
-                    </div>
-                    {node.children.length > 0 && <Tree nodes={node.children} depth={depth + 1} />}
-                </li>
-            ))}
-        </ul>
-    );
-}
+const HAND_LABELS = ['1st Hand', '2nd Hand', '3rd Hand'];
 
 export default function Referrals() {
     const page = usePage<PageProps & {
         referralCode: string; referralLink: string;
         directCount: number; teamSize: number;
+        hands: HandLeader[];
+        handRanks: HandRankRow[];
         directReferrals: { data: ReferralRow[]; current_page: number; last_page: number };
-        tree: TreeNode[];
     }>();
     const [copied, setCopied] = useState(false);
 
@@ -100,22 +81,53 @@ export default function Referrals() {
                     </div>
                 </div>
 
-                {/* Tree */}
+                {/* Hands */}
                 <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:col-span-2">
                     <div className="border-b border-gray-50 px-6 py-4">
-                        <h2 className="text-sm font-black text-gray-900">Referral Tree</h2>
-                        <p className="mt-0.5 text-xs text-gray-400">First 3 generations</p>
+                        <h2 className="text-sm font-black text-gray-900">Hands</h2>
+                        <p className="mt-0.5 text-xs text-gray-400">Each rank fills from zero. Extra above a filled hand counts toward the next rank.</p>
                     </div>
-                    <div className="max-h-80 overflow-auto p-4">
-                        {page.props.tree.length === 0 ? (
-                            <div className="py-10 text-center">
-                                <svg className="mx-auto h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                <p className="mt-3 text-sm font-semibold text-gray-500">No referrals yet</p>
-                                <p className="mt-1 text-xs text-gray-400">Share your link to start building your team.</p>
-                            </div>
-                        ) : (
-                            <Tree nodes={page.props.tree} depth={0} />
-                        )}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-100">
+                            <thead>
+                                <tr>
+                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        Rank
+                                    </th>
+                                    {HAND_LABELS.map((label, index) => (
+                                        <th key={label} scope="col" className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                            <span className="block">{label}</span>
+                                            <span className={`mt-1 block text-sm font-black normal-case tracking-normal ${page.props.hands[index]?.username ? 'text-gray-900' : 'text-gray-300'}`}>
+                                                {page.props.hands[index]?.username ? `@${page.props.hands[index].username}` : '—'}
+                                            </span>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {page.props.handRanks.map((rank) => (
+                                    <tr key={rank.id} className="hover:bg-gray-50/70">
+                                        <td className="whitespace-nowrap px-4 py-3">
+                                            <span className="flex items-center gap-2.5 text-sm font-black text-gray-900">
+                                                <span className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: rank.color }} />
+                                                {rank.name}
+                                            </span>
+                                        </td>
+                                        {rank.hands.map((hand, index) => (
+                                            <td key={`${rank.id}-${index}`} className="whitespace-nowrap px-4 py-3 text-center">
+                                                {hand ? (
+                                                    <span className={`font-mono text-xs font-semibold ${hand.met ? 'text-emerald-600' : 'text-gray-500'}`}>
+                                                        {formatMoney(hand.actual)} / {formatMoney(hand.value)}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-gray-300">—</span>
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
