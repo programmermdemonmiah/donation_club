@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\CommissionStatus;
+use App\Enums\ReturnStatus;
+use App\Enums\WalletTransactionType;
 use App\Http\Controllers\Controller;
 use App\Models\Commission;
 use App\Models\MemberReturn;
@@ -18,12 +21,16 @@ class DashboardController extends Controller
     public function __construct(
         private readonly SettingsService $settings,
         private readonly RankService $ranks,
-    ) {
-    }
+    ) {}
 
     public function index(): Response
     {
         $user = request()->user();
+
+        if ($user && ! $user->isAdmin()) {
+            $this->ranks->promoteIfEligible($user);
+            $user->unsetRelation('activeRank');
+        }
 
         $wallet = $user->wallet()->first();
 
@@ -33,15 +40,15 @@ class DashboardController extends Controller
             'total_deposit' => (string) $user->deposits()->completed()->sum('amount'),
             'total_return' => (string) MemberReturn::query()
                 ->where('user_id', $user->id)
-                ->where('status', \App\Enums\ReturnStatus::Completed->value)
+                ->where('status', ReturnStatus::Completed->value)
                 ->sum('payout_amount'),
             'total_commission' => (string) Commission::query()
                 ->where('user_id', $user->id)
-                ->where('status', \App\Enums\CommissionStatus::Completed->value)
+                ->where('status', CommissionStatus::Completed->value)
                 ->sum('amount'),
             'total_transfer' => (string) WalletTransaction::query()
                 ->where('user_id', $user->id)
-                ->where('type', \App\Enums\WalletTransactionType::Adjustment->value)
+                ->where('type', WalletTransactionType::Adjustment->value)
                 ->where('direction', 'debit')
                 ->where('description', 'like', 'Transfer to %')
                 ->sum('amount'),

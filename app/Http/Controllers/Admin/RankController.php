@@ -18,6 +18,12 @@ class RankController extends Controller
 
     public function index(): Response
     {
+        try {
+            $this->ranks->evaluateAll();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return Inertia::render('admin/ranks/Index', [
             'ranks' => Rank::query()->withCount('requirements')->orderBy('level')->get()
                 ->map(fn (Rank $rank) => [

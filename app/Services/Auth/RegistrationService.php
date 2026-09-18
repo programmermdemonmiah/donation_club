@@ -6,6 +6,7 @@ use App\Models\Pin;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\Wallet;
+use App\Services\Rank\RankService;
 use App\Services\Referral\ReferralService;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -18,12 +19,14 @@ use ValueError;
  */
 class RegistrationService
 {
+    public function __construct(private readonly RankService $ranks) {}
+
     public function register(array $data): User
     {
         try {
-            return DB::transaction(function () use ($data) {
-                $referrer = null;
+            $referrer = null;
 
+            $user = DB::transaction(function () use ($data, &$referrer) {
                 if (! blank($data['referral_code'] ?? null)) {
                     $referrer = ReferralService::validateForRegistration($data['referral_code']);
                 }
@@ -56,6 +59,14 @@ class RegistrationService
 
                 return $user;
             });
+
+            if ($referrer) {
+                $this->ranks->evaluateUserAndUpline($user);
+            } else {
+                $this->ranks->promoteIfEligible($user);
+            }
+
+            return $user;
         } catch (InvalidArgumentException $e) {
             throw ValidationException::withMessages([
                 'referral_code' => $e->getMessage(),

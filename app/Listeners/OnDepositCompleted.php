@@ -5,21 +5,23 @@ namespace App\Listeners;
 use App\Events\DepositCompleted;
 use App\Notifications\DepositSuccessful;
 use App\Services\Commission\CommissionService;
+use App\Services\Rank\RankService;
 use App\Services\Return\ReturnService;
 
 /**
  * Post-deposit pipeline:
  *  1. create pending return record (rate locked at creation)
  *  2. direct referral commission (if enabled)
- *  3. notify the member
+ *  3. instant rank evaluation + incentive for the donor and upline
+ *  4. notify the member
  */
 class OnDepositCompleted
 {
     public function __construct(
         private readonly ReturnService $returns,
         private readonly CommissionService $commissions,
-    ) {
-    }
+        private readonly RankService $ranks,
+    ) {}
 
     public function handle(DepositCompleted $event): void
     {
@@ -29,7 +31,12 @@ class OnDepositCompleted
         // 2) Direct commission on referred member's deposit
         $this->commissions->handleDepositCompleted($event->deposit);
 
-        // 3) Member notification
+        // 3) Instant rank evaluation for the donor and upline whose hand volume changed
+        if ($event->deposit->user) {
+            $this->ranks->evaluateUserAndUpline($event->deposit->user);
+        }
+
+        // 4) Member notification
         $event->deposit->user->notify(new DepositSuccessful([
             'message' => sprintf(
                 'Your deposit of %s was confirmed. Sequence number: #%011d.',

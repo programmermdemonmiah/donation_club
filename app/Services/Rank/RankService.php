@@ -14,6 +14,7 @@ use App\Services\Referral\ReferralService;
 use App\Services\Settings\SettingsService;
 use App\Support\Money;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Evaluates rank requirements against live team metrics and promotes members.
@@ -179,11 +180,15 @@ class RankService
     }
 
     /**
-     * Promote if the evaluated target is higher than the current rank.
-     * Returns true when a promotion happened.
+     * Promote every filled rank above the current one, in order, so each
+     * rank's one-time incentive can be paid. Returns true when any promotion happened.
      */
     public function promoteIfEligible(User $user, ?int $actorId = null): bool
     {
+        if ($user->isAdmin() || ! $user->isActive()) {
+            return false;
+        }
+
         $metrics = $this->metrics($user);
         $target = $this->evaluateTarget($user, $metrics);
 
@@ -192,7 +197,6 @@ class RankService
         }
 
         return DB::transaction(function () use ($user, $target, $metrics, $actorId) {
-            // Lock user's rank rows to avoid double promotion under concurrency.
             UserRank::query()->where('user_id', $user->id)->lockForUpdate()->get();
 
             $current = UserRank::query()
@@ -200,38 +204,78 @@ class RankService
                 ->where('status', UserRankStatus::Active->value)
                 ->first();
 
-            if ($current && $current->rank_id >= $target->id) {
+            $currentLevel = $current
+                ? (int) Rank::query()->whereKey($current->rank_id)->value('level')
+                : 0;
+
+            if ($currentLevel >= (int) $target->level) {
                 return false;
             }
 
-            $oldRankId = $current?->rank_id;
+            $ranksToAward = Rank::query()
+                ->where('active', true)
+                ->where('level', '>', $currentLevel)
+                ->where('level', '<=', (int) $target->level)
+                ->orderBy('level')
+                ->get();
 
-            if ($current) {
-                $current->forceFill(['status' => UserRankStatus::Superseded->value])->save();
+            $previousRankId = $current?->rank_id;
+            $promoted = false;
+
+            foreach ($ranksToAward as $rank) {
+                if ($current) {
+                    $current->delete();
+                }
+
+                $current = UserRank::create([
+                    'user_id' => $user->id,
+                    'rank_id' => $rank->id,
+                    'status' => UserRankStatus::Active->value,
+                    'metrics_snapshot' => $metrics,
+                    'achieved_at' => now(),
+                ]);
+
+                RankHistory::create([
+                    'user_id' => $user->id,
+                    'old_rank_id' => $previousRankId,
+                    'new_rank_id' => $rank->id,
+                    'reason' => 'Automated requirement evaluation',
+                    'changed_by' => $actorId,
+                ]);
+
+                AuditLogService::log('rank.promoted', $user, ['rank' => $previousRankId], ['rank' => $rank->id]);
+
+                RankAchieved::dispatch($user->refresh(), $rank);
+
+                $previousRankId = $rank->id;
+                $promoted = true;
             }
 
-            UserRank::create([
-                'user_id' => $user->id,
-                'rank_id' => $target->id,
-                'status' => UserRankStatus::Active->value,
-                'metrics_snapshot' => $metrics,
-                'achieved_at' => now(),
-            ]);
-
-            RankHistory::create([
-                'user_id' => $user->id,
-                'old_rank_id' => $oldRankId,
-                'new_rank_id' => $target->id,
-                'reason' => 'Automated requirement evaluation',
-                'changed_by' => $actorId,
-            ]);
-
-            AuditLogService::log('rank.promoted', $user, ['rank' => $oldRankId], ['rank' => $target->id]);
-
-            RankAchieved::dispatch($user->refresh(), $target);
-
-            return true;
+            return $promoted;
         });
+    }
+
+    /**
+     * Instant evaluation for a member and every upline whose hand volume may have changed.
+     */
+    public function evaluateUserAndUpline(User $user): void
+    {
+        $this->promoteSafely($user);
+
+        foreach (ReferralService::upline($user) as $entry) {
+            $this->promoteSafely($entry['user']);
+        }
+    }
+
+    private function promoteSafely(User $user): bool
+    {
+        try {
+            return $this->promoteIfEligible($user);
+        } catch (Throwable $e) {
+            report($e);
+
+            return false;
+        }
     }
 
     /**
@@ -247,7 +291,7 @@ class RankService
             ->orderBy('id')
             ->chunkById($chunkSize, function ($users) use (&$promoted) {
                 foreach ($users as $user) {
-                    if ($this->promoteIfEligible($user)) {
+                    if ($this->promoteSafely($user)) {
                         $promoted++;
                     }
                 }

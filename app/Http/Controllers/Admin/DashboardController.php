@@ -14,6 +14,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\WalletTransaction;
 use App\Models\Withdrawal;
+use App\Services\Rank\RankService;
 use App\Services\Settings\SettingsService;
 use App\Support\Money;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +23,19 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __construct(private readonly SettingsService $settings) {}
+    public function __construct(
+        private readonly SettingsService $settings,
+        private readonly RankService $ranks,
+    ) {}
 
     public function index(): Response
     {
+        try {
+            $this->ranks->evaluateAll();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         $userStats = User::query()
             ->selectRaw('COUNT(*) as total')
             ->selectRaw("SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active")

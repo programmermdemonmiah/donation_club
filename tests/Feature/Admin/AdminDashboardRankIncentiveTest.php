@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\UserRankStatus;
 use App\Enums\WalletTransactionStatus;
 use App\Enums\WalletTransactionType;
 use App\Models\Rank;
+use App\Models\UserRank;
 use App\Models\WalletTransaction;
 use App\Services\Wallet\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,6 +36,13 @@ class AdminDashboardRankIncentiveTest extends TestCase
         ])->save();
         WalletService::credit($excludedMember, '25.00', WalletTransactionType::MonthlySalary, $bronze, 'Monthly salary for holding Bronze rank');
         WalletService::credit($excludedMember, '5.00', WalletTransactionType::Commission, null, 'Generation 1 commission');
+
+        UserRank::query()->create([
+            'user_id' => $excludedMember->id,
+            'rank_id' => $bronze->id,
+            'status' => UserRankStatus::Active,
+            'achieved_at' => now(),
+        ]);
 
         $this->actingAs($admin)
             ->get('/admin')

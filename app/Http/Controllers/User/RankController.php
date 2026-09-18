@@ -18,6 +18,9 @@ class RankController extends Controller
     {
         $user = Auth::user();
 
+        $this->ranks->promoteIfEligible($user);
+        $user->unsetRelation('activeRank');
+
         $metrics = $this->ranks->metrics($user);
         $current = $this->ranks->currentRank($user);
 
