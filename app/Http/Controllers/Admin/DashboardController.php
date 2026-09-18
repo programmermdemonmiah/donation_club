@@ -58,6 +58,7 @@ class DashboardController extends Controller
 
         $commissionAgg = Commission::query()
             ->selectRaw("COALESCE(SUM(CASE WHEN status = 'completed' THEN amount END),0) as total")
+            ->selectRaw("COUNT(DISTINCT CASE WHEN status = 'completed' THEN user_id END) as users")
             ->selectRaw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count")
             ->first();
 
@@ -104,7 +105,8 @@ class DashboardController extends Controller
                     'pending' => (int) ($returnsAgg->pending_count ?? 0),
                 ],
                 'commissions' => [
-                    'total' => (string) ($commissionAgg->total ?? '0'),
+                    'total' => Money::parse($commissionAgg->total ?? '0'),
+                    'users' => (int) ($commissionAgg->users ?? 0),
                     'pending' => (int) ($commissionAgg->pending_count ?? 0),
                 ],
                 'profit' => [

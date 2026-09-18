@@ -11,7 +11,7 @@ interface Stats {
     deposits: { total_amount: string; count: number; today_amount: string; pending_payments: number };
     transfers: { total: string; users: number };
     returns: { total_payout: string; count: number; pending: number };
-    commissions: { total: string; pending: number };
+    commissions: { total: string; users: number; pending: number };
     profit: { total: string; users: number };
     withdrawals: { total: string; count: number; pending: number };
     referrals: { relationships: number };
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
                 <StatCard label="Today's Deposits" value={formatMoney(s.deposits.today_amount)} accent="text-blue-600" />
                 <StatCard label="Pending Payments" value={s.deposits.pending_payments} accent="text-blue-600" />
                 <StatCard label="Support Provided" value={formatMoney(s.returns.total_payout)} sub={`${s.returns.pending} pending`} />
-                <StatCard label="Donations Shared" value={formatMoney(s.commissions.total)} />
+                <StatCard label="Total Generation Cost" value={formatMoney(s.commissions.total)} sub={`${s.commissions.users} users completed`} />
                 <StatCard label="Total Profit Cost" value={formatMoney(s.profit.total)} sub={`${s.profit.users} users completed`} />
                 <StatCard label="Withdrawals Paid" value={formatMoney(s.withdrawals.total)} sub={`${s.withdrawals.count} completed`} />
                 <StatCard label="Pending Withdrawals" value={s.withdrawals.pending} accent="text-blue-600" />
