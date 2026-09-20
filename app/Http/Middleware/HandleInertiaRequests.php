@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'company' => [
-                'name' => $settings->get('company.name', 'Donation Club LTD'),
+                'name' => $settings->get('company.name', 'Donation Club'),
                 'registration' => $settings->get('company.registration', '13589920'),
                 'address' => $settings->get('company.address', '71-75 Shelton Street, London, UK'),
                 'phone' => $settings->get('company.phone', '+44 20 7946 0958'),

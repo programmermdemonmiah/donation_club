@@ -16,7 +16,7 @@ Route::get('/nai/kono/migration', function () {
         Artisan::call('migrate');
 
         // :fresh', [
-        //             '--seed' => true,
+        //                '--seed' => true,
         //             '--force' => true,
         //         ]
         return 'Migration run successfully<br><pre>'.e(Artisan::output()).'</pre>';
