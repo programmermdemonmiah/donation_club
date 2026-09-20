@@ -92,31 +92,45 @@ class DatabaseSeeder extends Seeder
 
     private function seedCommissionRules(): void
     {
-        $rules = [
-            // direct referral commission on referred member's completed deposit
-            ['name' => 'Direct Referral Commission', 'scope' => 'direct', 'generation' => 1, 'percentage' => '5.000', 'trigger_event' => 'deposit'],
-            // generation commissions triggered by member return payouts
-            ['name' => 'Generation 2 Commission', 'scope' => 'generation', 'generation' => 2, 'percentage' => '2.000', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 3 Commission', 'scope' => 'generation', 'generation' => 3, 'percentage' => '1.000', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 4 Commission', 'scope' => 'generation', 'generation' => 4, 'percentage' => '0.500', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 5 Commission', 'scope' => 'generation', 'generation' => 5, 'percentage' => '0.400', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 6 Commission', 'scope' => 'generation', 'generation' => 6, 'percentage' => '0.300', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 7 Commission', 'scope' => 'generation', 'generation' => 7, 'percentage' => '0.200', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 8 Commission', 'scope' => 'generation', 'generation' => 8, 'percentage' => '0.100', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 9 Commission', 'scope' => 'generation', 'generation' => 9, 'percentage' => '0.100', 'trigger_event' => 'return_payout'],
-            ['name' => 'Generation 10 Commission', 'scope' => 'generation', 'generation' => 10, 'percentage' => '0.100', 'trigger_event' => 'return_payout'],
+        $ladder = [
+            1 => '5.000',
+            2 => '2.000',
+            3 => '1.000',
+            4 => '0.500',
+            5 => '0.400',
+            6 => '0.300',
+            7 => '0.200',
+            8 => '0.100',
+            9 => '0.100',
+            10 => '0.100',
         ];
 
-        foreach ($rules as $rule) {
-            CommissionRule::query()->updateOrCreate([
-                'trigger_event' => $rule['trigger_event'],
-                'generation' => $rule['generation'],
-            ], [
-                'name' => $rule['name'],
-                'scope' => $rule['scope'],
-                'percentage' => $rule['percentage'],
-                'enabled' => true,
-            ]);
+        foreach ($ladder as $generation => $percentage) {
+            CommissionRule::query()->updateOrCreate(
+                [
+                    'trigger_event' => 'deposit',
+                    'generation' => $generation,
+                ],
+                [
+                    'name' => "Generation {$generation} – Deposit",
+                    'scope' => $generation === 1 ? 'direct' : 'generation',
+                    'percentage' => $percentage,
+                    'enabled' => true,
+                ],
+            );
+
+            CommissionRule::query()->updateOrCreate(
+                [
+                    'trigger_event' => 'return_payout',
+                    'generation' => $generation,
+                ],
+                [
+                    'name' => "Generation {$generation} – Return",
+                    'scope' => 'generation',
+                    'percentage' => $percentage,
+                    'enabled' => true,
+                ],
+            );
         }
     }
 
